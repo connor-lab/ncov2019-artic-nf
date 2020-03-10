@@ -29,6 +29,6 @@ dependencies:
   - artic-network::rampart=1.0
   - pip
   - pip:
-    - git+https://github.com/connor-lab/fieldbioinformatics.git@flongle-gather
+    - git+https://github.com/artic-network/fieldbioinformatics.git
     - git+https://github.com/artic-network/Porechop.git@v0.3.2pre
     - binlorry==1.3.0_alpha1
