@@ -94,7 +94,7 @@ process articMinION {
     if ( bcFastqPass =~ /.*_NB\d{2}.fastq$/ ) {
         sampleName = ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][0]
     } else {
-        sampleName = params.runDirectory
+        sampleName = params.runPrefix
     }
 
     if ( params.normalise )
@@ -105,7 +105,7 @@ process articMinION {
             --threads ${task.cpus} \
             --scheme-directory ${schemeRepo}/${params.schemeDir} \
             --read-file ${bcFastqPass} \
-            --nanopolish-read-file nanopolish/${params.runDirectory}_fastq_pass.fastq \
+            --nanopolish-read-file nanopolish/${params.runPrefix}_fastq_pass.fastq \
             ${params.scheme}/${params.schemeVersion} \
             ${sampleName}
             """
@@ -116,7 +116,7 @@ process articMinION {
             --threads ${task.cpus} \
             --scheme-directory ${schemeRepo}/${params.schemeDir} \
             --read-file ${bcFastqPass} \
-            --nanopolish-read-file nanopolish/${params.runDirectory}_fastq_pass.fastq \
+            --nanopolish-read-file nanopolish/${params.runPrefix}_fastq_pass.fastq \
             ${params.scheme}/${params.schemeVersion} \
             ${sampleName}
             """
@@ -127,7 +127,7 @@ process articMinION {
             --threads ${task.cpus} \
             --scheme-directory ${schemeRepo}/${params.schemeDir} \
             --read-file ${bcFastqPass} \
-            --nanopolish-read-file nanopolish/${params.runDirectory}_fastq_pass.fastq \
+            --nanopolish-read-file nanopolish/${params.runPrefix}_fastq_pass.fastq \
             ${params.scheme}/${params.schemeVersion} \
             ${sampleName}
             """
@@ -136,7 +136,7 @@ process articMinION {
             artic minion --threads ${task.cpus} \
             --scheme-directory ${schemeRepo}/${params.schemeDir} \
             --read-file ${bcFastqPass} \
-            --nanopolish-read-file nanopolish/${params.runDirectory}_fastq_pass.fastq \
+            --nanopolish-read-file nanopolish/${params.runPrefix}_fastq_pass.fastq \
             ${params.scheme}/${params.schemeVersion} \
             ${sampleName}
             """
