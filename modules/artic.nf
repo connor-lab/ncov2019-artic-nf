@@ -3,6 +3,8 @@
 process articDownloadScheme{
     tag params.schemeRepoURL
 
+    label 'internet'
+
     publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "scheme", mode: "copy"
 
     output:
@@ -15,40 +17,40 @@ process articDownloadScheme{
 }
 
 process articGather {
-    tag params.runDirectory
+    tag params.runPrefix
 
-    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runDirectory}_fastq_pass.fastq", mode: "copy"
-    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runDirectory}_sequencing_summary.txt", mode: "copy"
+    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runPrefix}_fastq_pass.fastq", mode: "copy"
+    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runPrefix}_sequencing_summary.txt", mode: "copy"
 
     input:
     file(runDirectory)
 
     output:
-    tuple file("${params.runDirectory}_fastq_pass.fastq"), file("${params.runDirectory}_sequencing_summary.txt"), emit: gathered
-    path "${params.runDirectory}_fastq_pass.fastq", emit: fastq
+    tuple file("${params.runPrefix}_fastq_pass.fastq"), file("${params.runPrefix}_sequencing_summary.txt"), emit: gathered
+    path "${params.runPrefix}_fastq_pass.fastq", emit: fastq
 
     script:
     """
     artic gather \
     --min-length ${params.min_length} \
     --max-length ${params.max_length} \
-    --prefix ${params.runDirectory} \
+    --prefix ${params.runPrefix} \
     --directory ${runDirectory} 
     """
 }
 
 process articDemultiplex {
-    tag params.runDirectory
+    tag params.runPrefix
 
     cpus 4
 
-    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runDirectory}_pass_NB*.fastq", mode: "copy"
+    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runPrefix}_pass_NB*.fastq", mode: "copy"
 
     input:
     tuple file(fastqPass), file(sequencingSummary)
 
     output:
-    file "${params.runDirectory}_pass_NB*.fastq", emit: demultiplexed
+    file "${params.runPrefix}_pass_NB*.fastq", emit: demultiplexed
 
     script:
     """
@@ -57,7 +59,7 @@ process articDemultiplex {
 }
 
 process nanopolishIndex {
-   tag params.runDirectory
+   tag params.runPrefix
 
    cpus 1
 
