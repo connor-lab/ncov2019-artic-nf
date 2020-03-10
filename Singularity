@@ -1,0 +1,22 @@
+Bootstrap: docker
+From: continuumio/miniconda3:latest
+%files
+environment.yml /
+%labels
+authors="Matt Bull" 
+description="Docker image containing all requirements for the ARTIC project's ncov2019 pipeline"
+%post
+
+apt-get update && apt-get install -y g++ git make procps && apt-get clean -y
+/opt/conda/bin/conda env create -f /environment.yml && /opt/conda/bin/conda clean -a
+PATH=/opt/conda/envs/artic-ncov2019/bin:$PATH
+
+%environment
+export PATH=/opt/conda/envs/artic-ncov2019/bin:$PATH
+
+%runscript
+
+exec "/opt/conda/envs/artic-ncov2019/bin/artic" "$@"
+
+%startscript
+/opt/conda/envs/artic-ncov2019/bin/rampart "$@"
