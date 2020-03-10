@@ -81,7 +81,7 @@ process articMinION {
 
     cpus 4
 
-    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${sampleName}*", mode: "copy"
+    publishDir "${params.outdir}/${task.process.split(":")[1]}/${sampleName}", pattern: "${sampleName}*", mode: "copy"
 
     input:
     tuple file("nanopolish/*"), file(bcFastqPass), file("nanopolish/*"), file(schemeRepo), file(runDirectory)
