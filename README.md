@@ -17,10 +17,13 @@ An up-to-date version of Nextflow is required because the pipeline is written in
 This repo contains both [Singularity]("https://sylabs.io/guides/3.0/user-guide/index.html") and Dockerfiles. The containers will be available from Docker/Singularityhub shortly.
 
 ##### Conda
-The repo contains an environment.yml file which automatically builds the correct conda env if `--profile conda` is specifed in the command. Although you'll need `conda` installed, this is probably the easiest way to run this pipeline.
+The repo contains an environment.yml file which automatically builds the correct conda env if `-profile conda` is specifed in the command. Although you'll need `conda` installed, this is probably the easiest way to run this pipeline.
 
 ##### Executors
 By default, the pipeline just runs on the local machine. You can specify `-profile slurm` to use a SLURM cluster. Additional [config]("https://www.nextflow.io/docs/latest/executor.html#slurm") can be added with `-c /path/to/config.nf`. 
+
+##### Profiles
+You can use multiple profiles at once, separating them with a comma. This is described in the Nextflow [documentation](https://www.nextflow.io/docs/latest/config.html#config-profiles) 
 
 ##### Config
 Configuration options are set in `conf/base.config`. They are described and set to sensible defaults (as suggested in the [nCoV-2019 novel coronavirus bioinformatics protocol](https://artic.network/ncov-2019/ncov2019-bioinformatics-sop.html "nCoV-2019 novel coronavirus bioinformatics protocol"))
