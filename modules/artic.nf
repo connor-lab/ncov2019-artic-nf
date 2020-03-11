@@ -19,6 +19,8 @@ process articDownloadScheme{
 process articGather {
     tag params.runPrefix
 
+    label 'largemem'
+
     publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runPrefix}_fastq_pass.fastq", mode: "copy"
     publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runPrefix}_sequencing_summary.txt", mode: "copy"
 
@@ -61,6 +63,8 @@ process articDemultiplex {
 process nanopolishIndex {
    tag params.runPrefix
 
+   label 'largemem'
+
    cpus 1
 
    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${fastqPass}.index*", mode: "copy"
@@ -82,7 +86,7 @@ process nanopolishIndex {
 process articMinION {
     tag { sampleName }
 
-    cpus 4
+    cpus 10
 
     publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${sampleName}.*", mode: "copy"
 
@@ -101,6 +105,7 @@ process articMinION {
     if ( params.normalise )
         if ( params.minimap )
             """
+            ln -s ${runDirectory}/fast5_pass .
             artic minion --minimap \
             --normalise ${params.normalise} \
             --threads ${task.cpus} \
@@ -112,6 +117,7 @@ process articMinION {
             """
         else 
             """
+            ln -s ${runDirectory}/fast5_pass .
             artic minion \
             --normalise ${params.normalise}
             --threads ${task.cpus} \
@@ -124,6 +130,7 @@ process articMinION {
     else
         if ( params.minimap )
             """
+            ln -s ${runDirectory}/fast5_pass .
             artic minion --minimap \
             --threads ${task.cpus} \
             --scheme-directory ${schemeRepo}/${params.schemeDir} \
@@ -134,6 +141,7 @@ process articMinION {
             """
         else
             """
+            ln -s ${runDirectory}/fast5_pass .
             artic minion --threads ${task.cpus} \
             --scheme-directory ${schemeRepo}/${params.schemeDir} \
             --read-file ${bcFastqPass} \
