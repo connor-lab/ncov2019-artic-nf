@@ -73,7 +73,8 @@ process nanopolishIndex {
 
    script:
    """
-   nanopolish index -s ${sequencingSummary} -d ${runDirectory}/fast5_pass ${fastqPass}
+   ln -s ${runDirectory}/fast5_pass .
+   nanopolish index -s ${sequencingSummary} -d fast5_pass ${fastqPass}
    """
 }
 
@@ -83,7 +84,7 @@ process articMinION {
 
     cpus 4
 
-    publishDir "${params.outdir}/${task.process.split(":")[1]}/${sampleName}", pattern: "${sampleName}*", mode: "copy"
+    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${sampleName}.*", mode: "copy"
 
     input:
     tuple file("nanopolish/*"), file(bcFastqPass), file("nanopolish/*"), file(schemeRepo), file(runDirectory)
