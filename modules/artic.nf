@@ -94,6 +94,7 @@ process articMinION {
     tuple file("nanopolish/*"), file(bcFastqPass), file("nanopolish/*"), file(schemeRepo), file(runDirectory)
 
     output:
+    file("${sampleName}.*")
 
     script:
     if ( bcFastqPass =~ /.*_NB\d{2}.fastq$/ ) {
