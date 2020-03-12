@@ -57,15 +57,15 @@ process articGather {
 process articDemultiplex {
     tag params.runPrefix
 
-    cpus 4
+    cpus 10
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_pass_NB*.fastq", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_fastq_pass_NB*.fastq", mode: "copy"
 
     input:
     tuple file(fastqPass), file(sequencingSummary)
 
     output:
-    file "${params.runPrefix}*.fastq"
+    file "${params.runPrefix}_fastq_pass-NB*.fastq"
 
     script:
     """
@@ -90,7 +90,8 @@ process nanopolishIndex {
 
    script:
    """
-   ln -s ${runDirectory}/fast5_pass .
+   mkdir fast5_pass
+   find \$(pwd)/${runDirectory}/fast5_pass -name "*.fast5" -exec ln -s {} fast5_pass \\;
    nanopolish index -s ${sequencingSummary} -d fast5_pass ${fastqPass}
    """
 }
@@ -119,7 +120,9 @@ process articMinION {
     if ( params.normalise )
         if ( params.minimap )
             """
-            ln -s ${runDirectory}/fast5_pass .
+            mkdir fast5_pass
+            find \$(pwd)/${runDirectory}/fast5_pass -name "*.fast5" -exec ln -s {} fast5_pass \\;
+
             artic minion --minimap \
             --normalise ${params.normalise} \
             --threads ${task.cpus} \
@@ -131,7 +134,9 @@ process articMinION {
             """
         else 
             """
-            ln -s ${runDirectory}/fast5_pass .
+            mkdir fast5_pass
+            find \$(pwd)/${runDirectory}/fast5_pass -name "*.fast5" -exec ln -s {} fast5_pass \\;
+            
             artic minion \
             --normalise ${params.normalise}
             --threads ${task.cpus} \
@@ -144,7 +149,9 @@ process articMinION {
     else
         if ( params.minimap )
             """
-            ln -s ${runDirectory}/fast5_pass .
+            mkdir fast5_pass
+            find \$(pwd)/${runDirectory}/fast5_pass -name "*.fast5" -exec ln -s {} fast5_pass \\;
+ 
             artic minion --minimap \
             --threads ${task.cpus} \
             --scheme-directory ${schemeRepo}/${params.schemeDir} \
@@ -155,7 +162,9 @@ process articMinION {
             """
         else
             """
-            ln -s ${runDirectory}/fast5_pass .
+            mkdir fast5_pass
+            find \$(pwd)/${runDirectory}/fast5_pass -name "*.fast5" -exec ln -s {} fast5_pass \\;
+
             artic minion --threads ${task.cpus} \
             --scheme-directory ${schemeRepo}/${params.schemeDir} \
             --read-file ${bcFastqPass} \
