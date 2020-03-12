@@ -59,7 +59,7 @@ process articDemultiplex {
 
     cpus 10
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_fastq_pass_NB*.fastq", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_fastq_pass-NB*.fastq", mode: "copy"
 
     input:
     tuple file(fastqPass), file(sequencingSummary)
@@ -111,8 +111,8 @@ process articMinION {
     file("${sampleName}.*")
 
     script:
-    if ( bcFastqPass =~ /.*_NB\d{2}.fastq$/ ) {
-        sampleName = ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][0]
+    if ( bcFastqPass =~ /.*NB\d{2}.fastq$/ ) {
+        sampleName = ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][1]
     } else {
         sampleName = params.runPrefix
     }
@@ -138,7 +138,7 @@ process articMinION {
             find \$(pwd)/${runDirectory}/fast5_pass -name "*.fast5" -exec ln -s {} fast5_pass \\;
             
             artic minion \
-            --normalise ${params.normalise}
+            --normalise ${params.normalise} \
             --threads ${task.cpus} \
             --scheme-directory ${schemeRepo}/${params.schemeDir} \
             --read-file ${bcFastqPass} \
