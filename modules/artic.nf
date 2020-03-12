@@ -5,7 +5,7 @@ process articDownloadScheme{
 
     label 'internet'
 
-    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "scheme", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "scheme", mode: "copy"
 
     output:
     file("scheme")
@@ -21,8 +21,8 @@ process articGather {
 
     label 'largemem'
 
-    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runPrefix}_fastq_pass.fastq", mode: "copy"
-    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runPrefix}_sequencing_summary.txt", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_fastq_pass.fastq", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_sequencing_summary.txt", mode: "copy"
 
     input:
     file(runDirectory)
@@ -32,13 +32,26 @@ process articGather {
     path "${params.runPrefix}_fastq_pass.fastq", emit: fastq
 
     script:
-    """
-    artic gather \
-    --min-length ${params.min_length} \
-    --max-length ${params.max_length} \
-    --prefix ${params.runPrefix} \
-    --directory ${runDirectory} 
-    """
+    if ( params.barcode ) 
+        """
+        artic gather \
+        --min-length ${params.min_length} \
+        --max-length ${params.max_length} \
+        --prefix ${params.runPrefix} \
+        --directory ${runDirectory}
+
+        cat ${params.runPrefix}_barcode*.fastq ${params.runPrefix}_unclassified.fastq > ${params.runPrefix}_fastq_pass.fastq
+        """
+    else
+        """
+        artic gather \
+        --min-length ${params.min_length} \
+        --max-length ${params.max_length} \
+        --prefix ${params.runPrefix} \
+        --directory ${runDirectory}
+        """
+
+ 
 }
 
 process articDemultiplex {
@@ -46,13 +59,13 @@ process articDemultiplex {
 
     cpus 4
 
-    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${params.runPrefix}_pass_NB*.fastq", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_pass_NB*.fastq", mode: "copy"
 
     input:
     tuple file(fastqPass), file(sequencingSummary)
 
     output:
-    file "${params.runPrefix}_pass_NB*.fastq", emit: demultiplexed
+    file "${params.runPrefix}*.fastq"
 
     script:
     """
@@ -67,7 +80,7 @@ process nanopolishIndex {
 
    cpus 1
 
-   publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${fastqPass}.index*", mode: "copy"
+   publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${fastqPass}.index*", mode: "copy"
 
    input:
    tuple file(fastqPass), file(sequencingSummary), file(runDirectory)
@@ -88,7 +101,7 @@ process articMinION {
 
     cpus 10
 
-    publishDir "${params.outdir}/${task.process.split(":")[1]}", pattern: "${sampleName}.*", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
 
     input:
     tuple file("nanopolish/*"), file(bcFastqPass), file("nanopolish/*"), file(schemeRepo), file(runDirectory)
