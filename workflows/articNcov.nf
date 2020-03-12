@@ -27,10 +27,11 @@ workflow articNcov {
       if(params.barcode) {
           articDemultiplex(articGather.out.gathered)
           
-          articMinION(articDemultiplex.out.flatten()
-                                          .combine(nanopolishIndex.out.toList())
-                                          .combine(articDownloadScheme.out)
-                                          .combine(ch_runDirectory))
+          articMinION(articGather.out.fastq
+                                     .combine(articDemultiplex.out.flatten())
+                                     .combine(nanopolishIndex.out.toList())
+                                     .combine(articDownloadScheme.out)
+                                     .combine(ch_runDirectory))
 
       } else {
           articMinION(articGather.out.fastq
