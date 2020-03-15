@@ -1,5 +1,5 @@
 .nextflow*
 nextflow
 results
-artic-ncov2019.sif
+*.sif
 work

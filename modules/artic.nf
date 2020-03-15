@@ -57,7 +57,7 @@ process articGather {
 process articDemultiplex {
     tag params.runPrefix
 
-    cpus 10
+    label 'largecpu'
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_fastq_pass-NB*.fastq", mode: "copy"
 
@@ -96,10 +96,10 @@ process nanopolishIndex {
 }
 
 
-process articMinION {
+process articMinIONNanopolish {
     tag { sampleName }
 
-    cpus 10
+    label 'largecpu'
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
 
@@ -168,3 +168,69 @@ process articMinION {
             ${sampleName}
             """
 }
+
+process articMinIONMedaka {
+    tag { sampleName }
+
+    label 'largecpu'
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
+
+    input:
+    tuple file(bcFastqPass), file(schemeRepo), file(runDirectory)
+
+    output:
+    file("${sampleName}.*")
+
+    script:
+    if ( bcFastqPass =~ /.*NB\d{2}.fastq$/ ) {
+        sampleName = ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][1]
+    } else {
+        sampleName = params.runPrefix
+    }
+
+    if ( params.normalise )
+        if ( params.minimap )
+            """
+            artic minion --medaka \
+            --minimap \
+            --normalise ${params.normalise} \
+            --threads ${task.cpus} \
+            --scheme-directory ${schemeRepo}/${params.schemeDir} \
+            --read-file ${bcFastqPass} \
+            ${params.scheme}/${params.schemeVersion} \
+            ${sampleName}
+            """
+        else
+            """
+            artic minion --medaka \
+            --normalise ${params.normalise} \
+            --threads ${task.cpus} \
+            --scheme-directory ${schemeRepo}/${params.schemeDir} \
+            --read-file ${bcFastqPass} \
+            ${params.scheme}/${params.schemeVersion} \
+            ${sampleName}
+            """
+    else
+        if ( params.minimap )
+            """
+            artic minion --medaka \
+            --minimap \
+            --threads ${task.cpus} \
+            --scheme-directory ${schemeRepo}/${params.schemeDir} \
+            --read-file ${bcFastqPass} \
+            ${params.scheme}/${params.schemeVersion} \
+            ${sampleName}
+            """
+        else
+            """
+            artic minion --medaka \
+            --threads ${task.cpus} \
+            --scheme-directory ${schemeRepo}/${params.schemeDir} \
+            --read-file ${bcFastqPass} \
+            ${params.scheme}/${params.schemeVersion} \
+            ${sampleName}
+            """
+}
+
+

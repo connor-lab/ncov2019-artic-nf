@@ -11,10 +11,10 @@ This Nextflow pipeline automates the ARTIC network [nCoV-2019 novel coronavirus 
 `nextflow run connor-lab/ncov2019-artic-nf [-c /path/to/additional_config.nf]  [-profile conda,singularity,docker,slurm] [--minimap] [--barcode] --directory /path/to/reads`
 
 ##### Installation
-An up-to-date version of Nextflow is required because the pipeline is written in DSL2. Following the instructions at https://www.nextflow.io/ to download and install Nextflow should get you a recent-enough version.
+An up-to-date version of Nextflow is required because the pipeline is written in DSL2. Following the instructions at https://www.nextflow.io/ to download and install Nextflow should get you a recent-enough version. 
 
 ##### Containers
-This repo contains both [Singularity]("https://sylabs.io/guides/3.0/user-guide/index.html") and Dockerfiles. The containers will be available from Docker/Singularityhub shortly.
+This repo contains both [Singularity]("https://sylabs.io/guides/3.0/user-guide/index.html") and Dockerfiles. You can build the Singularity containers locally by running `scripts/build_singularity_containers.sh` and use them with `-profile singularity` The containers will be available from Docker/Singularityhub shortly.
 
 ##### Conda
 The repo contains an environment.yml file which automatically builds the correct conda env if `-profile conda` is specifed in the command. Although you'll need `conda` installed, this is probably the easiest way to run this pipeline.
@@ -42,4 +42,4 @@ The only required option is `--directory`, which should point to a nanopore outp
 - sequencing_summary_ACG216_1e627889.txt
 - throughput_ACG216_1e627889.csv
 
-Use `--minimap` to swap to minimap for mapping, and `--barcode` if you ran with barcodes.
+Use `--minimap` to swap to minimap for mapping, `--barcode` if you ran with barcodes, and `--medaka` to run the experimental medaka version of the pipeline.

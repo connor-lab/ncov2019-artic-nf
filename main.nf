@@ -4,7 +4,8 @@
 nextflow.preview.dsl = 2
 
 // import subworkflows
-include {articNcov} from './workflows/articNcov.nf' params(params)
+include {articNcovNanopolish} from './workflows/articNcovNanopolish.nf' params(params)
+include {articNcovMedaka} from './workflows/articNcovMedaka.nf' params(params)
 
 
 // main workflow
@@ -16,6 +17,10 @@ workflow {
 
 
    main:
-     articNcov(ch_runDirectory)
+     if( params.medaka ) {
+         articNcovMedaka(ch_runDirectory)
+     } else {
+         articNcovNanopolish(ch_runDirectory)
+     }
 }
 
