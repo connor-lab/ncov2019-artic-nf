@@ -102,7 +102,7 @@ process trimPrimerSequences {
         tuple(path(bedfile), sampleName, path(ref), path(bam))
 
     output:
-        path("${sampleName}.mapped.primertrimmed.sorted.bam")
+        tuple(sampleName, path("${sampleName}.mapped.primertrimmed.sorted.bam"))
 
     script:
     if (params.allowNoprimer){
