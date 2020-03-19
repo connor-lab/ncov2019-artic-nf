@@ -9,7 +9,7 @@ include {articGather} from '../modules/artic.nf' params(params)
 include {articDemultiplex} from  '../modules/artic.nf' params(params)
 include {nanopolishIndex} from  '../modules/artic.nf' params(params)
 include {articMinIONMedaka} from  '../modules/artic.nf' params(params)
-
+include {articRemoveUnmappedReads} from '../modules/artic.nf' params(params)
 
 // workflow component for artic pipeline
 workflow articNcovMedaka {
@@ -27,10 +27,14 @@ workflow articNcovMedaka {
           articMinIONMedaka(articDemultiplex.out.flatten()
                                           .combine(articDownloadScheme.out)
                                           .combine(ch_runDirectory))
+          
+          articRemoveUnmappedReads(articMinIONMedaka.out.sorted_bam)
 
       } else {
           articMinIONMedaka(articGather.out.fastq
                                      .combine(articDownloadScheme.out)
                                      .combine(ch_runDirectory))
+
+          articRemoveUnmappedReads(articMinIONMedaka.out.sorted_bam)
       }
 }

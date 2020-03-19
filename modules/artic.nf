@@ -102,16 +102,18 @@ process articMinIONNanopolish {
     label 'largecpu'
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
+    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.consensus.fasta", mode: 'copy'
 
     input:
     tuple file("nanopolish/*"), file(bcFastqPass), file("nanopolish/*"), file(schemeRepo), file(runDirectory)
 
     output:
     file("${sampleName}.*")
+    tuple sampleName, file("${sampleName}.primertrimmed.sorted.bam"), emit: sorted_bam
 
     script:
     if ( bcFastqPass =~ /.*NB\d{2}.fastq$/ ) {
-        sampleName = ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][1]
+        sampleName = params.runPrefix + "-" + ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][1]
     } else {
         sampleName = params.runPrefix
     }
@@ -175,16 +177,18 @@ process articMinIONMedaka {
     label 'largecpu'
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
+    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.consensus.fasta", mode: 'copy'
 
     input:
     tuple file(bcFastqPass), file(schemeRepo), file(runDirectory)
 
     output:
     file("${sampleName}.*")
+    tuple sampleName, file("${sampleName}.primertrimmed.sorted.bam"), emit: sorted_bam
 
     script:
     if ( bcFastqPass =~ /.*NB\d{2}.fastq$/ ) {
-        sampleName = ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][1]
+        sampleName = params.runPrefix + "-" + ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][1]
     } else {
         sampleName = params.runPrefix
     }
@@ -233,4 +237,22 @@ process articMinIONMedaka {
             """
 }
 
+process articRemoveUnmappedReads {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
+
+    cpus 1
+
+    input:
+    tuple(sampleName, path(bamfile))
+
+    output:
+    file("${sampleName}.mapped.primertrimmed.sorted.bam")
+
+    script:
+    """
+    samtools view -F4 -o ${sampleName}.mapped.primertrimmed.sorted.bam ${bamfile} 
+    """
+}
 
