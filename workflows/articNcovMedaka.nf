@@ -11,8 +11,12 @@ include {nanopolishIndex} from  '../modules/artic.nf' params(params)
 include {articMinIONMedaka} from  '../modules/artic.nf' params(params)
 include {articRemoveUnmappedReads} from '../modules/artic.nf' params(params)
 
+include {collateSamples} from '../modules/upload.nf' params(params)
+include {uploadToCLIMB} from '../modules/upload.nf' params(params)
+
+
 // workflow component for artic pipeline
-workflow articNcovMedaka {
+workflow sequenceAnalysis {
     take:
       ch_runDirectory
     
@@ -34,7 +38,39 @@ workflow articNcovMedaka {
           articMinIONMedaka(articGather.out.fastq
                                      .combine(articDownloadScheme.out)
                                      .combine(ch_runDirectory))
-
+          
           articRemoveUnmappedReads(articMinIONMedaka.out.sorted_bam)
       }
+
+    emit:
+      bams = articRemoveUnmappedReads.out
+      fastas = articMinIONMedaka.out.consensus_fasta
 }
+
+workflow CLIMBrsync {
+    take:
+      ch_sequenceAnalysisBAMs
+      ch_sequenceAnalysisFastas
+      ch_CLIMBkey
+
+    main:
+      collateSamples(ch_sequenceAnalysisBAMs.join(ch_sequenceAnalysisFastas, by: 0))
+      uploadToCLIMB(ch_CLIMBkey.combine(collateSamples.out.collect().toList()))
+}
+
+workflow articNcovMedaka {
+    take:
+      ch_runDirectory
+
+    main:
+      sequenceAnalysis(ch_runDirectory)
+
+      if ( params.upload ) {
+
+        Channel.fromPath("${params.CLIMBkey}")
+               .set{ ch_CLIMBkey }
+
+        CLIMBrsync(sequenceAnalysis.out.bams, sequenceAnalysis.out.fastas, ch_CLIMBkey )
+      }
+}
+

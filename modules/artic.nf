@@ -110,6 +110,7 @@ process articMinIONNanopolish {
     output:
     file("${sampleName}.*")
     tuple sampleName, file("${sampleName}.primertrimmed.sorted.bam"), emit: sorted_bam
+    tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
 
     script:
     if ( bcFastqPass =~ /.*NB\d{2}.fastq$/ ) {
@@ -185,7 +186,8 @@ process articMinIONMedaka {
     output:
     file("${sampleName}.*")
     tuple sampleName, file("${sampleName}.primertrimmed.sorted.bam"), emit: sorted_bam
-
+    tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
+    
     script:
     if ( bcFastqPass =~ /.*NB\d{2}.fastq$/ ) {
         sampleName = params.runPrefix + "-" + ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][1]
@@ -248,7 +250,7 @@ process articRemoveUnmappedReads {
     tuple(sampleName, path(bamfile))
 
     output:
-    file("${sampleName}.mapped.primertrimmed.sorted.bam")
+    tuple( sampleName, file("${sampleName}.mapped.primertrimmed.sorted.bam"))
 
     script:
     """

@@ -11,7 +11,10 @@ include {readMapping} from '../modules/illumina.nf' params(params)
 include {trimPrimerSequences} from '../modules/illumina.nf' params(params)
 include {makeConsensus} from '../modules/illumina.nf' params(params)
 
-workflow ncovIllumina{
+include {collateSamples} from '../modules/upload.nf' params(params)
+include {uploadToCLIMB} from '../modules/upload.nf' params(params)
+
+workflow sequenceAnalysis {
     take:
       ch_filePairs
 
@@ -27,4 +30,37 @@ workflow ncovIllumina{
       trimPrimerSequences(makeIvarBedfile.out.combine(readMapping.out))
 
       makeConsensus(trimPrimerSequences.out)
+
+    emit:
+      bams = trimPrimerSequences.out
+      fastas = makeConsensus.out
+      
 }
+
+workflow CLIMBrsync {
+    take:
+      ch_sequenceAnalysisBAMs
+      ch_sequenceAnalysisFastas
+      ch_CLIMBkey
+
+    main:
+      collateSamples(ch_sequenceAnalysisBAMs.join(ch_sequenceAnalysisFastas, by: 0))
+      uploadToCLIMB(ch_CLIMBkey.combine(collateSamples.out.collect().toList()))
+}
+
+workflow ncovIllumina {
+    take:
+      ch_filePairs
+
+    main:
+      sequenceAnalysis(ch_filePairs)
+      
+      if ( params.upload ) {
+        
+        Channel.fromPath("${params.CLIMBkey}")
+               .set{ ch_CLIMBkey }
+      
+        CLIMBrsync(sequenceAnalysis.out.bams, sequenceAnalysis.out.fastas, ch_CLIMBkey )
+      }
+}
+

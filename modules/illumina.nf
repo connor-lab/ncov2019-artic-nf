@@ -128,7 +128,7 @@ process makeConsensus {
         tuple(sampleName, path(bam))
 
     output:
-        path("${sampleName}.primertrimmed.consensus.fa")
+        tuple(sampleName, path("${sampleName}.primertrimmed.consensus.fa"))
 
     script:
         """
