@@ -17,7 +17,7 @@ workflow {
   
        illuminaSuffixes = ['*_R{1,2}_001', '*_R{1,2}', '*_{1,2}' ]
        fastq_exts = ['.fastq.gz', '.fq.gz']
-  
+
        Channel.fromFilePairs( params.fastqSearchPath, flat: true)
               .set{ ch_filePairs }
    }
@@ -36,5 +36,6 @@ workflow {
      } else {
          println("Please select a workflow with --nanopolish, --illumina or --medaka")
      }
+
 }
 
