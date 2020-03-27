@@ -14,6 +14,8 @@ include {makeConsensus} from '../modules/illumina.nf' params(params)
 include {collateSamples} from '../modules/upload.nf' params(params)
 include {uploadToCLIMB} from '../modules/upload.nf' params(params)
 
+include {cramToFastq} from '../modules/illumina.nf' params(params)
+
 workflow sequenceAnalysis {
     take:
       ch_filePairs

@@ -7,6 +7,7 @@ nextflow.preview.dsl = 2
 include {articNcovNanopolish} from './workflows/articNcovNanopolish.nf' params(params)
 include {articNcovMedaka} from './workflows/articNcovMedaka.nf' params(params)
 include {ncovIllumina} from './workflows/illuminaNcov.nf' params(params)
+include {ncovIlluminaCram} from './workflows/illuminaNcov.nf' params(params)
 
 // main workflow
 workflow {
