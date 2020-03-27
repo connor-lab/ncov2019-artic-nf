@@ -173,7 +173,7 @@ process cramToFastq {
         file(cram)
 
     output:
-        tuple(val(${cram.toString().replaceFirst(/\.cram/, "")}), path("*_1.fastq.gz"),path("*_2.fastq.gz"))
+        tuple(val("${cram.toString().replaceFirst(/\.cram/, "")}"), path("*_1.fastq.gz"),path("*_2.fastq.gz"))
 
     script:
         """
