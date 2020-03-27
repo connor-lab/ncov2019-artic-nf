@@ -159,3 +159,27 @@ process makeConsensus {
         """
 }
 
+process cramToFastq {
+    /**
+    * Converts CRAM to fastq (http://bio-bwa.sourceforge.net/)
+    * Uses samtools to convert to CRAM, to FastQ (http://www.htslib.org/doc/samtools.html)
+    * @input
+    * @output
+    */
+
+    //publishDir "${params.outdir}/${task.process.replaceAll(":","_")}"
+
+    input:
+        file(cram)
+
+    output:
+        tuple(val(${cram.toString().replaceFirst(/\.cram/, "")}), path("*_1.fastq.gz"),path("*_2.fastq.gz"))
+
+    script:
+        """
+        samtools collate -u ${cram} -o tmp.bam
+        samtools fastq -1 ${cram.toString().replaceFirst(/\.cram/, "_1.fastq.gz")} -2 ${cram.toString().replaceFirst(/\.cram/, "_2.fastq.gz")} tmp.$
+        rm tmp.bam
+        """
+}
+
