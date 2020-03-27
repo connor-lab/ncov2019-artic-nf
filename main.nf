@@ -13,9 +13,14 @@ workflow {
   
    runDirectory = "${params.directory}"
    if ( params.illumina ) {
-  
-       Channel.fromFilePairs( params.fastqSearchPath, flat: true)
-              .set{ ch_filePairs }
+       if (params.cram) {
+        Channel.fromPath( "${runDirectory}*.cram" )
+              .set{ ch_cramDirectory }
+       }
+       else {
+	   Channel.fromFilePairs( params.fastqSearchPath, flat: true)
+			  .set{ ch_filePairs }
+	   }
    }
    else {
        Channel.fromPath( "${runDirectory}" )
@@ -28,7 +33,12 @@ workflow {
      } else if ( params.nanopolish ) {
          articNcovNanopolish(ch_runDirectory)
      } else if ( params.illumina ) {
-         ncovIllumina(ch_filePairs)
+         if(params.cram) {
+            ncovIlluminaCram(ch_cramDirectory)
+         }
+         else {
+            ncovIllumina(ch_filePairs)
+         }
      } else {
          println("Please select a workflow with --nanopolish, --illumina or --medaka")
      }

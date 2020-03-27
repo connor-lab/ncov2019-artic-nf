@@ -64,3 +64,11 @@ workflow ncovIllumina {
       }
 }
 
+workflow ncovIlluminaCram {
+    take:
+      ch_cramDirectory
+    main:
+      cramToFastq(ch_cramDirectory)
+      ncovIllumina(cramToFastq.out)
+}
+
