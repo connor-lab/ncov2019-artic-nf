@@ -28,11 +28,17 @@ workflow sequenceAnalysis {
       ch_filePairs
 
     main:
-      articDownloadScheme()
-
-      readTrimming(ch_filePairs)
-
-      readMapping(articDownloadScheme.out.scheme.combine(readTrimming.out))
+      if (params.schemeRepoURL =~ /^http/) {
+        articDownloadScheme()
+        makeIvarBedfile(articDownloadScheme.out)
+        readTrimming(ch_filePairs)
+        readMapping(articDownloadScheme.out.combine(readTrimming.out))
+      } else {
+        localScheme = Channel.fromPath(params.schemeRepoURL)
+        makeIvarBedfile(localScheme)
+        readTrimming(ch_filePairs)
+        readMapping(localScheme.combine(readTrimming.out))
+      }
 
       trimPrimerSequences(articDownloadScheme.out.bed.combine(readMapping.out))
 
