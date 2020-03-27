@@ -178,7 +178,7 @@ process cramToFastq {
     script:
         """
         samtools collate -u ${cram} -o tmp.bam
-        samtools fastq -1 ${cram.toString().replaceFirst(/\.cram/, "_1.fastq.gz")} -2 ${cram.toString().replaceFirst(/\.cram/, "_2.fastq.gz")} tmp.$
+        samtools fastq -1 ${cram.toString().replaceFirst(/\.cram/, "_1.fastq.gz")} -2 ${cram.toString().replaceFirst(/\.cram/, "_2.fastq.gz")}
         rm tmp.bam
         """
 }

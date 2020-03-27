@@ -21,6 +21,8 @@ include {collateSamples} from '../modules/upload.nf'
 include {CLIMBrsync} from './upload.nf'
 
 
+include {cramToFastq} from '../modules/illumina.nf' params(params)
+
 workflow sequenceAnalysis {
     take:
       ch_filePairs
