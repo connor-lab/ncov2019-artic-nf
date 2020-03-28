@@ -5,10 +5,8 @@ nextflow.preview.dsl = 2
 
 // import modules
 include {articDownloadScheme} from '../modules/artic.nf' params(params)
-include {articGather} from '../modules/artic.nf' params(params)
-include {articDemultiplex} from  '../modules/artic.nf' params(params)
-include {nanopolishIndex} from  '../modules/artic.nf' params(params)
-include {articMinIONMedaka} from  '../modules/artic.nf' params(params)
+include {articGuppyPlex} from '../modules/artic.nf' params(params)
+include {articMinION} from  '../modules/artic.nf' params(params)
 include {articRemoveUnmappedReads} from '../modules/artic.nf' params(params)
 
 include {collateSamples} from '../modules/upload.nf' params(params)
@@ -19,33 +17,24 @@ include {uploadToCLIMB} from '../modules/upload.nf' params(params)
 workflow sequenceAnalysis {
     take:
       ch_runDirectory
+      ch_runFastqDirs
     
     main:
       articDownloadScheme()
 
-      articGather(ch_runDirectory)
-      
-      if(params.barcode) {
-          articDemultiplex(articGather.out.gathered)
-          
-          articMinIONMedaka(articDemultiplex.out.flatten()
-                                          .combine(articDownloadScheme.out)
-                                          .combine(ch_runDirectory))
-          
-          articRemoveUnmappedReads(articMinIONMedaka.out.sorted_bam)
+      articGuppyPlex(ch_runDirectory.combine(ch_runFastqDirs.flatten()))
 
-      } else {
-          articMinIONMedaka(articGather.out.fastq
-                                     .combine(articDownloadScheme.out)
-                                     .combine(ch_runDirectory))
-          
-          articRemoveUnmappedReads(articMinIONMedaka.out.sorted_bam)
-      }
+      articMinION(articGuppyPlex.out.fastq
+                             .combine(articDownloadScheme.out)
+                             .combine(ch_runDirectory))
+
+      articRemoveUnmappedReads(articMinION.out.sorted_bam)
 
     emit:
       bams = articRemoveUnmappedReads.out
-      fastas = articMinIONMedaka.out.consensus_fasta
+      fastas = articMinION.out.consensus_fasta
 }
+     
 
 workflow CLIMBrsync {
     take:
@@ -58,13 +47,14 @@ workflow CLIMBrsync {
       uploadToCLIMB(ch_CLIMBkey.combine(collateSamples.out.collect().toList()))
 }
 
-workflow articNcovMedaka {
+workflow articNcovNanopore {
     take:
       ch_runDirectory
+      ch_fastqDirs
 
     main:
-      sequenceAnalysis(ch_runDirectory)
-
+      sequenceAnalysis(ch_runDirectory, ch_fastqDirs)
+/*
       if ( params.upload ) {
 
         Channel.fromPath("${params.CLIMBkey}")
@@ -72,5 +62,6 @@ workflow articNcovMedaka {
 
         CLIMBrsync(sequenceAnalysis.out.bams, sequenceAnalysis.out.fastas, ch_CLIMBkey )
       }
+*/
 }
 
