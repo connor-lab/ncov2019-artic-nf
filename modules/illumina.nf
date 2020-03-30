@@ -27,6 +27,26 @@ process readTrimming {
     """
 }
 
+process indexReference {
+    /**
+    * Indexes reference fasta file in the scheme repo using bwa.
+    */
+
+    tag { schemeRepo }
+
+    input:
+        path(schemeRepo)
+
+    output:
+        tuple(path('ref.fa'), path('ref.fa.amb'), path('ref.fa.ann'), path('ref.fa.bwt'), path('ref.fa.pac'), path('ref.fa.sa'))
+
+    script:
+        """
+        ln -s ${schemeRepo}/${params.schemeDir}/${params.scheme}/${params.schemeVersion}/*.reference.fasta ref.fa
+        bwa index ref.fa
+        """
+}
+
 process readMapping {
     /**
     * Maps trimmed paired fastq using BWA (http://bio-bwa.sourceforge.net/)
@@ -42,16 +62,14 @@ process readMapping {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.sorted.bam", mode: 'copy'
 
     input:
-        tuple(path(schemeRepo), sampleName, path(forward), path(reverse))
+        tuple(path(ref), path(amb), path(ann), path(bwt), path(pac), path(sa), sampleName, path(forward), path(reverse))
 
     output:
-        tuple(sampleName, path("ref.fa"), path("${sampleName}.sorted.bam"))
+        tuple(sampleName, path("${sampleName}.sorted.bam"))
 
     script:
         """
-        ln -s ${schemeRepo}/${params.schemeDir}/${params.scheme}/${params.schemeVersion}/*.reference.fasta ref.fa
-        bwa index ref.fa
-        bwa mem -t ${task.cpus} ref.fa ${forward} ${reverse} | samtools view -bS | \
+        bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | samtools view -bS | \
         samtools sort -o ${sampleName}.sorted.bam
         """
 }
@@ -100,7 +118,7 @@ process trimPrimerSequences {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
 
     input:
-    tuple(path(bedfile), sampleName, path(ref), path(bam))
+    tuple(path(bedfile), sampleName, path(bam))
 
     output:
     tuple sampleName, path("${sampleName}.mapped.bam"), emit: mapped

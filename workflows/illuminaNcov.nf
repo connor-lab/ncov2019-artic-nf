@@ -8,6 +8,7 @@ include {articDownloadScheme } from '../modules/artic.nf'
 include {makeIvarBedfile} from '../modules/illumina.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
 include {readTrimming} from '../modules/illumina.nf' 
+include {indexReference} from '../modules/illumina.nf'
 include {readMapping} from '../modules/illumina.nf' 
 include {trimPrimerSequences} from '../modules/illumina.nf' 
 include {callVariants} from '../modules/illumina.nf'
@@ -29,17 +30,34 @@ workflow sequenceAnalysis {
       ch_filePairs
 
     main:
-      if (params.schemeRepoURL =~ /^http/) {
-        articDownloadScheme()
-        makeIvarBedfile(articDownloadScheme.out.scheme)
-        readTrimming(ch_filePairs)
-        readMapping(articDownloadScheme.out.scheme.combine(readTrimming.out))
+      readTrimming(ch_filePairs)
+
+      if (params.ivarBed != "" && params.alignerRefPrefix != "") {
+        ivarBed = Channel.fromPath(params.ivarBed)
+        ref = Channel.fromPath(params.alignerRefPrefix)
+        index = Channel.fromPath("${params.alignerRefPrefix}.*")
+
+        readMapping(ref.combine(index.collect()).combine(readTrimming.out))
+
+        trimPrimerSequences(ivarBed.combine(readMapping.out))
+
+        callVariants(trimPrimerSequences.out.ptrim.combine(ref))
       } else {
-        localRef = Channel.fromPath("${params.schemeRepoURL}/**/${params.schemeVersion}/*.reference.fasta")
-        makeIvarBedfile(localRef)
-        readTrimming(ch_filePairs)
-        localScheme = Channel.fromPath($params.schemeRepoURL)
-        readMapping(localScheme.combine(readTrimming.out))
+        if (params.schemeRepoURL =~ /^http/) {
+          articDownloadScheme()
+          indexReference(articDownloadScheme.out)
+          readMapping(indexReference.out.combine(readTrimming.out))
+          trimPrimerSequences(articDownloadScheme.out.bed.combine(readMapping.out))
+          callVariants(trimPrimerSequences.out.ptrim.combine(articDownloadScheme.out.reffasta))
+        } else {
+          localScheme = Channel.fromPath(params.schemeRepoURL)
+          indexReference(localScheme)
+          readMapping(indexReference.out.combine(readTrimming.out))
+          localBed = Channel.fromPath("${params.schemeRepoURL}/**/${params.schemeVersion}/${params.scheme}.bed")
+          trimPrimerSequences(localBed.combine(readMapping.out))
+          localRef = Channel.fromPath("${params.schemeRepoURL}/**/${params.schemeVersion}/*.reference.fasta")
+          callVariants(trimPrimerSequences.out.ptrim.combine(localRef))
+        } 
       }
 
       trimPrimerSequences(articDownloadScheme.out.bed.combine(readMapping.out))
