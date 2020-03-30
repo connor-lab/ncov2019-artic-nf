@@ -96,13 +96,14 @@ process trimPrimerSequences {
 
     tag { sampleName }
 
-    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
+    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.mapped.bam", mode: 'copy'
 
     input:
-        tuple(path(bedfile), sampleName, path(ref), path(bam))
+    tuple(path(bedfile), sampleName, path(ref), path(bam))
 
     output:
-        tuple(sampleName, path("${sampleName}.mapped.primertrimmed.sorted.bam"))
+    path "${sampleName}.mapped.bam", emit: mapped
+    tuple sampleName, path("${sampleName}.mapped.primertrimmed.sorted.bam" ), emit: ptrim
 
     script:
     if (params.allowNoprimer){
@@ -111,9 +112,9 @@ process trimPrimerSequences {
         ivarCmd = "ivar trim"
     }
         """
-        samtools view -F4 -o ivar.bam ${bam}
-        samtools index ivar.bam
-        ${ivarCmd} -i ivar.bam -b ${bedfile} ${params.illuminaKeepLen} -q ${params.illuminaQualThreshold} -p ivar.out
+        samtools view -F4 -o ${sampleName}.mapped.bam ${bam}
+        samtools index ${sampleName}.mapped.bam
+        ${ivarCmd} -i ${sampleName}.mapped.bam -b ${bedfile} ${params.illuminaKeepLen} -q ${params.illuminaQualThreshold} -p ivar.out
         samtools sort -o ${sampleName}.mapped.primertrimmed.sorted.bam ivar.out.bam
         """
 }

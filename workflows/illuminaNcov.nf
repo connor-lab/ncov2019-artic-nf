@@ -29,10 +29,10 @@ workflow sequenceAnalysis {
 
       trimPrimerSequences(makeIvarBedfile.out.combine(readMapping.out))
 
-      makeConsensus(trimPrimerSequences.out)
+      makeConsensus(trimPrimerSequences.out.ptrim)
 
     emit:
-      bams = trimPrimerSequences.out
+      bams = trimPrimerSequences.out.mapped
       fastas = makeConsensus.out
       
 }
