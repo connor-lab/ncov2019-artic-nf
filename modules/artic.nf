@@ -17,42 +17,26 @@ process articDownloadScheme{
 }
 
 process articGuppyPlex {
-    tag { params.runPrefix + "_" + fastqDir }
+    tag { samplePrefix + "-" + fastqDir }
 
     label 'largemem'
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}*.fastq", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.prefix}*.fastq", mode: "copy"
 
     input:
-    tuple( path(runDirectory), fastqDir )
+    path(fastqDir)
 
     output:
-    path "${params.runPrefix}*.fastq", emit: fastq
+    path "${params.prefix}*.fastq", emit: fastq
 
     script:
-    
-    if ( fastqDir =~ /barcode/ )   
     """
-    ln -s ${runDirectory}/fast5_pass .
-
     artic guppyplex \
     --min-length ${params.min_length} \
     --max-length ${params.max_length} \
-    --prefix ${params.runPrefix} \
-    --directory ${runDirectory}/fastq_pass/${fastqDir}
+    --prefix ${params.prefix} \
+    --directory ${fastqDir}
     """
-    
-    else if ( fastqDir =~ /fastq_pass/ )
-    """
-    ln -s ${runDirectory}/fast5_pass .
-
-    artic guppyplex \
-    --min-length ${params.min_length} \
-    --max-length ${params.max_length} \
-    --prefix ${params.runPrefix} \
-    --directory ${runDirectory}/fastq_pass
-    """
- 
 }
 
 process articMinION {
@@ -61,14 +45,14 @@ process articMinION {
     label 'largecpu'
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
-    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.consensus.fasta", mode: 'copy'
+    publishDir "${params.outdir}/climb_upload/${params.prefix}/${sampleName}", pattern: "${sampleName}.consensus.fasta", mode: 'copy'
 
     input:
-    tuple file(fastq), file(schemeRepo), file(runDirectory)
+    tuple file(fastq), file(schemeRepo), file(fast5Pass), file(seqSummary)
 
     output:
     file("${sampleName}.*")
-    tuple sampleName, file("${sampleName}.primertrimmed.rg.sorted.bam"), emit: sorted_bam
+    tuple sampleName, file("${sampleName}.sorted.bam"), emit: sorted_bam
     tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
 
     script:
@@ -99,8 +83,8 @@ process articMinION {
     --threads ${task.cpus} \
     --scheme-directory ${schemeRepo}/${params.schemeDir} \
     --read-file ${fastq} \
-    --fast5-directory ${runDirectory}/fast5_pass \
-    --sequencing-summary ${runDirectory}/*cing_summary*.txt \
+    --fast5-directory ${fast5Pass} \
+    --sequencing-summary ${seqSummary} \
     ${params.scheme}/${params.schemeVersion} \
     ${sampleName}
     """
@@ -109,7 +93,7 @@ process articMinION {
 process articRemoveUnmappedReads {
     tag { sampleName }
 
-    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
+    publishDir "${params.outdir}/climb_upload/${params.prefix}/${sampleName}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
 
     cpus 1
 
@@ -117,11 +101,11 @@ process articRemoveUnmappedReads {
     tuple(sampleName, path(bamfile))
 
     output:
-    tuple( sampleName, file("${sampleName}.mapped.primertrimmed.sorted.bam"))
+    tuple( sampleName, file("${sampleName}.mapped.sorted.bam"))
 
     script:
     """
-    samtools view -F4 -o ${sampleName}.mapped.primertrimmed.sorted.bam ${bamfile} 
+    samtools view -F4 -o ${sampleName}.mapped.sorted.bam ${bamfile} 
     """
 }
 

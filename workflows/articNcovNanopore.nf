@@ -16,23 +16,26 @@ include {uploadToCLIMB} from '../modules/upload.nf' params(params)
 // workflow component for artic pipeline
 workflow sequenceAnalysis {
     take:
-      ch_runDirectory
       ch_runFastqDirs
+      ch_fast5Pass
+      ch_seqSummary
     
     main:
       articDownloadScheme()
-
-      articGuppyPlex(ch_runDirectory.combine(ch_runFastqDirs.flatten()))
+      
+      articGuppyPlex(ch_runFastqDirs.flatten())
 
       articMinION(articGuppyPlex.out.fastq
                              .combine(articDownloadScheme.out)
-                             .combine(ch_runDirectory))
+                             .combine(ch_fast5Pass)
+                             .combine(ch_seqSummary))
 
       articRemoveUnmappedReads(articMinION.out.sorted_bam)
 
     emit:
       bams = articRemoveUnmappedReads.out
       fastas = articMinION.out.consensus_fasta
+
 }
      
 
@@ -51,9 +54,10 @@ workflow articNcovNanopore {
     take:
       ch_runDirectory
       ch_fastqDirs
+      ch_seqSummary
 
     main:
-      sequenceAnalysis(ch_runDirectory, ch_fastqDirs)
+      sequenceAnalysis(ch_runDirectory, ch_fastqDirs, ch_seqSummary)
 /*
       if ( params.upload ) {
 
