@@ -16,233 +16,84 @@ process articDownloadScheme{
     """
 }
 
-process articGather {
-    tag params.runPrefix
+process articGuppyPlex {
+    tag { samplePrefix + "-" + fastqDir }
 
     label 'largemem'
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_fastq_pass.fastq", mode: "copy"
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_sequencing_summary.txt", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.prefix}*.fastq", mode: "copy"
 
     input:
-    file(runDirectory)
+    path(fastqDir)
 
     output:
-    tuple file("${params.runPrefix}_fastq_pass.fastq"), file("${params.runPrefix}_sequencing_summary.txt"), emit: gathered
-    path "${params.runPrefix}_fastq_pass.fastq", emit: fastq
-
-    script:
-    if ( params.barcode ) 
-        """
-        artic gather \
-        --min-length ${params.min_length} \
-        --max-length ${params.max_length} \
-        --prefix ${params.runPrefix} \
-        --directory ${runDirectory}
-
-        cat ${params.runPrefix}_barcode*.fastq ${params.runPrefix}_unclassified.fastq > ${params.runPrefix}_fastq_pass.fastq
-        """
-    else
-        """
-        artic gather \
-        --min-length ${params.min_length} \
-        --max-length ${params.max_length} \
-        --prefix ${params.runPrefix} \
-        --directory ${runDirectory}
-        """
-
- 
-}
-
-process articDemultiplex {
-    tag params.runPrefix
-
-    label 'largecpu'
-
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.runPrefix}_fastq_pass-NB*.fastq", mode: "copy"
-
-    input:
-    tuple file(fastqPass), file(sequencingSummary)
-
-    output:
-    file "${params.runPrefix}_fastq_pass-NB*.fastq"
+    path "${params.prefix}*.fastq", emit: fastq
 
     script:
     """
-    artic demultiplex --threads ${task.cpus} ${fastqPass}
+    artic guppyplex \
+    --min-length ${params.min_length} \
+    --max-length ${params.max_length} \
+    --prefix ${params.prefix} \
+    --directory ${fastqDir}
     """
 }
 
-process nanopolishIndex {
-   tag params.runPrefix
-
-   label 'largemem'
-
-   cpus 1
-
-   publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${fastqPass}.index*", mode: "copy"
-
-   input:
-   tuple file(fastqPass), file(sequencingSummary), file(runDirectory)
-
-   output:
-   file "${fastqPass}.index*"
-
-   script:
-   """
-   ln -s ${runDirectory}/fast5_pass .
-   nanopolish index -s ${sequencingSummary} -d fast5_pass ${fastqPass}
-   """
-}
-
-
-process articMinIONNanopolish {
+process articMinION {
     tag { sampleName }
 
     label 'largecpu'
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
-    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.consensus.fasta", mode: 'copy'
+    publishDir "${params.outdir}/climb_upload/${params.prefix}/${sampleName}", pattern: "${sampleName}.consensus.fasta", mode: 'copy'
 
     input:
-    tuple file("nanopolish/*"), file(bcFastqPass), file("nanopolish/*"), file(schemeRepo), file(runDirectory)
+    tuple file(fastq), file(schemeRepo), file(fast5Pass), file(seqSummary)
 
     output:
     file("${sampleName}.*")
-    tuple sampleName, file("${sampleName}.primertrimmed.sorted.bam"), emit: sorted_bam
+    tuple sampleName, file("${sampleName}.sorted.bam"), emit: sorted_bam
     tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
 
     script:
-    if ( bcFastqPass =~ /.*NB\d{2}.fastq$/ ) {
-        sampleName = params.runPrefix + "-" + ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][1]
-    } else {
-        sampleName = params.runPrefix
+    // Make an identifier from the fastq filename
+    sampleName = fastq.getBaseName().replaceAll(~/\.fastq.*$/, '')
+
+    // Configure artic minion pipeline
+    minionRunConfigBuilder = []
+
+    if (params.medaka) {
+    minionRunConfigBuilder.add("--medaka")
     }
 
-    if ( params.normalise )
-        if ( params.minimap )
-            """
-            ln -s ${runDirectory}/fast5_pass .                       
-
-            artic minion --minimap \
-            --normalise ${params.normalise} \
-            --threads ${task.cpus} \
-            --scheme-directory ${schemeRepo}/${params.schemeDir} \
-            --read-file ${bcFastqPass} \
-            --nanopolish-read-file nanopolish/${params.runPrefix}_fastq_pass.fastq \
-            ${params.scheme}/${params.schemeVersion} \
-            ${sampleName}
-            """
-        else 
-            """
-            ln -s ${runDirectory}/fast5_pass .            
- 
-            artic minion \
-            --normalise ${params.normalise} \
-            --threads ${task.cpus} \
-            --scheme-directory ${schemeRepo}/${params.schemeDir} \
-            --read-file ${bcFastqPass} \
-            --nanopolish-read-file nanopolish/${params.runPrefix}_fastq_pass.fastq \
-            ${params.scheme}/${params.schemeVersion} \
-            ${sampleName}
-            """
-    else
-        if ( params.minimap )
-            """
-            ln -s ${runDirectory}/fast5_pass .
- 
-            artic minion --minimap \
-            --threads ${task.cpus} \
-            --scheme-directory ${schemeRepo}/${params.schemeDir} \
-            --read-file ${bcFastqPass} \
-            --nanopolish-read-file nanopolish/${params.runPrefix}_fastq_pass.fastq \
-            ${params.scheme}/${params.schemeVersion} \
-            ${sampleName}
-            """
-        else
-            """
-            ln -s ${runDirectory}/fast5_pass .
-
-            artic minion --threads ${task.cpus} \
-            --scheme-directory ${schemeRepo}/${params.schemeDir} \
-            --read-file ${bcFastqPass} \
-            --nanopolish-read-file nanopolish/${params.runPrefix}_fastq_pass.fastq \
-            ${params.scheme}/${params.schemeVersion} \
-            ${sampleName}
-            """
-}
-
-process articMinIONMedaka {
-    tag { sampleName }
-
-    label 'largecpu'
-
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
-    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.consensus.fasta", mode: 'copy'
-
-    input:
-    tuple file(bcFastqPass), file(schemeRepo), file(runDirectory)
-
-    output:
-    file("${sampleName}.*")
-    tuple sampleName, file("${sampleName}.primertrimmed.sorted.bam"), emit: sorted_bam
-    tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
+    if ( params.normalise ) {
+    minionRunConfigBuilder.add("--normalise ${params.normalise}")
+    }
     
-    script:
-    if ( bcFastqPass =~ /.*NB\d{2}.fastq$/ ) {
-        sampleName = params.runPrefix + "-" + ( bcFastqPass =~ /.*(NB\d{2}).fastq$/ )[0][1]
+    if ( params.bwa ) {
+    minionRunConfigBuilder.add("--bwa")
     } else {
-        sampleName = params.runPrefix
+    minionRunConfigBuilder.add("--minimap2")
     }
 
-    if ( params.normalise )
-        if ( params.minimap )
-            """
-            artic minion --medaka \
-            --minimap \
-            --normalise ${params.normalise} \
-            --threads ${task.cpus} \
-            --scheme-directory ${schemeRepo}/${params.schemeDir} \
-            --read-file ${bcFastqPass} \
-            ${params.scheme}/${params.schemeVersion} \
-            ${sampleName}
-            """
-        else
-            """
-            artic minion --medaka \
-            --normalise ${params.normalise} \
-            --threads ${task.cpus} \
-            --scheme-directory ${schemeRepo}/${params.schemeDir} \
-            --read-file ${bcFastqPass} \
-            ${params.scheme}/${params.schemeVersion} \
-            ${sampleName}
-            """
-    else
-        if ( params.minimap )
-            """
-            artic minion --medaka \
-            --minimap \
-            --threads ${task.cpus} \
-            --scheme-directory ${schemeRepo}/${params.schemeDir} \
-            --read-file ${bcFastqPass} \
-            ${params.scheme}/${params.schemeVersion} \
-            ${sampleName}
-            """
-        else
-            """
-            artic minion --medaka \
-            --threads ${task.cpus} \
-            --scheme-directory ${schemeRepo}/${params.schemeDir} \
-            --read-file ${bcFastqPass} \
-            ${params.scheme}/${params.schemeVersion} \
-            ${sampleName}
-            """
+    minionFinalConfig = minionRunConfigBuilder.join(" ")
+
+    """
+    artic minion ${minionFinalConfig} \
+    --threads ${task.cpus} \
+    --scheme-directory ${schemeRepo}/${params.schemeDir} \
+    --read-file ${fastq} \
+    --fast5-directory ${fast5Pass} \
+    --sequencing-summary ${seqSummary} \
+    ${params.scheme}/${params.schemeVersion} \
+    ${sampleName}
+    """
 }
 
 process articRemoveUnmappedReads {
     tag { sampleName }
 
-    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
+    publishDir "${params.outdir}/climb_upload/${params.prefix}/${sampleName}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
 
     cpus 1
 
@@ -250,11 +101,11 @@ process articRemoveUnmappedReads {
     tuple(sampleName, path(bamfile))
 
     output:
-    tuple( sampleName, file("${sampleName}.mapped.primertrimmed.sorted.bam"))
+    tuple( sampleName, file("${sampleName}.mapped.sorted.bam"))
 
     script:
     """
-    samtools view -F4 -o ${sampleName}.mapped.primertrimmed.sorted.bam ${bamfile} 
+    samtools view -F4 -o ${sampleName}.mapped.sorted.bam ${bamfile} 
     """
 }
 

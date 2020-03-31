@@ -4,34 +4,78 @@
 nextflow.preview.dsl = 2
 
 // import subworkflows
-include {articNcovNanopolish} from './workflows/articNcovNanopolish.nf' params(params)
-include {articNcovMedaka} from './workflows/articNcovMedaka.nf' params(params)
+include {articNcovNanopore} from './workflows/articNcovNanopore.nf' params(params)
 include {ncovIllumina} from './workflows/illuminaNcov.nf' params(params)
+
+
+if ( params.illumina ) {
+   if (! params.directory ) {
+       println("Please supply a directory containing fastqs with --directory")
+       System.exit(1)
+   }
+} else if ( params.medaka || params.nanopolish ) {
+   if (! params.basecalled_fastq ) {
+       println("Please supply a directory containing basecalled fastqs with --basecalled_fastq (this is the output directory from guppy_barcoder or guppy_basecaller)")
+   }
+   if (! params.fast5_pass ) {
+       println("Please supply a directory containing fast5 files with --fast5_pass (this is the fast5_pass directory)")
+   }
+   if (! params.sequencing_summary ) {
+       println("Please supply the path to the sequencing_summary.txt file from your run with --sequencing_summary")
+       System.exit(1)
+   }
+} else {
+       println("Please select a workflow with --nanopolish, --illumina or --medaka")
+       System.exit(1)
+}
+
+if ( ! params.prefix ) {
+     println("Please supply a prefix for your output files with --prefix")
+     System.exit(1)
+}
+
 
 // main workflow
 workflow {
-  
-   runDirectory = "${params.directory}"
    if ( params.illumina ) {
-  
        Channel.fromFilePairs( params.fastqSearchPath, flat: true)
               .set{ ch_filePairs }
    }
    else {
-       Channel.fromPath( "${runDirectory}" )
+       Channel.fromPath( "${params.basecalled_fastq}" )
               .set{ ch_runDirectory }
+
+       Channel.fromPath( "${params.fast5_pass}" )
+              .set{ ch_fast5Pass }
+
+       Channel.fromPath( "${params.sequencing_summary}" )
+              .set{ ch_seqSummary }
+
+ 
+       // Check to see if we have barcodes
+       def nanoporeBarcodeDirs = new FileNameByRegexFinder().getFileNames(params.basecalled_fastq, /.*barcode\d\d$/)
+       
+       
+       if( nanoporeBarcodeDirs ) {
+            // Yes, barcodes!
+            Channel.fromPath( "${params.basecalled_fastq}/barcode*", type: 'dir', maxDepth: 1 )
+                   .filter{ it.listFiles().size() > 5 }
+                   .set{ ch_fastqDirs }
+       } else {
+            // No, no barcodes
+            Channel.fromPath( "${params.basecalled_fastq}", type: 'dir', maxDepth: 1 )
+                    .set{ ch_fastqDirs }
+      }
    }
 
    main:
-     if( params.medaka ) {
-         articNcovMedaka(ch_runDirectory)
-     } else if ( params.nanopolish ) {
-         articNcovNanopolish(ch_runDirectory)
+     if ( params.nanopolish || params.medaka ) {
+         articNcovNanopore(ch_fastqDirs, ch_fast5Pass, ch_seqSummary)
      } else if ( params.illumina ) {
          ncovIllumina(ch_filePairs)
-     } else {
+    } else {
          println("Please select a workflow with --nanopolish, --illumina or --medaka")
      }
-
+     
 }
 
