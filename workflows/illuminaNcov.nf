@@ -4,15 +4,15 @@
 nextflow.preview.dsl = 2
 
 // import modules
-include {articDownloadScheme } from '../modules/artic.nf' params(params)
-include {makeIvarBedfile} from '../modules/illumina.nf' params(params)
-include {readTrimming} from '../modules/illumina.nf' params(params)
-include {readMapping} from '../modules/illumina.nf' params(params)
-include {trimPrimerSequences} from '../modules/illumina.nf' params(params)
-include {makeConsensus} from '../modules/illumina.nf' params(params)
+include {articDownloadScheme } from '../modules/artic.nf' 
+include {makeIvarBedfile} from '../modules/illumina.nf' 
+include {readTrimming} from '../modules/illumina.nf' 
+include {readMapping} from '../modules/illumina.nf' 
+include {trimPrimerSequences} from '../modules/illumina.nf' 
+include {makeConsensus} from '../modules/illumina.nf' 
 
-include {collateSamples} from '../modules/upload.nf' params(params)
-include {uploadToCLIMB} from '../modules/upload.nf' params(params)
+include {collateSamples} from '../modules/upload.nf' 
+include {uploadToCLIMB} from '../modules/upload.nf' 
 
 workflow sequenceAnalysis {
     take:

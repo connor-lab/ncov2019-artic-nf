@@ -4,8 +4,8 @@
 nextflow.preview.dsl = 2
 
 // import subworkflows
-include {articNcovNanopore} from './workflows/articNcovNanopore.nf' params(params)
-include {ncovIllumina} from './workflows/illuminaNcov.nf' params(params)
+include {articNcovNanopore} from './workflows/articNcovNanopore.nf' 
+include {ncovIllumina} from './workflows/illuminaNcov.nf'
 
 
 if ( params.illumina ) {
