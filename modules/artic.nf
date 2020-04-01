@@ -45,7 +45,6 @@ process articMinION {
     label 'largecpu'
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
-    publishDir "${params.outdir}/climb_upload/${params.prefix}/${sampleName}", pattern: "${sampleName}.consensus.fasta", mode: 'copy'
 
     input:
     tuple file(fastq), file(schemeRepo), file(fast5Pass), file(seqSummary)
@@ -93,7 +92,7 @@ process articMinION {
 process articRemoveUnmappedReads {
     tag { sampleName }
 
-    publishDir "${params.outdir}/climb_upload/${params.prefix}/${sampleName}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
+    publishDir "${params.outdir}/climb_upload/${params.prefix}/${sampleName}", pattern: "${sampleName}.mapped.sorted.bam", mode: 'copy'
 
     cpus 1
 
