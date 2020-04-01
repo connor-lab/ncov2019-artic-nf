@@ -8,7 +8,8 @@ process articDownloadScheme{
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "scheme", mode: "copy"
 
     output:
-    file("scheme")
+    path "scheme/**/${params.schemeVersion}/*.reference.fasta" , emit: reffasta
+    path "scheme" , emit: scheme
 
     script:
     """
@@ -51,7 +52,9 @@ process articMinION {
 
     output:
     file("${sampleName}.*")
-    tuple sampleName, file("${sampleName}.sorted.bam"), emit: sorted_bam
+    
+    tuple sampleName, file("${sampleName}.primertrimmed.rg.sorted.bam"), emit: ptrim
+    tuple sampleName, file("${sampleName}.sorted.bam"), emit: mapped
     tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
 
     script:
@@ -91,8 +94,6 @@ process articMinION {
 
 process articRemoveUnmappedReads {
     tag { sampleName }
-
-    publishDir "${params.outdir}/climb_upload/${params.prefix}/${sampleName}", pattern: "${sampleName}.mapped.sorted.bam", mode: 'copy'
 
     cpus 1
 

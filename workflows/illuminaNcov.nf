@@ -11,6 +11,11 @@ include {readMapping} from '../modules/illumina.nf'
 include {trimPrimerSequences} from '../modules/illumina.nf' 
 include {makeConsensus} from '../modules/illumina.nf' 
 
+include {makeQCCSV} from '../modules/qc.nf'
+include {writeQCSummaryCSV} from '../modules/qc.nf'
+
+include {collateSamples} from '../modules/upload.nf'
+
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
 
@@ -22,20 +27,36 @@ workflow sequenceAnalysis {
     main:
       articDownloadScheme()
 
-      makeIvarBedfile(articDownloadScheme.out)
+      makeIvarBedfile(articDownloadScheme.out.scheme)
 
       readTrimming(ch_filePairs)
 
-      readMapping(articDownloadScheme.out.combine(readTrimming.out))
+      readMapping(articDownloadScheme.out.scheme.combine(readTrimming.out))
 
       trimPrimerSequences(makeIvarBedfile.out.combine(readMapping.out))
 
       makeConsensus(trimPrimerSequences.out.ptrim)
 
+      makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
+                                   .combine(articDownloadScheme.out.reffasta))
+
+      makeQCCSV.out.splitCsv()
+                   .unique()
+                   .branch {
+                       header: it[-1] == 'qc_pass'
+                       fail: it[-1] == 'FALSE'
+                       pass: it[-1] == 'TRUE'
+    		   }
+                   .set { qc }
+
+     writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
+
+     collateSamples(qc.pass.map{ it[0] }
+                           .join(makeConsensus.out, by: 0)
+                           .join(trimPrimerSequences.out.mapped))     
+
     emit:
-      bams = trimPrimerSequences.out.mapped
-      fastas = makeConsensus.out
-      
+      qc_pass = collateSamples.out
 }
 
 workflow ncovIllumina {
@@ -44,13 +65,14 @@ workflow ncovIllumina {
 
     main:
       sequenceAnalysis(ch_filePairs)
-      
+ 
       if ( params.upload ) {
         
         Channel.fromPath("${params.CLIMBkey}")
                .set{ ch_CLIMBkey }
       
-        CLIMBrsync(sequenceAnalysis.out.bams, sequenceAnalysis.out.fastas, ch_CLIMBkey )
+        CLIMBrsync(sequenceAnalysis.out.qc_pass, ch_CLIMBkey )
       }
+
 }
 
