@@ -114,7 +114,7 @@ process trimPrimerSequences {
         """
         samtools view -F4 -o ${sampleName}.mapped.bam ${bam}
         samtools index ${sampleName}.mapped.bam
-        ${ivarCmd} -i ${sampleName}.mapped.bam -b ${bedfile} ${params.illuminaKeepLen} -q ${params.illuminaQualThreshold} -p ivar.out
+        ${ivarCmd} -i ${sampleName}.mapped.bam -b ${bedfile} -m ${params.illuminaKeepLen} -q ${params.illuminaQualThreshold} -p ivar.out
         samtools sort -o ${sampleName}.mapped.primertrimmed.sorted.bam ivar.out.bam
         """
 }
