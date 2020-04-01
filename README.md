@@ -69,6 +69,8 @@ Important config options are:
 |ivarFreqThreshold | ivar frequency threshold for variant|
 |ivarMinDepth | Minimum coverage depth to call variant|
 
+#### QC
+A script to do some basic COG-UK QC is provided in `bin/qc.py`. This currently tests if >50% of reference bases are covered by >10 reads (Illumina) or >20 reads (Nanopore), OR if there is a stretch of more than 10 Kb of sequence without N - setting qc_pass in `<outdir>/<prefix>.qc.csv` to TRUE. `bin/qc.py` can be extended to incorporate any QC test, as long as the script outputs a csv file a "qc_pass" last column, with samples TRUE or FALSE.
 
 #### Output
-A subdirectory for each process in the workflow is created in `--outdir`. Additionally, a `climb_upload` subdirectory containing files important for [COG-UK](https://github.com/COG-UK) is created.
+A subdirectory for each process in the workflow is created in `--outdir`. A `qc_pass_climb_upload` subdirectory containing files important for [COG-UK](https://github.com/COG-UK) is created. 
