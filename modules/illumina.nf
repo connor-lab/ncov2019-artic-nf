@@ -96,7 +96,7 @@ process trimPrimerSequences {
 
     tag { sampleName }
 
-    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.mapped.bam", mode: 'copy'
+    publishDir "${params.outdir}/climb_upload/${params.prefix}/${sampleName}", pattern: "${sampleName}.mapped.bam", mode: 'copy'
 
     input:
     tuple(path(bedfile), sampleName, path(ref), path(bam))
@@ -123,7 +123,7 @@ process makeConsensus {
 
     tag { sampleName }
 
-    publishDir "${params.outdir}/climb_upload/${params.runPrefix}/${sampleName}", pattern: "${sampleName}.primertrimmed.consensus.fa", mode: 'copy'
+    publishDir "${params.outdir}/climb_upload/${params.prefix}/${sampleName}", pattern: "${sampleName}.primertrimmed.consensus.fa", mode: 'copy'
 
     input:
         tuple(sampleName, path(bam))
