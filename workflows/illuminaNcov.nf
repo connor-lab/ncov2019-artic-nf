@@ -11,8 +11,9 @@ include {readMapping} from '../modules/illumina.nf'
 include {trimPrimerSequences} from '../modules/illumina.nf' 
 include {makeConsensus} from '../modules/illumina.nf' 
 
-include {collateSamples} from '../modules/upload.nf' 
-include {uploadToCLIMB} from '../modules/upload.nf' 
+// import subworkflows
+include {CLIMBrsync} from './upload.nf'
+
 
 workflow sequenceAnalysis {
     take:
@@ -35,17 +36,6 @@ workflow sequenceAnalysis {
       bams = trimPrimerSequences.out.mapped
       fastas = makeConsensus.out
       
-}
-
-workflow CLIMBrsync {
-    take:
-      ch_sequenceAnalysisBAMs
-      ch_sequenceAnalysisFastas
-      ch_CLIMBkey
-
-    main:
-      collateSamples(ch_sequenceAnalysisBAMs.join(ch_sequenceAnalysisFastas, by: 0))
-      uploadToCLIMB(ch_CLIMBkey.combine(collateSamples.out.collect().toList()))
 }
 
 workflow ncovIllumina {

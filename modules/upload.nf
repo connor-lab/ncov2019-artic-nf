@@ -15,16 +15,16 @@ process collateSamples {
 }
 
 process uploadToCLIMB {
-    tag { params.runPrefix }
+    tag { params.prefix }
 
     input:
-    tuple(path(sshkey), path("${params.runPrefix}/*"))
+    tuple(path(sshkey), path("${params.prefix}/*"))
 
     output:
 
     script:
     """
-    echo "rsync -Lav -e "ssh -i ${sshkey} -l ${params.CLIMBUser}" ${params.runPrefix} ${params.CLIMBHostname}:upload/"
+    rsync -Lav -e "ssh -i ${sshkey} -l ${params.CLIMBUser}" ${params.prefix} ${params.CLIMBHostname}:upload/
     """
 }
 

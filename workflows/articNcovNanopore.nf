@@ -9,8 +9,8 @@ include {articGuppyPlex} from '../modules/artic.nf'
 include {articMinION} from  '../modules/artic.nf' 
 include {articRemoveUnmappedReads} from '../modules/artic.nf' 
 
-include {collateSamples} from '../modules/upload.nf' 
-include {uploadToCLIMB} from '../modules/upload.nf' 
+// import subworkflows
+include {CLIMBrsync} from './upload.nf'
 
 
 // workflow component for artic pipeline
@@ -39,17 +39,6 @@ workflow sequenceAnalysis {
 }
      
 
-workflow CLIMBrsync {
-    take:
-      ch_sequenceAnalysisBAMs
-      ch_sequenceAnalysisFastas
-      ch_CLIMBkey
-
-    main:
-      collateSamples(ch_sequenceAnalysisBAMs.join(ch_sequenceAnalysisFastas, by: 0))
-      uploadToCLIMB(ch_CLIMBkey.combine(collateSamples.out.collect().toList()))
-}
-
 workflow articNcovNanopore {
     take:
       ch_runDirectory
@@ -58,7 +47,6 @@ workflow articNcovNanopore {
 
     main:
       sequenceAnalysis(ch_runDirectory, ch_fastqDirs, ch_seqSummary)
-/*
       if ( params.upload ) {
 
         Channel.fromPath("${params.CLIMBkey}")
@@ -66,6 +54,5 @@ workflow articNcovNanopore {
 
         CLIMBrsync(sequenceAnalysis.out.bams, sequenceAnalysis.out.fastas, ch_CLIMBkey )
       }
-*/
 }
 
