@@ -19,7 +19,7 @@ process readTrimming {
 
     script:
     """
-    if [[ \$(zcat ${forward} | head -n4 | wc -l) -eq 0 ]]; then
+    if [[ \$(gunzip -c ${forward} | head -n4 | wc -l) -eq 0 ]]; then
       exit 0
     else
       trim_galore --paired $forward $reverse
