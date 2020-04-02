@@ -6,6 +6,7 @@ nextflow.preview.dsl = 2
 // import modules
 include {articDownloadScheme } from '../modules/artic.nf' 
 include {makeIvarBedfile} from '../modules/illumina.nf' 
+include {cramToFastq} from '../modules/illumina.nf'
 include {readTrimming} from '../modules/illumina.nf' 
 include {readMapping} from '../modules/illumina.nf' 
 include {trimPrimerSequences} from '../modules/illumina.nf' 
@@ -30,13 +31,14 @@ workflow sequenceAnalysis {
     main:
       if (params.schemeRepoURL =~ /^http/) {
         articDownloadScheme()
-        makeIvarBedfile(articDownloadScheme.out)
+        makeIvarBedfile(articDownloadScheme.out.scheme)
         readTrimming(ch_filePairs)
-        readMapping(articDownloadScheme.out.combine(readTrimming.out))
+        readMapping(articDownloadScheme.out.scheme.combine(readTrimming.out))
       } else {
-        localScheme = Channel.fromPath(params.schemeRepoURL)
-        makeIvarBedfile(localScheme)
+        localRef = Channel.fromPath("${params.schemeRepoURL}/**/${params.schemeVersion}/*.reference.fasta")
+        makeIvarBedfile(localRef)
         readTrimming(ch_filePairs)
+        localScheme = Channel.fromPath($params.schemeRepoURL)
         readMapping(localScheme.combine(readTrimming.out))
       }
 
