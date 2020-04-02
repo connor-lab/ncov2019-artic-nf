@@ -14,6 +14,10 @@ if ( params.illumina ) {
        println("Please supply a directory containing fastqs with --directory")
        System.exit(1)
    }
+   if ( params.ivarBed && ! params.alignerRefPrefix ) {
+       println("ivarBed and alignerRefPrefix must be supplied together")
+       System.exit(1)
+   }
 } else if ( params.medaka || params.nanopolish ) {
    if (! params.basecalled_fastq ) {
        println("Please supply a directory containing basecalled fastqs with --basecalled_fastq (this is the output directory from guppy_barcoder or guppy_basecaller)")
@@ -23,6 +27,10 @@ if ( params.illumina ) {
    }
    if (! params.sequencing_summary ) {
        println("Please supply the path to the sequencing_summary.txt file from your run with --sequencing_summary")
+       System.exit(1)
+   }
+   if ( params.ivarBed || params.alignerRefPrefix ) {
+       println("ivarBed and alignerRefPrefix only work in illumina mode")
        System.exit(1)
    }
 } else {
