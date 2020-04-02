@@ -9,6 +9,7 @@ include {makeIvarBedfile} from '../modules/illumina.nf'
 include {readTrimming} from '../modules/illumina.nf' 
 include {readMapping} from '../modules/illumina.nf' 
 include {trimPrimerSequences} from '../modules/illumina.nf' 
+include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 
 include {makeQCCSV} from '../modules/qc.nf'
@@ -34,6 +35,8 @@ workflow sequenceAnalysis {
       readMapping(articDownloadScheme.out.scheme.combine(readTrimming.out))
 
       trimPrimerSequences(makeIvarBedfile.out.combine(readMapping.out))
+
+      callVariants(trimPrimerSequences.out.ptrim.combine(articDownloadScheme.out.reffasta))
 
       makeConsensus(trimPrimerSequences.out.ptrim)
 
