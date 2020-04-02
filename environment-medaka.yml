@@ -14,6 +14,7 @@ dependencies:
   - nomkl
   - openblas==0.3.3
   - pandas=0.23.0=py36_1
+  - matplotlib
   - pip
   - pysam=0.15.3
   - pytest

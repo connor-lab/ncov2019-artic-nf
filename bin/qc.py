@@ -3,6 +3,8 @@
 from Bio import SeqIO
 import csv
 import subprocess
+import pandas as pd
+import matplotlib.pyplot as plt
 
 """
 This script can incorporate as many QC checks as required
@@ -11,17 +13,34 @@ headed with 'qc_pass' and rows for each sample indcating
 'TRUE' if the overall QC check has passed or 'FALSE' if not.
 """
 
-def collect_covered_pos(bamfile, min_depth):
-    p = subprocess.Popen(['samtools', 'depth', bamfile],
+def make_depth_plot(depth_pos, samplename, window=200):
+    df = pd.DataFrame({ 'position' : [pos[1] for pos in depth_pos], 'depth' : [dep[2] for dep in depth_pos]  })
+    df['depth_moving_average'] = df.iloc[:,1].rolling(window=window).mean()
+    plt.plot(df['depth_moving_average'],label='Depth')
+    plt.legend(loc=2)
+    plt.title(samplename)
+    plt.savefig(samplename + '.depth.png')
+
+def read_depth_file(bamfile):
+    p = subprocess.Popen(['samtools', 'depth', '-a', '-d', '0', bamfile],
                        stdout=subprocess.PIPE)
     out, err = p.communicate()
     counter = 0
+
+    pos_depth = []
     for ln in out.decode('utf-8').split("\n"):
        if ln:
-          contig, pos, depth = ln.split("\t")
-          if int(depth) >= min_depth:
-              counter = counter + 1
+          pos_depth.append(ln.split("\t"))
+    
+    return pos_depth
 
+
+def collect_covered_pos(pos_depth, min_depth):
+    counter = 0
+    for contig, pos,depth in pos_depth:
+        if int(depth) >= min_depth:
+            counter = counter + 1
+    
     return counter
 
 
@@ -51,10 +70,9 @@ def go(args):
         depth = 20
 
     ref_length = get_ref_length(args.ref)
+    depth_pos = read_depth_file(args.bam)
 
-    qc_lines = []
-
-    depth_covered_bases = collect_covered_pos(args.bam, depth)
+    depth_covered_bases = collect_covered_pos(depth_pos, depth)
 
     pct_covered_bases = depth_covered_bases / ref_length * 100
 
@@ -67,21 +85,22 @@ def go(args):
         qc_pass = "FALSE"
 
 
-    qc_lines.append({ 'sample_name' : args.sample, 
-                'pct_covered_bases' : pct_covered_bases, 
-                 'longest_no_N_run' : largest_n_gap,
-                             'fasta': args.fasta, 
-                              'bam' : args.bam,
-                          'qc_pass' : qc_pass})
+    qc_line = { 'sample_name' : args.sample, 
+          'pct_covered_bases' : pct_covered_bases, 
+           'longest_no_N_run' : largest_n_gap,
+                       'fasta': args.fasta, 
+                        'bam' : args.bam,
+                    'qc_pass' : qc_pass}
 
 
     with open(args.outfile, 'w') as csvfile:
-        header = qc_lines[0].keys()
+        header = qc_line.keys()
         writer = csv.DictWriter(csvfile, fieldnames=header)
         writer.writeheader()
-        for line in qc_lines:
-            writer.writerow(line)
+        writer.writerow(qc_line)
 
+
+    make_depth_plot(depth_pos, args.sample)
 
 def main():
     import argparse

@@ -1,11 +1,14 @@
 process makeQCCSV {
     tag { sampleName }
 
+    publishDir "${params.outdir}/qc_plots", pattern: "${sampleName}.depth.png", mode: 'copy'
+
     input:
     tuple sampleName, path(bam), path(fasta), path(ref)
 
     output:
-    path("${params.prefix}.${sampleName}.qc.csv")
+    path "${params.prefix}.${sampleName}.qc.csv", emit: csv
+    path "${sampleName}.depth.png"
 
     script:
     if ( params.illumina ) {

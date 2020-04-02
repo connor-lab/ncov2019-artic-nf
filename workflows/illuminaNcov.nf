@@ -43,14 +43,14 @@ workflow sequenceAnalysis {
       makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
                                    .combine(articDownloadScheme.out.reffasta))
 
-      makeQCCSV.out.splitCsv()
-                   .unique()
-                   .branch {
-                       header: it[-1] == 'qc_pass'
-                       fail: it[-1] == 'FALSE'
-                       pass: it[-1] == 'TRUE'
-    		   }
-                   .set { qc }
+      makeQCCSV.out.csv.splitCsv()
+                       .unique()
+                       .branch {
+                           header: it[-1] == 'qc_pass'
+                           fail: it[-1] == 'FALSE'
+                           pass: it[-1] == 'TRUE'
+    		       }
+                       .set { qc }
 
      writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
 
