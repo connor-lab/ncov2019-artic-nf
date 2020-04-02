@@ -13,11 +13,26 @@ headed with 'qc_pass' and rows for each sample indcating
 'TRUE' if the overall QC check has passed or 'FALSE' if not.
 """
 
-def make_depth_plot(depth_pos, samplename, window=200):
-    df = pd.DataFrame({ 'position' : [pos[1] for pos in depth_pos], 'depth' : [dep[2] for dep in depth_pos]  })
-    df['depth_moving_average'] = df.iloc[:,1].rolling(window=window).mean()
-    plt.plot(df['depth_moving_average'],label='Depth')
-    plt.legend(loc=2)
+def make_qc_plot(depth_pos, n_density, samplename, window=200):
+    depth_df = pd.DataFrame( { 'position' : [pos[1] for pos in depth_pos], 'depth' : [dep[2] for dep in depth_pos] } )
+    depth_df['depth_moving_average'] = depth_df.iloc[:,1].rolling(window=window).mean()
+
+    n_df = pd.DataFrame( { 'position' : [pos[0] for pos in n_density], 'n_density' : [dens[1] for dens in n_density] } )
+
+    fig, ax1 = plt.subplots()
+    ax2 = ax1.twinx()
+
+    ax1.set_xlabel('Position')
+
+    ax1.set_ylabel('Depth', color = 'g')
+    ax1.set_ylim(top=10**5, bottom=1)
+    ax1.set_yscale('log')
+    ax1.plot(depth_df['depth_moving_average'], color = 'g')
+
+    ax2.set_ylabel('N density', color = 'r')  
+    ax2.plot(n_df['n_density'], color = 'r')
+    ax2.set_ylim(top=1)
+
     plt.title(samplename)
     plt.savefig(samplename + '.depth.png')
 
@@ -44,14 +59,12 @@ def collect_covered_pos(pos_depth, min_depth):
     return counter
 
 
-def collect_largest_n_gap(fastafile):
-    record = SeqIO.read(fastafile, "fasta")
-
-    n_pos =  [i for i, letter in enumerate(record.seq.lower()) if letter == 'n']
+def collect_largest_n_gap(fasta):
+    n_pos =  [i for i, letter in enumerate(fasta.seq.lower()) if letter == 'n']
 
     n_pos = [0] + n_pos
 
-    n_pos = n_pos + [len(record.seq)] 
+    n_pos = n_pos + [len(fasta.seq)] 
 
     n_gaps = [j-i for i, j in zip(n_pos[:-1], n_pos[1:])]
 
@@ -62,6 +75,21 @@ def collect_largest_n_gap(fastafile):
 def get_ref_length(ref):
     record = SeqIO.read(ref, "fasta")
     return len(record.seq)
+
+
+def sliding_window_n_density(sequence, window=10):
+
+    sliding_window_n_density = []
+    for i in range(0, len(sequence.seq), 1):
+        window_mid = i + ( window / 2)
+        window_seq = sequence.seq[i:i+window]
+        n_count = window_seq.lower().count('n')
+        n_density = n_count / window
+
+        sliding_window_n_density.append( [ window_mid, n_density ] )
+
+    return sliding_window_n_density
+
 
 def go(args):
     if args.illumina:
@@ -76,7 +104,9 @@ def go(args):
 
     pct_covered_bases = depth_covered_bases / ref_length * 100
 
-    largest_n_gap = collect_largest_n_gap(args.fasta)
+    fasta = SeqIO.read(args.fasta, "fasta")
+
+    largest_n_gap = collect_largest_n_gap(fasta)
 
     if largest_n_gap >= 10000 or pct_covered_bases > 50.0:
         qc_pass = "TRUE"
@@ -99,8 +129,8 @@ def go(args):
         writer.writeheader()
         writer.writerow(qc_line)
 
-
-    make_depth_plot(depth_pos, args.sample)
+    n_density = sliding_window_n_density(fasta)
+    make_qc_plot(depth_pos, n_density, args.sample)
 
 def main():
     import argparse
