@@ -30,6 +30,10 @@ def collect_largest_n_gap(fastafile):
 
     n_pos =  [i for i, letter in enumerate(record.seq.lower()) if letter == 'n']
 
+    n_pos = [0] + n_pos
+
+    n_pos = n_pos + [len(record.seq)] 
+
     n_gaps = [j-i for i, j in zip(n_pos[:-1], n_pos[1:])]
 
     return sorted(n_gaps)[-1]
