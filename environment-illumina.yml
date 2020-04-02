@@ -5,6 +5,7 @@ channels:
   - defaults
 dependencies:
   - python=3
+  - biopython=1.76
   - bwa=0.7.17=pl5.22.0_2
   - samtools=1.9
   - trim-galore=0.6.5
