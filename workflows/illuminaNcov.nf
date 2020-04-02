@@ -32,9 +32,18 @@ workflow sequenceAnalysis {
     main:
       readTrimming(ch_filePairs)
 
+      ref = Channel.fromPath("var")
+      if (params.alignerRefPrefix) {
+        ref = Channel.fromPath(params.alignerRefPrefix)
+      } else if (params.schemeRepoURL =~ /^http/) {
+        articDownloadScheme()
+        ref = articDownloadScheme.out.reffasta
+      } else {
+        ref = Channel.fromPath("${params.schemeRepoURL}/**/${params.schemeVersion}/*.reference.fasta")
+      }
+
       if (params.ivarBed != "" && params.alignerRefPrefix != "") {
         ivarBed = Channel.fromPath(params.ivarBed)
-        ref = Channel.fromPath(params.alignerRefPrefix)
         index = Channel.fromPath("${params.alignerRefPrefix}.*")
 
         readMapping(ref.combine(index.collect()).combine(readTrimming.out))
@@ -43,21 +52,18 @@ workflow sequenceAnalysis {
 
         callVariants(trimPrimerSequences.out.ptrim.combine(ref))
       } else {
+        indexReference(ref)
+
+        readMapping(indexReference.out.combine(readTrimming.out))
+
         if (params.schemeRepoURL =~ /^http/) {
-          articDownloadScheme()
-          indexReference(articDownloadScheme.out)
-          readMapping(indexReference.out.combine(readTrimming.out))
           trimPrimerSequences(articDownloadScheme.out.bed.combine(readMapping.out))
-          callVariants(trimPrimerSequences.out.ptrim.combine(articDownloadScheme.out.reffasta))
         } else {
-          localScheme = Channel.fromPath(params.schemeRepoURL)
-          indexReference(localScheme)
-          readMapping(indexReference.out.combine(readTrimming.out))
           localBed = Channel.fromPath("${params.schemeRepoURL}/**/${params.schemeVersion}/${params.scheme}.bed")
           trimPrimerSequences(localBed.combine(readMapping.out))
-          localRef = Channel.fromPath("${params.schemeRepoURL}/**/${params.schemeVersion}/*.reference.fasta")
-          callVariants(trimPrimerSequences.out.ptrim.combine(localRef))
-        } 
+        }
+
+        callVariants(trimPrimerSequences.out.ptrim.combine(ref))
       }
 
       trimPrimerSequences(articDownloadScheme.out.bed.combine(readMapping.out))
@@ -67,7 +73,7 @@ workflow sequenceAnalysis {
       makeConsensus(trimPrimerSequences.out.ptrim)
 
       makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
-                                   .combine(articDownloadScheme.out.reffasta))
+                                   .combine(ref))
 
       makeQCCSV.out.csv.splitCsv()
                        .unique()

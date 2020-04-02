@@ -32,17 +32,17 @@ process indexReference {
     * Indexes reference fasta file in the scheme repo using bwa.
     */
 
-    tag { schemeRepo }
+    tag { ref }
 
     input:
-        path(schemeRepo)
+        path(ref)
 
     output:
         tuple(path('ref.fa'), path('ref.fa.amb'), path('ref.fa.ann'), path('ref.fa.bwt'), path('ref.fa.pac'), path('ref.fa.sa'))
 
     script:
         """
-        ln -s ${schemeRepo}/${params.schemeDir}/${params.scheme}/${params.schemeVersion}/*.reference.fasta ref.fa
+        ln -s ${ref} ref.fa
         bwa index ref.fa
         """
 }
