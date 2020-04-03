@@ -108,7 +108,7 @@ def go(args):
 
     largest_n_gap = collect_largest_n_gap(fasta)
 
-    if largest_n_gap >= 10000 or pct_covered_bases > 50.0:
+    if largest_n_gap >= 10000 or pct_covered_bases > 85.0:
         qc_pass = "TRUE"
        
     else:
