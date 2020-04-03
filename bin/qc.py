@@ -50,7 +50,7 @@ def read_depth_file(bamfile):
     return pos_depth
 
 
-def collect_covered_pos(pos_depth, min_depth):
+def get_covered_pos(pos_depth, min_depth):
     counter = 0
     for contig, pos,depth in pos_depth:
         if int(depth) >= min_depth:
@@ -58,26 +58,34 @@ def collect_covered_pos(pos_depth, min_depth):
     
     return counter
 
-
-def collect_largest_n_gap(fasta):
+def get_N_positions(fasta):
     n_pos =  [i for i, letter in enumerate(fasta.seq.lower()) if letter == 'n']
 
-    n_pos = [0] + n_pos
+    return n_pos
 
-    n_pos = n_pos + [len(fasta.seq)] 
+def get_pct_N_bases(fasta):
+    
+    count_N = len(get_N_positions(fasta))
+
+    pct_N_bases = count_N / len(fasta.seq) * 100
+
+    return pct_N_bases
+
+def get_largest_N_gap(fasta):
+    n_pos = get_N_positions(fasta)
+
+    n_pos = [0] + n_pos + [len(fasta.seq)]
 
     n_gaps = [j-i for i, j in zip(n_pos[:-1], n_pos[1:])]
 
     return sorted(n_gaps)[-1]
-
-
 
 def get_ref_length(ref):
     record = SeqIO.read(ref, "fasta")
     return len(record.seq)
 
 
-def sliding_window_n_density(sequence, window=10):
+def sliding_window_N_density(sequence, window=10):
 
     sliding_window_n_density = []
     for i in range(0, len(sequence.seq), 1):
@@ -97,27 +105,39 @@ def go(args):
     elif args.nanopore:
         depth = 20
 
+    ## Depth calcs
     ref_length = get_ref_length(args.ref)
     depth_pos = read_depth_file(args.bam)
 
-    depth_covered_bases = collect_covered_pos(depth_pos, depth)
+    depth_covered_bases = get_covered_pos(depth_pos, depth)
 
     pct_covered_bases = depth_covered_bases / ref_length * 100
 
+    
+    # Unknown base calcs
     fasta = SeqIO.read(args.fasta, "fasta")
 
-    largest_n_gap = collect_largest_n_gap(fasta)
+    pct_N_bases = get_pct_N_bases(fasta)
 
-    if largest_n_gap >= 10000 or pct_covered_bases > 85.0:
-        qc_pass = "TRUE"
+    largest_N_gap = get_largest_N_gap(fasta)
+
+
+    # QC PASS / FAIL
+    if largest_N_gap >= 10000 or pct_covered_bases >= 85.0:
+        if pct_N_bases < 50.0:
+            qc_pass = "TRUE"
+       
+        else:
+            qc_pass = "FALSE"
        
     else:
         qc_pass = "FALSE"
 
 
-    qc_line = { 'sample_name' : args.sample, 
-          'pct_covered_bases' : pct_covered_bases, 
-           'longest_no_N_run' : largest_n_gap,
+    qc_line = { 'sample_name' : args.sample,
+                'pct_N_bases' : "{:.2f}".format(pct_N_bases),
+          'pct_covered_bases' : "{:.2f}".format(pct_covered_bases), 
+           'longest_no_N_run' : largest_N_gap,
                        'fasta': args.fasta, 
                         'bam' : args.bam,
                     'qc_pass' : qc_pass}
@@ -129,8 +149,8 @@ def go(args):
         writer.writeheader()
         writer.writerow(qc_line)
 
-    n_density = sliding_window_n_density(fasta)
-    make_qc_plot(depth_pos, n_density, args.sample)
+    N_density = sliding_window_N_density(fasta)
+    make_qc_plot(depth_pos, N_density, args.sample)
 
 def main():
     import argparse
