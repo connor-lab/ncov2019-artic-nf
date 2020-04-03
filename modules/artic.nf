@@ -9,6 +9,7 @@ process articDownloadScheme{
 
     output:
     path "scheme/**/${params.schemeVersion}/*.reference.fasta" , emit: reffasta
+    path "scheme/**/${params.schemeVersion}/${params.scheme}.bed" , emit: bed
     path "scheme" , emit: scheme
 
     script:

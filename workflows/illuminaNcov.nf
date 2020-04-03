@@ -28,13 +28,11 @@ workflow sequenceAnalysis {
     main:
       articDownloadScheme()
 
-      makeIvarBedfile(articDownloadScheme.out.scheme)
-
       readTrimming(ch_filePairs)
 
       readMapping(articDownloadScheme.out.scheme.combine(readTrimming.out))
 
-      trimPrimerSequences(makeIvarBedfile.out.combine(readMapping.out))
+      trimPrimerSequences(articDownloadScheme.out.bed.combine(readMapping.out))
 
       callVariants(trimPrimerSequences.out.ptrim.combine(articDownloadScheme.out.reffasta))
 
