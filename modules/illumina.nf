@@ -79,7 +79,7 @@ process makeIvarBedfile {
         reader = csv.reader(bedfile, delimiter='\t')
         for row in reader:
             row[4] = '60'
-            if row[3].endswith('LEFT'):
+            if 'LEFT' in row[3]:
                  row.append('+')
             else: 
                 row.append('-')
