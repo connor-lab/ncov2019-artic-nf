@@ -33,6 +33,8 @@ This repo contains both [Singularity]("https://sylabs.io/guides/3.0/user-guide/i
 #### Conda
 The repo contains a environment.yml files which automatically build the correct conda env if `-profile conda` is specifed in the command. Although you'll need `conda` installed, this is probably the easiest way to run this pipeline.
 
+--cache /some/dir can be specified to have a fixed, shared location to store the conda build for use by multiple runs of the workflow.
+
 #### Executors
 By default, the pipeline just runs on the local machine. You can specify `-profile slurm` to use a SLURM cluster. 
 
