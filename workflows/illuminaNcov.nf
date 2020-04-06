@@ -7,6 +7,7 @@ nextflow.preview.dsl = 2
 include {articDownloadScheme } from '../modules/artic.nf' 
 include {makeIvarBedfile} from '../modules/illumina.nf' 
 include {readTrimming} from '../modules/illumina.nf' 
+include {indexReference} from '../modules/illumina.nf'
 include {readMapping} from '../modules/illumina.nf' 
 include {trimPrimerSequences} from '../modules/illumina.nf' 
 include {callVariants} from '../modules/illumina.nf'
@@ -28,20 +29,46 @@ workflow sequenceAnalysis {
       ch_filePairs
 
     main:
-      articDownloadScheme()
-
       readTrimming(ch_filePairs)
 
-      readMapping(articDownloadScheme.out.scheme.combine(readTrimming.out))
+      ref = Channel.fromPath("var")
+      if (params.alignerRefPrefix) {
+        ref = Channel.fromPath(params.alignerRefPrefix)
+      } else if (params.schemeRepoURL =~ /^http/) {
+        articDownloadScheme()
+        ref = articDownloadScheme.out.reffasta
+      } else {
+        ref = Channel.fromPath("${params.schemeRepoURL}/**/${params.schemeVersion}/*.reference.fasta")
+      }
 
-      trimPrimerSequences(articDownloadScheme.out.bed.combine(readMapping.out))
+      if (params.ivarBed != "" && params.alignerRefPrefix != "") {
+        ivarBed = Channel.fromPath(params.ivarBed)
+        index = Channel.fromPath("${params.alignerRefPrefix}.*")
 
-      callVariants(trimPrimerSequences.out.ptrim.combine(articDownloadScheme.out.reffasta))
+        readMapping(ref.combine(index.collect()).combine(readTrimming.out))
+
+        trimPrimerSequences(ivarBed.combine(readMapping.out))
+
+        callVariants(trimPrimerSequences.out.ptrim.combine(ref))
+      } else {
+        indexReference(ref)
+
+        readMapping(indexReference.out.combine(readTrimming.out))
+
+        if (params.schemeRepoURL =~ /^http/) {
+          trimPrimerSequences(articDownloadScheme.out.bed.combine(readMapping.out))
+        } else {
+          localBed = Channel.fromPath("${params.schemeRepoURL}/**/${params.schemeVersion}/${params.scheme}.bed")
+          trimPrimerSequences(localBed.combine(readMapping.out))
+        }
+
+        callVariants(trimPrimerSequences.out.ptrim.combine(ref))
+      }
 
       makeConsensus(trimPrimerSequences.out.ptrim)
 
       makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
-                                   .combine(articDownloadScheme.out.reffasta))
+                                   .combine(ref))
 
       makeQCCSV.out.csv.splitCsv()
                        .unique()
