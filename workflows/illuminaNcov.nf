@@ -6,7 +6,6 @@ nextflow.preview.dsl = 2
 // import modules
 include {articDownloadScheme } from '../modules/artic.nf' 
 include {makeIvarBedfile} from '../modules/illumina.nf' 
-include {cramToFastq} from '../modules/illumina.nf'
 include {readTrimming} from '../modules/illumina.nf' 
 include {indexReference} from '../modules/illumina.nf'
 include {readMapping} from '../modules/illumina.nf' 
@@ -65,10 +64,6 @@ workflow sequenceAnalysis {
 
         callVariants(trimPrimerSequences.out.ptrim.combine(ref))
       }
-
-      trimPrimerSequences(articDownloadScheme.out.bed.combine(readMapping.out))
-
-      callVariants(trimPrimerSequences.out.ptrim.combine(articDownloadScheme.out.reffasta))
 
       makeConsensus(trimPrimerSequences.out.ptrim)
 
