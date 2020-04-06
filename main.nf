@@ -10,8 +10,8 @@ include {ncovIlluminaCram} from './workflows/illuminaNcov.nf'
 
 
 if ( params.illumina ) {
-   if (! params.directory ) {
-       println("Please supply a directory containing fastqs with --directory")
+   if ( !params.directory ) {
+       println("Please supply a directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
        System.exit(1)
    }
 } else if ( params.medaka || params.nanopolish ) {
@@ -41,10 +41,13 @@ workflow {
    if ( params.illumina ) {
        if (params.cram) {
            Channel.fromPath( "${params.directory}/**.cram" )
-              .set{ ch_cramDirectory }
+              .map { file -> tuple(file.baseName, file) }
+              .ifEmpty{ println("Couldn't match any cram files") ; System.exit(1)}
+              .set{ ch_cramFiles }
        }
        else {
 	   Channel.fromFilePairs( params.fastqSearchPath, flat: true)
+               .ifEmpty{ println("Couldn't match any fastq files with glob: " + ${params.fastqSearchPath} ) ; System.exit(1) }
 	       .set{ ch_filePairs }
        }
    }
@@ -80,7 +83,7 @@ workflow {
          articNcovNanopore(ch_fastqDirs, ch_fast5Pass, ch_seqSummary)
      } else if ( params.illumina ) {
          if ( params.cram ) {
-            ncovIlluminaCram(ch_cramDirectory)
+            ncovIlluminaCram(ch_cramFiles)
          }
          else {
             ncovIllumina(ch_filePairs)

@@ -11,6 +11,8 @@ include {readMapping} from '../modules/illumina.nf'
 include {trimPrimerSequences} from '../modules/illumina.nf' 
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
+include {cramToFastq} from '../modules/illumina.nf'
+
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
@@ -20,8 +22,6 @@ include {collateSamples} from '../modules/upload.nf'
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
 
-
-include {cramToFastq} from '../modules/illumina.nf' params(params)
 
 workflow sequenceAnalysis {
     take:
@@ -81,9 +81,9 @@ workflow ncovIllumina {
 
 workflow ncovIlluminaCram {
     take:
-      ch_cramDirectory
+      ch_cramFiles
     main:
-      cramToFastq(ch_cramDirectory)
+      cramToFastq(ch_cramFiles)
       ncovIllumina(cramToFastq.out)
 }
 

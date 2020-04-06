@@ -167,18 +167,16 @@ process cramToFastq {
     * @output
     */
 
-    //publishDir "${params.outdir}/${task.process.replaceAll(":","_")}"
-
     input:
-        file(cram)
+        tuple sampleName, file(cram)
 
     output:
-        tuple(val("${cram.toString().replaceFirst(/\.cram/, "")}"), path("*_1.fastq.gz"),path("*_2.fastq.gz"))
+        tuple sampleName, path("${sampleName}_1.fastq.gz"), path("${sampleName}_2.fastq.gz")
 
     script:
         """
         samtools collate -u ${cram} -o tmp.bam
-        samtools fastq -1 ${cram.toString().replaceFirst(/\.cram/, "_1.fastq.gz")} -2 ${cram.toString().replaceFirst(/\.cram/, "_2.fastq.gz")} tmp.bam
+        samtools fastq -1 ${sampleName}_1.fastq.gz -2 ${sampleName}_2.fastq.gz tmp.bam
         rm tmp.bam
         """
 }
