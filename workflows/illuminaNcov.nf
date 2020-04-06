@@ -21,6 +21,8 @@ include {collateSamples} from '../modules/upload.nf'
 include {CLIMBrsync} from './upload.nf'
 
 
+include {cramToFastq} from '../modules/illumina.nf' params(params)
+
 workflow sequenceAnalysis {
     take:
       ch_filePairs
@@ -75,5 +77,13 @@ workflow ncovIllumina {
         CLIMBrsync(sequenceAnalysis.out.qc_pass, ch_CLIMBkey )
       }
 
+}
+
+workflow ncovIlluminaCram {
+    take:
+      ch_cramDirectory
+    main:
+      cramToFastq(ch_cramDirectory)
+      ncovIllumina(cramToFastq.out)
 }
 
