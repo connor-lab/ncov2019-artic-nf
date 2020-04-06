@@ -19,6 +19,10 @@ This Nextflow pipeline automates the ARTIC network [nCoV-2019 novel coronavirus 
 
 You can also use cram file input by passing the --cram flag.
 
+For production use at large scale, where you will run the workflow many times, you can avoid cloning the scheme repository, creating an ivar bed file and indexing the reference every time by supplying both --ivarBed /path/to/ivar-compatible.bed and --alignerRefPrefix /path/to/bwa-indexed/ref.fa.
+
+Alternatively you can avoid just the cloning of the scheme repository to remain on a fixed revision of it over time by passing --schemeRepoURL /path/to/own/clone/of/github.com/artic-network/artic-ncov2019. This removes any internet access from the workflow except for the optional upload steps.
+
 ##### Nanopore
 ###### Nanopolish
 `nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] --nanopolish --prefix "output_file_prefix" --basecalled_fastq /path/to/directory --fast5_pass /path/to/directory --sequencing_summary /path/to/sequencing_summary.txt`
