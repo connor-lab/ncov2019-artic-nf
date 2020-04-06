@@ -14,7 +14,7 @@ if ( params.illumina ) {
        println("Please supply a directory containing fastqs with --directory")
        System.exit(1)
    }
-   if ( params.ivarBed && ! params.alignerRefPrefix ) {
+   if ( (params.ivarBed && ! params.alignerRefPrefix) || (!params.ivarBed && params.alignerRefPrefix) ) {
        println("ivarBed and alignerRefPrefix must be supplied together")
        System.exit(1)
    }
