@@ -14,8 +14,8 @@ if ( params.illumina ) {
        println("Please supply a directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
        System.exit(1)
    }
-   if ( (params.ivarBed && ! params.alignerRefPrefix) || (!params.ivarBed && params.alignerRefPrefix) ) {
-       println("ivarBed and alignerRefPrefix must be supplied together")
+   if ( (params.bed && ! params.ref) || (!params.bed && params.ref) ) {
+       println("--bed and --ref must be supplied together")
        System.exit(1)
    }
 } else if ( params.medaka || params.nanopolish ) {
@@ -49,14 +49,12 @@ workflow {
    if ( params.illumina ) {
        if (params.cram) {
            Channel.fromPath( "${params.directory}/**.cram" )
-              .map { file -> tuple(file.baseName, file) }
-              .ifEmpty{ println("Couldn't match any cram files") ; System.exit(1)}
-              .set{ ch_cramFiles }
+                  .map { file -> tuple(file.baseName, file) }
+                  .set{ ch_cramFiles }
        }
        else {
 	   Channel.fromFilePairs( params.fastqSearchPath, flat: true)
-               .ifEmpty{ println("Couldn't match any fastq files with glob: " + ${params.fastqSearchPath} ) ; System.exit(1) }
-	       .set{ ch_filePairs }
+	          .set{ ch_filePairs }
        }
    }
    else {

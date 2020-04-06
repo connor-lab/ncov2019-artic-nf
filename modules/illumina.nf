@@ -38,7 +38,7 @@ process indexReference {
         path(ref)
 
     output:
-        tuple(path('ref.fa'), path('ref.fa.amb'), path('ref.fa.ann'), path('ref.fa.bwt'), path('ref.fa.pac'), path('ref.fa.sa'))
+        tuple path('ref.fa'), path('ref.fa.*')
 
     script:
         """
@@ -62,7 +62,7 @@ process readMapping {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.sorted.bam", mode: 'copy'
 
     input:
-        tuple(path(ref), path(amb), path(ann), path(bwt), path(pac), path(sa), sampleName, path(forward), path(reverse))
+        tuple sampleName, path(forward), path(reverse), path(ref), path("*")
 
     output:
         tuple(sampleName, path("${sampleName}.sorted.bam"))
@@ -74,42 +74,6 @@ process readMapping {
         """
 }
 
-process makeIvarBedfile {
-
-    tag { schemeRepo }
-
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "ivar.bed", mode: 'copy'
-
-    input:
-    file(schemeRepo)
-
-    output:
-    file("ivar.bed")
-
-    script:
-    """
-    #!/usr/bin/env python3
-  
-    import csv
-
-    bedrows = []
-    with open("${schemeRepo}/${params.schemeDir}/${params.scheme}/${params.schemeVersion}/nCoV-2019.scheme.bed", newline='') as bedfile:
-        reader = csv.reader(bedfile, delimiter='\t')
-        for row in reader:
-            row[4] = '60'
-            if 'LEFT' in row[3]:
-                 row.append('+')
-            else: 
-                row.append('-')
-            bedrows.append(row)
-
-    with open('ivar.bed', 'w', newline='') as bedfile:
-        writer = csv.writer(bedfile, delimiter='\t')
-        for row in bedrows:
-            writer.writerow(row)
-    """
-}
-
 process trimPrimerSequences {
 
     tag { sampleName }
@@ -118,7 +82,7 @@ process trimPrimerSequences {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
 
     input:
-    tuple(path(bedfile), sampleName, path(bam))
+    tuple sampleName, path(bam), path(bedfile)
 
     output:
     tuple sampleName, path("${sampleName}.mapped.bam"), emit: mapped
