@@ -15,14 +15,14 @@ This Nextflow pipeline automates the ARTIC network [nCoV-2019 novel coronavirus 
 
 #### Quick-start
 ##### Illumina
-`nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm] --illumina --prefix "output_file_prefix" --directory /path/to/reads`
+`nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] --illumina --prefix "output_file_prefix" --directory /path/to/reads`
 
 ##### Nanopore
 ###### Nanopolish
-`nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm] --nanopolish --prefix "output_file_prefix" --basecalled_fastq /path/to/directory --fast5_pass /path/to/directory --sequencing_summary /path/to/sequencing_summary.txt`
+`nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] --nanopolish --prefix "output_file_prefix" --basecalled_fastq /path/to/directory --fast5_pass /path/to/directory --sequencing_summary /path/to/sequencing_summary.txt`
 
 ###### Medaka
- `nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm] --medaka --prefix "output_file_prefix" --basecalled_fastq /path/to/directory --fast5_pass /path/to/directory --sequencing_summary /path/to/sequencing_summary.txt`
+ `nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] --medaka --prefix "output_file_prefix" --basecalled_fastq /path/to/directory --fast5_pass /path/to/directory --sequencing_summary /path/to/sequencing_summary.txt`
 
 #### Installation
 An up-to-date version of Nextflow is required because the pipeline is written in DSL2. Following the instructions at https://www.nextflow.io/ to download and install Nextflow should get you a recent-enough version. 
@@ -36,7 +36,7 @@ The repo contains a environment.yml files which automatically build the correct 
 --cache /some/dir can be specified to have a fixed, shared location to store the conda build for use by multiple runs of the workflow.
 
 #### Executors
-By default, the pipeline just runs on the local machine. You can specify `-profile slurm` to use a SLURM cluster. 
+By default, the pipeline just runs on the local machine. You can specify `-profile slurm` to use a SLURM cluster, or `-profile lsf` to use an LSF cluster. In either case you will need to edit the appropriate .config file in the conf directory to provide local queue names.
 
 #### Profiles
 You can use multiple profiles at once, separating them with a comma. This is described in the Nextflow [documentation](https://www.nextflow.io/docs/latest/config.html#config-profiles) 
