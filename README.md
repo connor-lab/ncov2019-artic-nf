@@ -17,6 +17,8 @@ This Nextflow pipeline automates the ARTIC network [nCoV-2019 novel coronavirus 
 ##### Illumina
 `nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] --illumina --prefix "output_file_prefix" --directory /path/to/reads`
 
+You can also use cram file input by passing the --cram flag.
+
 ##### Nanopore
 ###### Nanopolish
 `nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] --nanopolish --prefix "output_file_prefix" --basecalled_fastq /path/to/directory --fast5_pass /path/to/directory --sequencing_summary /path/to/sequencing_summary.txt`
