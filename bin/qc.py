@@ -117,21 +117,20 @@ def go(args):
     # Unknown base calcs
     fasta = SeqIO.read(args.fasta, "fasta")
 
-    pct_N_bases = get_pct_N_bases(fasta)
+	pct_N_bases   = 0
+	largest_N_gap = 0
+	qc_pass       = "FALSE"
 
-    largest_N_gap = get_largest_N_gap(fasta)
+	if len(fasta.seq) != 0:
 
+    	pct_N_bases = get_pct_N_bases(fasta)
 
-    # QC PASS / FAIL
-    if largest_N_gap >= 10000 or pct_covered_bases >= 85.0:
-        if pct_N_bases < 50.0:
-            qc_pass = "TRUE"
-       
-        else:
-            qc_pass = "FALSE"
-       
-    else:
-        qc_pass = "FALSE"
+    	largest_N_gap = get_largest_N_gap(fasta)
+
+    	# QC PASS / FAIL
+    	if largest_N_gap >= 10000 or pct_covered_bases >= 85.0:
+        	if pct_N_bases < 50.0:
+            	qc_pass = "TRUE"
 
 
     qc_line = { 'sample_name' : args.sample,
