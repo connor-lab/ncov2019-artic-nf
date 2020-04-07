@@ -50,11 +50,15 @@ workflow prepareReferenceFiles {
 
         ch_refFasta.combine(ch_bwaAuxFiles.collect().toList())
                    .set{ ch_preparedRef }
-        } else {
-            indexReference(ch_refFasta)
-            indexReference.out
-                          .set{ ch_preparedRef }
-        }
+      } else {
+        indexReference(ch_refFasta)
+        indexReference.out
+                      .set{ ch_preparedRef }
+      }
+    } else {
+      indexReference(ch_refFasta)
+      indexReference.out
+                    .set{ ch_preparedRef }
     }
   
     /* If bedfile is supplied, use that,
