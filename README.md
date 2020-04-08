@@ -42,7 +42,7 @@ The repo contains a environment.yml files which automatically build the correct 
 --cache /some/dir can be specified to have a fixed, shared location to store the conda build for use by multiple runs of the workflow.
 
 #### Executors
-By default, the pipeline just runs on the local machine. You can specify `-profile slurm` to use a SLURM cluster, `-profile lsf` to use an LSF cluster, or  -profile gls  to use the Google Cloud Life Sciences API. In either case you will need to edit the appropriate .config file in the conf directory to provide local queue names.
+By default, the pipeline just runs on the local machine. You can specify `-profile slurm` to use a SLURM cluster, `-profile lsf` to use an LSF cluster, or  `-profile gls`  to use the Google Cloud Life Sciences API. In either case you will need to edit the appropriate .config file in the conf directory to provide local queue names.
 
 #### Profiles
 You can use multiple profiles at once, separating them with a comma. This is described in the Nextflow [documentation](https://www.nextflow.io/docs/latest/config.html#config-profiles) 
