@@ -11,4 +11,8 @@ dependencies:
   - pandas=1.0.3
   - samtools=1.9
   - trim-galore=0.6.5
-  - ivar=1.2
+  - bcftools=1.9
+  - bedtools=2.29.2
+  - lofreq=2.1.4
+  - pyvcf=0.6.8
+  - pysam=0.15.0.1
