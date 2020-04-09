@@ -7,9 +7,11 @@ nextflow.preview.dsl = 2
 include {articNcovNanopore} from './workflows/articNcovNanopore.nf' 
 include {ncovIllumina} from './workflows/illuminaNcov.nf'
 include {ncovIlluminaCram} from './workflows/illuminaNcov.nf'
+include {ncovIlluminaVariants} from './workflows/illuminaNcovVariants.nf'
+include {ncovIlluminaVariantsCram} from './workflows/illuminaNcovVariants.nf'
 
 
-if ( params.illumina ) {
+if ( params.illumina || params.illuminavariants ) {
    if ( !params.directory ) {
        println("Please supply a directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
        System.exit(1)
@@ -46,14 +48,14 @@ if ( ! params.prefix ) {
 
 // main workflow
 workflow {
-   if ( params.illumina ) {
+   if ( params.illumina || params.illuminavariants ) {
        if (params.cram) {
            Channel.fromPath( "${params.directory}/**.cram" )
                   .map { file -> tuple(file.baseName, file) }
                   .set{ ch_cramFiles }
        }
        else {
-	   Channel.fromFilePairs( params.fastqSearchPath, flat: true)
+	        Channel.fromFilePairs( params.fastqSearchPath, flat: true)
 	          .set{ ch_filePairs }
        }
    }
@@ -94,8 +96,15 @@ workflow {
          else {
             ncovIllumina(ch_filePairs)
          }
+     } else if ( params.illuminavariants ) {
+         if ( params.cram ) {
+            ncovIlluminaVariantsCram(ch_cramFiles)
+         }
+         else {
+            ncovIlluminaVariants(ch_filePairs)
+         }
      } else {
-         println("Please select a workflow with --nanopolish, --illumina or --medaka")
+         println("Please select a workflow with --nanopolish, --illumina, --illuminavariants or --medaka")
      }
      
 }
