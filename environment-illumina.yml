@@ -18,3 +18,4 @@ dependencies:
   - lofreq=2.1.4
   - pyvcf=0.6.8
   - pandas=1.0.3
+  - pysam=0.15.3
