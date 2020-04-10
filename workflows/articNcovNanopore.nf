@@ -6,7 +6,8 @@ nextflow.preview.dsl = 2
 // import modules
 include {articDownloadScheme} from '../modules/artic.nf' 
 include {articGuppyPlex} from '../modules/artic.nf' 
-include {articMinION} from  '../modules/artic.nf' 
+include {articMinIONNanopolish} from  '../modules/artic.nf' 
+include {articMinIONMedaka} from  '../modules/artic.nf'
 include {articRemoveUnmappedReads} from '../modules/artic.nf' 
 
 include {makeQCCSV} from '../modules/qc.nf'
@@ -20,7 +21,7 @@ include {CLIMBrsync} from './upload.nf'
 
 
 // workflow component for artic pipeline
-workflow sequenceAnalysis {
+workflow sequenceAnalysisNanopolish {
     take:
       ch_runFastqDirs
       ch_fast5Pass
@@ -31,14 +32,54 @@ workflow sequenceAnalysis {
       
       articGuppyPlex(ch_runFastqDirs.flatten())
 
-      articMinION(articGuppyPlex.out.fastq
-                             .combine(articDownloadScheme.out.scheme)
-                             .combine(ch_fast5Pass)
-                             .combine(ch_seqSummary))
+      articMinIONNanopolish(articGuppyPlex.out.fastq
+                                          .combine(articDownloadScheme.out.scheme)
+                                          .combine(ch_fast5Pass)
+                                          .combine(ch_seqSummary))
 
-      articRemoveUnmappedReads(articMinION.out.mapped)
+      articRemoveUnmappedReads(articMinIONNanopolish.out.mapped)
 
-      makeQCCSV(articMinION.out.ptrim.join(articMinION.out.consensus_fasta, by: 0)
+      makeQCCSV(articMinIONNanopolish.out.ptrim
+                                     .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
+                                     .combine(articDownloadScheme.out.reffasta))
+
+      makeQCCSV.out.csv.splitCsv()
+                       .unique()
+                       .branch {
+                           header: it[-1] == 'qc_pass'
+                           fail: it[-1] == 'FALSE'
+                           pass: it[-1] == 'TRUE'
+                       }
+                       .set { qc }
+
+     writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
+
+     collateSamples(qc.pass.map{ it[0] }
+                           .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
+                           .join(articRemoveUnmappedReads.out))
+
+
+
+    emit:
+      qc_pass = collateSamples.out
+
+}
+
+workflow sequenceAnalysisMedaka {
+    take:
+      ch_runFastqDirs
+
+    main:
+      articDownloadScheme()
+
+      articGuppyPlex(ch_runFastqDirs.flatten())
+
+      articMinIONMedaka(articGuppyPlex.out.fastq
+                                      .combine(articDownloadScheme.out.scheme))
+
+      articRemoveUnmappedReads(articMinIONMedaka.out.mapped)
+
+      makeQCCSV(articMinIONMedaka.out.ptrim.join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .combine(articDownloadScheme.out.reffasta))
 
       makeQCCSV.out.csv.splitCsv()
@@ -53,25 +94,33 @@ workflow sequenceAnalysis {
      writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
 
      collateSamples(qc.pass.map{ it[0] }
-                           .join(articMinION.out.consensus_fasta, by: 0)
+                           .join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
-
-
 
     emit:
       qc_pass = collateSamples.out
 
 }
-     
+
 
 workflow articNcovNanopore {
     take:
-      ch_runDirectory
       ch_fastqDirs
-      ch_seqSummary
-
+    
     main:
-      sequenceAnalysis(ch_runDirectory, ch_fastqDirs, ch_seqSummary)
+      if ( params.nanopolish ) {
+          Channel.fromPath( "${params.fast5_pass}" )
+                 .set{ ch_fast5Pass }
+
+          Channel.fromPath( "${params.sequencing_summary}" )
+                 .set{ ch_seqSummary }
+
+          sequenceAnalysisNanopolish(ch_fastqDirs, ch_fast5Pass, ch_seqSummary)
+
+      } else if ( params.medaka ) {
+          sequenceAnalysisMedaka(ch_fastqDirs)
+      }
+
       if ( params.upload ) {
 
         Channel.fromPath("${params.CLIMBkey}")
