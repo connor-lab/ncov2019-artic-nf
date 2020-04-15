@@ -41,7 +41,54 @@ process articGuppyPlex {
     """
 }
 
-process articMinION {
+process articMinIONMedaka {
+    tag { sampleName }
+
+    label 'largecpu'
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
+
+    input:
+    tuple file(fastq), file(schemeRepo)
+
+    output:
+    file("${sampleName}.*")
+    
+    tuple sampleName, file("${sampleName}.primertrimmed.rg.sorted.bam"), emit: ptrim
+    tuple sampleName, file("${sampleName}.sorted.bam"), emit: mapped
+    tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
+
+    script:
+    // Make an identifier from the fastq filename
+    sampleName = fastq.getBaseName().replaceAll(~/\.fastq.*$/, '')
+
+    // Configure artic minion pipeline
+    minionRunConfigBuilder = []
+
+    if ( params.normalise ) {
+    minionRunConfigBuilder.add("--normalise ${params.normalise}")
+    }
+    
+    if ( params.bwa ) {
+    minionRunConfigBuilder.add("--bwa")
+    } else {
+    minionRunConfigBuilder.add("--minimap2")
+    }
+
+    minionFinalConfig = minionRunConfigBuilder.join(" ")
+
+    """
+    artic minion --medaka \
+    ${minionFinalConfig} \
+    --threads ${task.cpus} \
+    --scheme-directory ${schemeRepo}/${params.schemeDir} \
+    --read-file ${fastq} \
+    ${params.scheme}/${params.schemeVersion} \
+    ${sampleName}
+    """
+}
+
+process articMinIONNanopolish {
     tag { sampleName }
 
     label 'largecpu'
@@ -64,10 +111,6 @@ process articMinION {
 
     // Configure artic minion pipeline
     minionRunConfigBuilder = []
-
-    if (params.medaka) {
-    minionRunConfigBuilder.add("--medaka")
-    }
 
     if ( params.normalise ) {
     minionRunConfigBuilder.add("--normalise ${params.normalise}")

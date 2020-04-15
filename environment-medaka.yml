@@ -23,4 +23,4 @@ dependencies:
   - samtools=1.9
   - pip:
       - git+https://github.com/artic-network/Porechop.git@v0.3.2pre
-      - git+https://github.com/artic-network/fieldbioinformatics.git
+      - git+https://github.com/artic-network/fieldbioinformatics.git@cadbac3c2d786a8df8f3839901e5a147f9234933
