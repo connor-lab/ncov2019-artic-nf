@@ -32,7 +32,7 @@ process writeQCSummaryCSV {
     val lines
 
     exec:
-    new File("${task.workDir}/${params.prefix}.qc.csv").withWriter { writer ->
+    file("${task.workDir}/${params.prefix}.qc.csv").withWriter { writer ->
         for ( line in lines ) {
             writer.writeLine(line.join(','))
          }   
