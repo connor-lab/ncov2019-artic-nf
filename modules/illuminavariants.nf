@@ -134,6 +134,9 @@ process callVariantsLofreq {
 
     script:
         """
+        # Index bam file
+        samtools index ${bam}
+
         lofreq indelqual --dindel ${bam} -f ${ref} |\
         lofreq call --call-indels --min-bq ${params.lofreqMinBaseQuality} --min-alt-bq ${params.lofreqMinBaseQuality} \
         --min-mq ${params.lofreqMinMapQuality} --no-default-filter --use-orphan --max-depth 1000000 \
@@ -151,13 +154,16 @@ process findLowCoverageRegions {
         tuple(sampleName, path(bam), path(ref), path(depthmask), path(vcftagprimersites))
 
     output:
-        tuple sampleName, path("${sampleName}.lowcoverage.txt")
+        tuple sampleName, path("${sampleName}.lowcoverage.txt"), emit: lowCoverageRegions
 
     script:
         """
         # was broken due to relative import- sed to patch this
         sed 's/from .vcftagprimersites import read_bed_file/from vcftagprimersites import read_bed_file/g' ${depthmask} > edited_depth_mask.py
         
+        # Create bam index (required for pysam)
+        samtools index ${bam}
+
         python edited_depth_mask.py --depth ${params.minDepthThreshold} ${ref} \
         ${bam} ${sampleName}.lowcoverage.txt
         """
@@ -173,14 +179,14 @@ process filterLowAlleleFrequencyVariants {
         tuple(sampleName, path(vcf))
 
     output:
-        tuple sampleName, path("${sampleName}_filterlowf"), emit: afFilteredVcf
+        tuple sampleName, path("${sampleName}_filterlowaf"), emit: afFilteredVcf
 
     script:
         """
         # Switch off default filters
         lofreq filter --no-defaults --cov-min 20 --af-min 0.25 \
         --in ${vcf} \
-        --out ${sampleName}_filterlowf.vcf --print-all
+        --out ${sampleName}_filterlowaf.vcf --print-all
         """
 }
 
@@ -194,6 +200,8 @@ process splitPrimerSiteVariants {
         tuple(sampleName, path(vcf), path(schemeRepo))
 
     output:
+        //tuple sampleName, path("${sampleName}.primersite.vcf"), emit: primerVariants
+        //tuple sampleName, path("${sampleName}.notprimersite.vcf"), emit: nonPrimerVariants
         tuple sampleName, path("${sampleName}.primersite.vcf"), path("${sampleName}.notprimersite.vcf")
 
     script:
@@ -215,7 +223,7 @@ process lofreqVariantFilters {
         tuple(sampleName, path(primerVcf), path(outsidePrimerVcf))
 
     output:
-        tuple sampleName, path(${sampleName}.lofreqfiltered.vcf), emit: lofreqFilteredVcf
+        tuple sampleName, path("${sampleName}.lofreqfiltered.vcf"), emit: lofreqFilteredVcf
 
     script:
         """
@@ -229,11 +237,11 @@ process lofreqVariantFilters {
         --out ${sampleName}.qualfiltered.vcf --print-all
         
         # Merge variants post filtering
-        bgzip ${sampleName}.strandAndQualfiltered.vcf 
-        bcftools index ${sampleName}.strandAndQualfiltered.vcf.gz
-        bgzip ${sampleName}.qualfiltered.vcf 
-        bcftools index ${sampleName}.qualfiltered.vcf.gz
-        bcftools concat ${sampleName}.strandAndQualfiltered.vcf.gz ${sampleName}.qualfiltered.vcf.gz |\
+        bgzip ${sampleName}.strandAndQualFiltered.vcf 
+        bcftools index ${sampleName}.strandAndQualFiltered.vcf.gz
+        bgzip ${sampleName}.qualFiltered.vcf 
+        bcftools index ${sampleName}.qualFiltered.vcf.gz
+        bcftools concat ${sampleName}.strandAndQualFiltered.vcf.gz ${sampleName}.qualFiltered.vcf.gz |\
         bcftools sort - > ${sampleName}.lofreqfiltered.vcf
         """
 }
@@ -248,12 +256,21 @@ process customVariantFilters {
         tuple(sampleName, path(vcf))
 
     output:
-        tuple sampleName, path("${sampleName}.qualfiltered.vcf"), emit: passVcf
-        tuple sampleName, path("${sampleName}.strandAndQualfiltered.vcf"), emit: failVcf
+        //tuple sampleName, path("${sampleName}.custompass.vcf"), emit: customPassVcf
+        //tuple sampleName, path("${sampleName}.customfail.vcf"), emit: customFailVcf
+        tuple sampleName, path("${sampleName}.customfiltered.vcf"), emit: customFilteredVcf
 
     script:
         """
-        vcf_filter.py --illumina ${vcf} ${sampleName}.pass.vcf ${dataset_id}.fail.vcf
+        vcf_filter.py --illumina ${vcf} ${sampleName}.custompass.vcf ${dataset_id}.customfail.vcf
+
+        # Merge variants post filtering
+        bgzip ${sampleName}.custompass.vcf 
+        bcftools index ${sampleName}.custompass.vcf.gz
+        bgzip ${dataset_id}.customfail.vcf 
+        bcftools index ${dataset_id}.customfail.vcf.gz
+        bcftools concat ${sampleName}.custompass.vcf.gz ${dataset_id}.customfail.vcf.gz |\
+        bcftools sort - > ${sampleName}.customfiltered.vcf
         """
 }
 

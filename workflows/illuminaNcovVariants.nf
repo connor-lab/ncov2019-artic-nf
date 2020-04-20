@@ -109,18 +109,37 @@ workflow sequenceAnalysisVariants {
 
       findLowCoverageRegions(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }).combine(illuminaDownloadScheme.out.depthmask).combine(illuminaDownloadScheme.out.vcftagprimersites))
 
-      filterLowAlleleFrequencyVariants(callVariants_lofreq.out.vcf)
+      filterLowAlleleFrequencyVariants(callVariantsLofreq.out.variants)
+
+      splitPrimerSiteVariants(filterLowAlleleFrequencyVariants.out.afFilteredVcf.combine(ch_bedFile))
+
+      lofreqVariantFilters(splitPrimerSiteVariants.out)
+      //lofreqVariantFilters(splitPrimerSiteVariants.out.primerVariants.join(splitPrimerSiteVariants))
+      //splitPrimerSiteVariants.out.view()
+
+      customVariantFilters(lofreqVariantFilters.out.lofreqFilteredVcf)
+
+      //mergeCustomFilteredVcfs(customVariantFilters.out.passVcf.join(mergeCustomFilteredVcfs.out.failVcf, by: 0))
+
+      //applyIupac(mergeCustomFilteredVcfs.out.mergedFilteredVcf)
+
+      applyIupac(customVariantFilters.out.customFilteredVcf)
+
+      removeFilteredVariants(applyIupac.out.iupacVcf)
+
+      createConsensus(removeFilteredVariants.out.passVcf.join(findLowCoverageRegions.out.lowCoverageRegions, by: 0).combine(ch_preparedRef.map{ it[0] }))
+
+      addSampleNameToConsensusHeader(createConsensus.out.interimConsensus)
 
 
 
-include {splitPrimerSiteVariants} from '../modules/illuminavariants.nf'
-include {lofreqVariantFilters} from '../modules/illuminavariants.nf'
-include {customVariantFilters} from '../modules/illuminavariants.nf'
-include {mergeCustomFilteredVcfs} from '../modules/illuminavariants.nf'
-include {applyIupac} from '../modules/illuminavariants.nf'
-include {removeFilteredVariants} from '../modules/illuminavariants.nf'
-include {createConsensus} from '../modules/illuminavariants.nf'
-include {addSampleNameToConsensusHeader} from '../modules/illuminavariants.nf'
+//include {lofreqVariantFilters} from '../modules/illuminavariants.nf'
+//include {customVariantFilters} from '../modules/illuminavariants.nf'
+//include {mergeCustomFilteredVcfs} from '../modules/illuminavariants.nf'
+//include {applyIupac} from '../modules/illuminavariants.nf'
+//include {removeFilteredVariants} from '../modules/illuminavariants.nf'
+//include {createConsensus} from '../modules/illuminavariants.nf'
+//include {addSampleNameToConsensusHeader} from '../modules/illuminavariants.nf'
       
       
       //makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
