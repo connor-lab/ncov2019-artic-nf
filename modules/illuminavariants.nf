@@ -184,7 +184,8 @@ process filterLowAlleleFrequencyVariants {
     script:
         """
         # Switch off default filters
-        lofreq filter --no-defaults --cov-min 20 --af-min 0.25 \
+        lofreq filter --no-defaults --cov-min ${params.minDepthThreshold} \
+        --af-min ${params.lofreqMinFreqThreshold} \
         --in ${vcf} \
         --out ${sampleName}_filterlowaf.vcf --print-all
         """
