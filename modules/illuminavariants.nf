@@ -155,15 +155,36 @@ process findLowCoverageRegions {
 
     script:
         """
+        # was broken due to relative import- sed to patch this
         sed 's/from .vcftagprimersites import read_bed_file/from vcftagprimersites import read_bed_file/g' ${depthmask} > edited_depth_mask.py
         
-        #broken due to relative import
         python edited_depth_mask.py --depth ${params.minDepthThreshold} ${ref} \
         ${bam} ${sampleName}.lowcoverage.txt
         """
 }
 
-process findVariantsInPrimerSites {
+process filterLowAlleleFrequencyVariants {
+    
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*.vcf", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(vcf))
+
+    output:
+        tuple sampleName, path("${sampleName}_filterlowf"), emit: afFilteredVcf
+
+    script:
+        """
+        # Switch off default filters
+        lofreq filter --no-defaults --cov-min 20 --af-min 0.25 \
+        --in ${vcf} \
+        --out ${sampleName}_filterlowf.vcf --print-all
+        """
+}
+
+process splitPrimerSiteVariants {
 
     tag { sampleName }
 
@@ -177,12 +198,166 @@ process findVariantsInPrimerSites {
 
     script:
         """
-        bedtools sort -i ${schemeRepo}/${params.schemeDir}/${params.scheme}/${params.schemeVersion}/nCoV-2019.scheme.bed > primers.sorted.bed
-        bedtools merge -i primers.sorted.bed > primers.merged.sorted.bed 
+        bedtools sort -i ${schemeRepo}/${params.schemeDir}/${params.scheme}/${params.schemeVersion}/nCoV-2019.scheme.bed |\
+        bedtools merge > primers.merged.sorted.bed 
         bedtools intersect -header -v -a ${vcf} -b primers.merged.sorted.bed >${sampleName}.notprimersite.vcf
         bedtools intersect -header -a ${vcf} -b primers.merged.sorted.bed >${sampleName}.primersite.vcf
         """
+}
 
+process lofreqVariantFilters {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*.vcf", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(primerVcf), path(outsidePrimerVcf))
+
+    output:
+        tuple sampleName, path(${sampleName}.lofreqfiltered.vcf), emit: lofreqFilteredVcf
+
+    script:
+        """
+        # Default fdr strand bias and quality filter applied
+        lofreq filter --sb-incl-indels --snvqual-mtc bonf --indelqual-mtc bonf \
+        --in ${outsidePrimerVcf} \
+        --out ${sampleName}.strandAndQualfiltered.vcf --print-all
+        # Switch off default filters
+        lofreq filter --no-defaults --snvqual-mtc bonf --indelqual-mtc bonf \
+        --in ${primerVcf} \
+        --out ${sampleName}.qualfiltered.vcf --print-all
+        
+        # Merge variants post filtering
+        bgzip ${sampleName}.strandAndQualfiltered.vcf 
+        bcftools index ${sampleName}.strandAndQualfiltered.vcf.gz
+        bgzip ${sampleName}.qualfiltered.vcf 
+        bcftools index ${sampleName}.qualfiltered.vcf.gz
+        bcftools concat ${sampleName}.strandAndQualfiltered.vcf.gz ${sampleName}.qualfiltered.vcf.gz |\
+        bcftools sort - > ${sampleName}.lofreqfiltered.vcf
+        """
+}
+
+process customVariantFilters {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*.vcf", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(vcf))
+
+    output:
+        tuple sampleName, path("${sampleName}.qualfiltered.vcf"), emit: passVcf
+        tuple sampleName, path("${sampleName}.strandAndQualfiltered.vcf"), emit: failVcf
+
+    script:
+        """
+        vcf_filter.py --illumina ${vcf} ${sampleName}.pass.vcf ${dataset_id}.fail.vcf
+        """
+}
+
+process mergeCustomFilteredVcfs {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*.vcf", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(vcf))
+
+    output:
+        tuple sampleName, path("${sampleName}.lofreqfiltered.combined.vcf"), emit: mergedFilteredVcf
+
+    script:
+        """
+        bgzip ${first_vcf}
+        bgzip ${second_vcf}
+        bcftools index ${first_vcf}.gz
+        bcftools index ${second_vcf}.gz
+        bcftools concat ${first_vcf}.gz ${second_vcf}.gz |\
+        bcftools sort - > ${sampleName}.lofreqfiltered.combined.vcf
+        """
+}
+
+process applyIupac {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*.vcf", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(vcf))
+
+    output:
+        tuple dataset_id, path("${sampleName}.edited.vcf"), emit: iupacVcf
+
+    script:
+        """
+        vcf_edit.py -v ${vcf} -c lofreq -o ${sampleName}.edited.vcf
+        """
+}
+
+process removeFilteredVariants {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*.vcf", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(vcf)) 
+
+    output:
+        tuple dataset_id, path("${sampleName}.pass.vcf"), emit: passVcf
+        tuple dataset_id, path("${sampleName}.fail.vcf"), emit: failVcf
+
+
+    script:
+        """
+        bgzip ${vcf}
+        bcftools index ${vcf}.gz
+        bcftools view -f .,PASS ${vcf}.gz -O v -o ${sampleName}.pass.vcf
+        bcftools view -f min_af_0.250000,min_dp_20,sb_fdr,snvqual_bonf,indelqual_bonf,lowaf_indel ${vcf}.gz -O v -o ${sampleName}.fail.vcf
+        """
+}
+
+process createConsensus {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*.fasta", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(passVcf), path(coverageMask), path(ref))
+
+    output:
+        tuple sampleName, path("${sampleName}.interim.consensus.fasta"), emit: interimConsensus
+
+    script:
+        """
+        bgzip ${passVcf}
+        bcftools index ${passVcf}.gz
+        bcftools consensus -f ${ref} ${passVcf}.gz -m ${coverageMask} -o ${sampleName}.interim.consensus.fasta
+        """
+}
+
+process addSampleNameToConsensusHeader {
+    
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*.fasta", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(fasta))
+
+    output:
+        tuple sampleName, path("${sampleName}.consensus.fasta"), emit: consensus
+
+    script:
+        """
+        original_header=\$(grep ^">" ${fasta})
+        sed "s/\$original_header/\$original_header|${sampleName}/g" ${fasta} > ${sampleName}.consensus.fasta
+        """
 }
 
 process cramToFastq {

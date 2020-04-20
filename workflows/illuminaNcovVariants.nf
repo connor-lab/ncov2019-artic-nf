@@ -10,8 +10,17 @@ include {readTrimming} from '../modules/illuminavariants.nf'
 include {indexReference} from '../modules/illuminavariants.nf'
 include {readMapping} from '../modules/illuminavariants.nf' 
 include {trimPrimerSequences} from '../modules/illuminavariants.nf' 
-include {findLowCoverageRegions} from '../modules/illuminavariants.nf'
 include {callVariantsLofreq} from '../modules/illuminavariants.nf'
+include {findLowCoverageRegions} from '../modules/illuminavariants.nf'
+include {filterLowAlleleFrequencyVariants} from '../modules/illuminavariants.nf'
+include {splitPrimerSiteVariants} from '../modules/illuminavariants.nf'
+include {lofreqVariantFilters} from '../modules/illuminavariants.nf'
+include {customVariantFilters} from '../modules/illuminavariants.nf'
+include {mergeCustomFilteredVcfs} from '../modules/illuminavariants.nf'
+include {applyIupac} from '../modules/illuminavariants.nf'
+include {removeFilteredVariants} from '../modules/illuminavariants.nf'
+include {createConsensus} from '../modules/illuminavariants.nf'
+include {addSampleNameToConsensusHeader} from '../modules/illuminavariants.nf'
 include {cramToFastq} from '../modules/illuminavariants.nf'
 
 
@@ -100,6 +109,20 @@ workflow sequenceAnalysisVariants {
 
       findLowCoverageRegions(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }).combine(illuminaDownloadScheme.out.depthmask).combine(illuminaDownloadScheme.out.vcftagprimersites))
 
+      filterLowAlleleFrequencyVariants(callVariants_lofreq.out.vcf)
+
+
+
+include {splitPrimerSiteVariants} from '../modules/illuminavariants.nf'
+include {lofreqVariantFilters} from '../modules/illuminavariants.nf'
+include {customVariantFilters} from '../modules/illuminavariants.nf'
+include {mergeCustomFilteredVcfs} from '../modules/illuminavariants.nf'
+include {applyIupac} from '../modules/illuminavariants.nf'
+include {removeFilteredVariants} from '../modules/illuminavariants.nf'
+include {createConsensus} from '../modules/illuminavariants.nf'
+include {addSampleNameToConsensusHeader} from '../modules/illuminavariants.nf'
+      
+      
       //makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
                                    //.combine(ch_preparedRef.map{ it[0] }))
 
