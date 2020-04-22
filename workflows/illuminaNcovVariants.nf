@@ -131,7 +131,7 @@ workflow sequenceAnalysisVariants {
 
       addSampleNameToConsensusHeader(createConsensus.out.interimConsensus)
 
-      makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
+      makeQCCSV(trimPrimerSequences.out.ptrim.join(addSampleNameToConsensusHeader.out, by: 0)
                                    .combine(ch_preparedRef.map{ it[0] }))
 
       makeQCCSV.out.csv.splitCsv()
@@ -146,11 +146,11 @@ workflow sequenceAnalysisVariants {
       writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
 
       collateSamples(qc.pass.map{ it[0] }
-                           .join(makeConsensus.out, by: 0)
+                           .join(addSampleNameToConsensusHeader.out, by: 0)
                            .join(trimPrimerSequences.out.mapped))     
 
     emit:
-      qc_pass = collateSamples.out */
+      qc_pass = collateSamples.out
 }
 
 workflow ncovIlluminaVariants {
@@ -170,7 +170,7 @@ workflow ncovIlluminaVariants {
         Channel.fromPath("${params.CLIMBkey}")
                .set{ ch_CLIMBkey }
       
-        //CLIMBrsync(sequenceAnalysisVariants.out.qc_pass, ch_CLIMBkey )
+        CLIMBrsync(sequenceAnalysisVariants.out.qc_pass, ch_CLIMBkey )
       }
 
 }
