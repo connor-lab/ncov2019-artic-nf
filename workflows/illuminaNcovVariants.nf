@@ -105,7 +105,7 @@ workflow sequenceAnalysisVariants {
 
       trimPrimerSequences(readMapping.out.combine(ch_bedFile))
  
-      callVariantsLofreq(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) // Change to match illumina  
+      callVariantsLofreq(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
 
       findLowCoverageRegions(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }).combine(illuminaDownloadScheme.out.depthmask).combine(illuminaDownloadScheme.out.vcftagprimersites))
 
@@ -131,21 +131,10 @@ workflow sequenceAnalysisVariants {
 
       addSampleNameToConsensusHeader(createConsensus.out.interimConsensus)
 
+      makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
+                                   .combine(ch_preparedRef.map{ it[0] }))
 
-
-//include {lofreqVariantFilters} from '../modules/illuminavariants.nf'
-//include {customVariantFilters} from '../modules/illuminavariants.nf'
-//include {mergeCustomFilteredVcfs} from '../modules/illuminavariants.nf'
-//include {applyIupac} from '../modules/illuminavariants.nf'
-//include {removeFilteredVariants} from '../modules/illuminavariants.nf'
-//include {createConsensus} from '../modules/illuminavariants.nf'
-//include {addSampleNameToConsensusHeader} from '../modules/illuminavariants.nf'
-      
-      
-      //makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
-                                   //.combine(ch_preparedRef.map{ it[0] }))
-
-      /*makeQCCSV.out.csv.splitCsv()
+      makeQCCSV.out.csv.splitCsv()
                        .unique()
                        .branch {
                            header: it[-1] == 'qc_pass'
@@ -181,7 +170,7 @@ workflow ncovIlluminaVariants {
         Channel.fromPath("${params.CLIMBkey}")
                .set{ ch_CLIMBkey }
       
-        CLIMBrsync(sequenceAnalysisVariants.out.qc_pass, ch_CLIMBkey )
+        //CLIMBrsync(sequenceAnalysisVariants.out.qc_pass, ch_CLIMBkey )
       }
 
 }

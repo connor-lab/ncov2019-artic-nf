@@ -134,13 +134,12 @@ process callVariantsLofreq {
 
     script:
         """
-        # Index bam file
-        samtools index ${bam}
-
-        lofreq indelqual --dindel ${bam} -f ${ref} |\
+        # Pipe removal?- software still segfaulting
+        lofreq indelqual --dindel ${bam} -f ${ref} \
+        --out ${sampleName}.lf.bam
         lofreq call --call-indels --min-bq ${params.lofreqMinBaseQuality} --min-alt-bq ${params.lofreqMinBaseQuality} \
         --min-mq ${params.lofreqMinMapQuality} --no-default-filter --use-orphan --max-depth 1000000 \
-        --min-cov ${params.lofreqMinCov} -f ${ref} -o ${sampleName}.lofreq.vcf -
+        --min-cov ${params.lofreqMinCov} -f ${ref} -o ${sampleName}.lofreq.vcf ${sampleName}.lf.bam
         """
 }
 
@@ -179,7 +178,7 @@ process filterLowAlleleFrequencyVariants {
         tuple(sampleName, path(vcf))
 
     output:
-        tuple sampleName, path("${sampleName}_filterlowaf"), emit: afFilteredVcf
+        tuple sampleName, path("${sampleName}_filterlowaf.vcf"), emit: afFilteredVcf
 
     script:
         """
@@ -198,7 +197,7 @@ process splitPrimerSiteVariants {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*.vcf", mode: 'copy'
 
     input:
-        tuple(sampleName, path(vcf), path(schemeRepo))
+        tuple(sampleName, path(vcf), path(bedfile))
 
     output:
         //tuple sampleName, path("${sampleName}.primersite.vcf"), emit: primerVariants
@@ -207,8 +206,7 @@ process splitPrimerSiteVariants {
 
     script:
         """
-        bedtools sort -i ${schemeRepo}/${params.schemeDir}/${params.scheme}/${params.schemeVersion}/nCoV-2019.scheme.bed |\
-        bedtools merge > primers.merged.sorted.bed 
+        bedtools sort -i ${bedfile} | bedtools merge > primers.merged.sorted.bed 
         bedtools intersect -header -v -a ${vcf} -b primers.merged.sorted.bed >${sampleName}.notprimersite.vcf
         bedtools intersect -header -a ${vcf} -b primers.merged.sorted.bed >${sampleName}.primersite.vcf
         """
@@ -231,11 +229,11 @@ process lofreqVariantFilters {
         # Default fdr strand bias and quality filter applied
         lofreq filter --sb-incl-indels --snvqual-mtc bonf --indelqual-mtc bonf \
         --in ${outsidePrimerVcf} \
-        --out ${sampleName}.strandAndQualfiltered.vcf --print-all
+        --out ${sampleName}.strandAndQualFiltered.vcf --print-all
         # Switch off default filters
         lofreq filter --no-defaults --snvqual-mtc bonf --indelqual-mtc bonf \
         --in ${primerVcf} \
-        --out ${sampleName}.qualfiltered.vcf --print-all
+        --out ${sampleName}.qualFiltered.vcf --print-all
         
         # Merge variants post filtering
         bgzip ${sampleName}.strandAndQualFiltered.vcf 
@@ -263,14 +261,14 @@ process customVariantFilters {
 
     script:
         """
-        vcf_filter.py --illumina ${vcf} ${sampleName}.custompass.vcf ${dataset_id}.customfail.vcf
+        vcf_filter.py --illumina ${vcf} ${sampleName}.custompass.vcf ${sampleName}.customfail.vcf
 
         # Merge variants post filtering
         bgzip ${sampleName}.custompass.vcf 
         bcftools index ${sampleName}.custompass.vcf.gz
-        bgzip ${dataset_id}.customfail.vcf 
-        bcftools index ${dataset_id}.customfail.vcf.gz
-        bcftools concat ${sampleName}.custompass.vcf.gz ${dataset_id}.customfail.vcf.gz |\
+        bgzip ${sampleName}.customfail.vcf 
+        bcftools index ${sampleName}.customfail.vcf.gz
+        bcftools concat ${sampleName}.custompass.vcf.gz ${sampleName}.customfail.vcf.gz |\
         bcftools sort - > ${sampleName}.customfiltered.vcf
         """
 }
@@ -308,7 +306,7 @@ process applyIupac {
         tuple(sampleName, path(vcf))
 
     output:
-        tuple dataset_id, path("${sampleName}.edited.vcf"), emit: iupacVcf
+        tuple sampleName, path("${sampleName}.edited.vcf"), emit: iupacVcf
 
     script:
         """
@@ -326,8 +324,8 @@ process removeFilteredVariants {
         tuple(sampleName, path(vcf)) 
 
     output:
-        tuple dataset_id, path("${sampleName}.pass.vcf"), emit: passVcf
-        tuple dataset_id, path("${sampleName}.fail.vcf"), emit: failVcf
+        tuple sampleName, path("${sampleName}.pass.vcf"), emit: passVcf
+        tuple sampleName, path("${sampleName}.fail.vcf"), emit: failVcf
 
 
     script:
