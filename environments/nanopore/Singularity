@@ -4,13 +4,13 @@ From: continuumio/miniconda3:latest
 authors="Matt Bull" 
 description="Docker image containing all requirements for the ARTIC project's ncov2019 pipeline"
 %files
-environments/extras.txt /extras.txt
+environments/extras.yml /extras.yml
 %post
 
 apt-get update && apt-get install -y curl g++ git make procps rsync && apt-get clean -y
 curl -o /environment.yml -fsSL 'https://raw.githubusercontent.com/artic-network/artic-ncov2019/master/environment.yml' 
-/opt/conda/bin/conda env create -f /environment.yml 
-/opt/conda/envs/artic-ncov2019/bin/pip install -r /extras.txt 
+/opt/conda/bin/conda env create -f /environment.yml
+/opt/conda/bin/conda env update -f /extras.yml -n artic-ncov2019
 /opt/conda/bin/conda clean -a
 PATH=/opt/conda/envs/artic-ncov2019/bin:$PATH
 
