@@ -3,13 +3,13 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 BASEDIR=$(dirname $SCRIPTPATH)
 
-CONTAINERS="artic-ncov2019-nanopore artic-ncov2019-illumina"
+WORKFLOWS="illumina nanopore"
 
-for CONTAINER in ${CONTAINERS}; do 
-    sudo singularity build ${BASEDIR}/${CONTAINER}.sif ${BASEDIR}/Singularity.${CONTAINER}
+for WORKFLOW in ${WORKFLOWS}; do 
+    sudo singularity build ${BASEDIR}/artic-ncov2019-${WORKFLOW}.sif ${BASEDIR}/environments/${WORKFLOW}/Singularity
 done
 
-for CONTAINER in ${CONTAINERS}; do
-    echo "Built container ${BASEDIR}/${CONTAINER}"
+for WORKFLOW in ${WORKFLOWS}; do
+    echo "Built container ${BASEDIR}/artic-ncov2019-${WORKFLOW}.sif"
 done
 

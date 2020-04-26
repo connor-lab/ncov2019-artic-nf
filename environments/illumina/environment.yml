@@ -11,4 +11,4 @@ dependencies:
   - pandas=1.0.3
   - samtools=1.9
   - trim-galore=0.6.5
-  - ivar=1.2
+  - ivar=1.2.2
