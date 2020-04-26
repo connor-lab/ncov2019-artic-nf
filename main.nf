@@ -69,21 +69,23 @@ workflow {
        }
    }
    else {
-       Channel.fromPath( "${params.basecalled_fastq}" )
-              .set{ ch_runDirectory }
-
        // Check to see if we have barcodes
-       def nanoporeBarcodeDirs = new FileNameByRegexFinder().getFileNames(params.basecalled_fastq, /.*barcode[0-9]{1,4}$/)
-       
+       nanoporeBarcodeDirs = file("${params.basecalled_fastq}/barcode*", type: 'dir', maxdepth: 1 )
+       nanoporeNoBarcode = file("${params.basecalled_fastq}/*.fastq", type: 'file', maxdepth: 1)
+
        if( nanoporeBarcodeDirs ) {
             // Yes, barcodes!
-            Channel.fromPath( "${params.basecalled_fastq}/barcode*", type: 'dir', maxDepth: 1 )
+            Channel.fromPath( nanoporeBarcodeDirs )
+                   .filter( ~/.*barcode[0-9]{1,4}$/ )
                    .filter{ it.listFiles().size() > 5 }
                    .set{ ch_fastqDirs }
-       } else {
+       } else if ( nanoporeNoBarcode ){
             // No, no barcodes
             Channel.fromPath( "${params.basecalled_fastq}", type: 'dir', maxDepth: 1 )
                     .set{ ch_fastqDirs }
+      } else {
+            println("Couldn't detect whether your Nanopore run was barcoded or not. Use --basecalled_fastq to point to the unmodified guppy output directory.")
+            System.exit(1)
       }
    }
 
