@@ -1,0 +1,9 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - biopython=1.74
+  - matplotlib
+  - pandas=0.23.0=py36_1
+  - samtools=1.9
