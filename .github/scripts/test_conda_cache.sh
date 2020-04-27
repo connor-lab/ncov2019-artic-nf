@@ -14,7 +14,7 @@ NXF_VER=20.03.0-edge nextflow run main.nf \
        --prefix test
 cp .nextflow.log ./artifacts/cache_creation.conda.profile.nextflow.log
 
-cat .nextflow.log | grep 'Conda create complete env=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/environment-illumina.yml path=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/conda_cache_dir/artic-ncov2019-illumina-' \
+cat .nextflow.log | grep 'Conda create complete env=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/environments/illumina/environment.yml path=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/conda_cache_dir/artic-ncov2019-illumina-' \
     && echo "Conda env created in cache dir" >> artifacts/test_artifact.log \
 	|| bash -c "echo test failed\: Conda environment not created as expected >> artifacts/test_artifact.log && exit 1"
     
@@ -29,7 +29,7 @@ NXF_VER=20.03.0-edge nextflow run main.nf \
        --prefix test
 cp .nextflow.log ./artifacts/cache_use.conda.profile.nextflow.log
 
-cat .nextflow.log | grep 'Conda found local env for environment=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/environment-illumina.yml; path=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/conda_cache_dir/artic-ncov2019-illumina-' \
+cat .nextflow.log | grep 'Conda found local env for environment=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/environments/illumina/environment.yml; path=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/conda_cache_dir/artic-ncov2019-illumina-' \
     && echo "Conda env found in cache dir" >> artifacts/test_artifact.log \
 	|| bash -c "echo test failed\: Conda environment not not found in cache dir >> artifacts/test_artifact.log && exit 1"
 
