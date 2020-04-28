@@ -122,6 +122,8 @@ process trimPrimerSequences {
 
 process callVariantsLofreq {
 
+    container 'lofreq_conda:v0.1'
+
     tag { sampleName }
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.lofreq.vcf", mode: 'copy'
@@ -169,6 +171,8 @@ process findLowCoverageRegions {
 }
 
 process filterLowAlleleFrequencyVariants {
+
+    container 'lofreq_conda:v0.1'
     
     tag { sampleName }
 

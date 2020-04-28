@@ -1,0 +1,107 @@
+# To build: docker build -t illuminavariants:v0.1 - < Dockerfile.illuminavariants
+
+FROM debian:buster
+
+ENV pengu_software_version_FastQC=0.11.7 \
+pengu_software_version_TrimGalore=0.6.5 \
+pengu_software_version_htslib=1.10.2 \
+pengu_software_version_samtools=1.10 \
+pengu_software_version_bcftools=1.10.2 \
+pengu_software_version_bwa=0.7.17 \
+pengu_software_version_ivar=1.2 \
+pengu_software_version_bedtools=2.29.2 \
+pengu_software_version_python=3.6.10 \
+pengu_software_version_lofreq=2.1.4 \
+pengu_software_version_python=3.7.7 \
+pengu_software_version_pyvcf=0.6.8 \
+pengu_software_version_biopython=1.68 \
+pengu_software_version_pandas=1.0.3 \ 
+pengu_software_version_matplotlib=3.1.3 \
+pengu_software_version_cutadapt=2.10 \
+pengu_software_version_pysam=0.15.3 
+
+RUN apt-get update && apt-get install -y git bzip2 curl wget g++ make zlib1g-dev libbz2-dev unzip \
+autoconf libncurses5-dev openjdk-11-jre-headless libfindbin-libs-perl libssl-dev libcurl4-openssl-dev \
+libffi-dev liblzma-dev
+
+RUN wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v${pengu_software_version_FastQC}.zip \
+&& unzip fastqc_v${pengu_software_version_FastQC}.zip \
+&& chmod +x FastQC/fastqc \
+&& mv FastQC /usr/local/bin \
+&& rm -r fastqc*
+
+ENV PATH ${PATH}:/usr/local/bin/FastQC/
+
+RUN wget -O trim_galore.tar.gz https://github.com/FelixKrueger/TrimGalore/archive/${pengu_software_version_TrimGalore}.tar.gz \
+&& tar -xzf trim_galore.tar.gz \
+&& mv TrimGalore-${pengu_software_version_TrimGalore}/trim_galore /usr/local/bin \
+&& rm -r trim_galore*
+
+# Install htslib
+WORKDIR /
+RUN curl -fsSL "https://github.com/samtools/htslib/releases/download/${pengu_software_version_htslib}/htslib-${pengu_software_version_htslib}.tar.bz2" | tar -xj
+WORKDIR htslib-${pengu_software_version_htslib}
+RUN ./configure && make && make install
+ENV PATH "$PATH:/htslib-${pengu_software_version_htslib}"
+RUN ln -s /usr/local/lib/libhts.so.3 /usr/lib/
+
+# Install samtools
+WORKDIR /
+RUN curl -fsSL "https://github.com/samtools/samtools/releases/download/${pengu_software_version_samtools}/samtools-${pengu_software_version_samtools}.tar.bz2" | tar -xj
+WORKDIR samtools-${pengu_software_version_samtools}
+RUN ./configure && make && make install
+ENV PATH "$PATH:/samtools-${pengu_software_version_samtools}"
+
+# Install bcftools
+WORKDIR /
+RUN curl -fsSL "https://github.com/samtools/bcftools/releases/download/${pengu_software_version_bcftools}/bcftools-${pengu_software_version_bcftools}.tar.bz2" | tar -xj
+WORKDIR bcftools-${pengu_software_version_bcftools}
+RUN ./configure && make && make install
+ENV PATH "$PATH:/bcftools-${pengu_software_version_bcftools}"
+
+# Install python
+WORKDIR /
+RUN curl -fsSL "https://www.python.org/ftp/python/${pengu_software_version_python}/Python-${pengu_software_version_python}.tgz" | tar -xz
+WORKDIR /Python-${pengu_software_version_python}
+RUN ./configure && make && make install
+ENV PATH "$PATH:/Python-${pengu_software_version_python}"
+
+# Make requirements file on the fly (copy didn't work under certain conditions (contextless build) and was concerned about compatibility with Singularity- may need to change later)
+RUN printf '%s\n' \
+pandas==${pengu_software_version_pandas} \
+matplotlib==${pengu_software_version_matplotlib} \
+biopython==${pengu_software_version_biopython} \
+pyvcf==${pengu_software_version_pyvcf} \
+cutadapt==${pengu_software_version_cutadapt} \
+pysam==${pengu_software_version_pysam} \
+> requirements.txt
+
+# install python modules
+RUN pip3 install -r requirements.txt
+
+ENV PATH "$PATH:/Python-${pengu_software_version_python}"
+
+# Install bedtools
+WORKDIR /
+RUN curl -fsSL "https://github.com/arq5x/bedtools2/releases/download/v${pengu_software_version_bedtools}/bedtools-${pengu_software_version_bedtools}.tar.gz" | tar -xz
+RUN cd bedtools2 && make
+ENV PATH "$PATH:/bedtools2/bin"
+
+# Install BWA
+WORKDIR /
+RUN curl -fsSL "https://github.com/lh3/bwa/releases/download/v${pengu_software_version_bwa}/bwa-${pengu_software_version_bwa}.tar.bz2" | tar -xj
+RUN cd bwa-${pengu_software_version_bwa} && make
+ENV PATH "$PATH:/bwa-${pengu_software_version_bwa}"
+
+# Install ivar
+WORKDIR /
+RUN curl -fsSL "https://github.com/andersen-lab/ivar/archive/v${pengu_software_version_ivar}.zip" -o ivar.zip && unzip ivar.zip
+WORKDIR ivar-${pengu_software_version_ivar}
+RUN ./autogen.sh && ./configure && make && make install
+ENV PATH "$PATH:/ivar-{pengu_software_version_ivar}"
+
+# Install lofreq
+WORKDIR /
+RUN curl -fsSL https://github.com/CSB5/lofreq/archive/v${pengu_software_version_lofreq}.tar.gz | tar -xz
+WORKDIR lofreq-${pengu_software_version_lofreq}
+RUN ./bootstrap && ./configure --with-htslib=/usr/lib64/ && make && make install

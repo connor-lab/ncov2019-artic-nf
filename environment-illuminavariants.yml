@@ -16,3 +16,5 @@ dependencies:
   - lofreq=2.1.3
   - pyvcf=0.6.8
   - pysam=0.15.0.1
+
+  #  - ivar=1.2
