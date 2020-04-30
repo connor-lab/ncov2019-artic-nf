@@ -6,10 +6,12 @@ mkdir conda_cache_dir
 
 # first NF run will create the conda env in the cache dir
 echo run pipeline with conda --cache to create cache.. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run main.nf \
+export REPO=$PWD
+cd ..
+NXF_VER=20.03.0-edge nextflow run $REPO \
        -profile conda \
-       --cache $PWD/conda_cache_dir \
-       --directory $PWD/.github/data/fastqs/ \
+       --cache $REPO/conda_cache_dir \
+       --directory $REPO/.github/data/fastqs/ \
        --illumina \
        --prefix test
 cp .nextflow.log ./artifacts/cache_creation.conda.profile.nextflow.log
@@ -21,10 +23,10 @@ cat .nextflow.log | grep 'Conda create complete env=/home/runner/work/ncov2019-a
 rm -rf results && rm -rf work && rm -rf .nextflow*
 # second NF run will use the conda env created in the previous run
 echo re-run pipeline with conda --cache.. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run main.nf \
+NXF_VER=20.03.0-edge nextflow run $REPO \
        -profile conda \
-       --cache $PWD/conda_cache_dir \
-       --directory $PWD/.github/data/fastqs/ \
+       --cache $REPO/conda_cache_dir \
+       --directory $REPO/.github/data/fastqs/ \
        --illumina \
        --prefix test
 cp .nextflow.log ./artifacts/cache_use.conda.profile.nextflow.log
