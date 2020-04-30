@@ -7,7 +7,9 @@ mkdir conda_cache_dir
 # first NF run will create the conda env in the cache dir
 echo run pipeline with conda --cache to create cache.. >> artifacts/test_artifact.log
 export REPO=$PWD
+echo REPO=$REPO >> artifacts/test_artifact.log
 cd ..
+echo PWD=$PWD >> $REPO/artifacts/test_artifact.log
 NXF_VER=20.03.0-edge nextflow run $REPO \
        -profile conda \
        --cache $REPO/conda_cache_dir \
