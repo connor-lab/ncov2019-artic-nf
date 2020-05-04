@@ -41,7 +41,7 @@ workflow prepareReferenceFiles {
     if (params.ref) {
       // Check if all BWA aux files exist, if not, make them
       bwaAuxFiles = []
-      refPath = new File(params.ref).getCanonicalPath()
+      refPath = new File(params.ref).getAbsolutePath()
       new File(refPath).getParentFile().eachFileMatch( ~/.*.bwt|.*.pac|.*.ann|.*.amb|.*.sa/) { bwaAuxFiles << it }
      
       if ( bwaAuxFiles.size() == 5 ) {
