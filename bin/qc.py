@@ -5,6 +5,7 @@ import csv
 import subprocess
 import pandas as pd
 import matplotlib.pyplot as plt
+import shlex
 
 """
 This script can incorporate as many QC checks as required
@@ -98,7 +99,14 @@ def sliding_window_N_density(sequence, window=10):
 
     return sliding_window_n_density
 
+def get_num_reads(bamfile):
 
+    st_filter = '0x900'
+    command = 'samtools view -c -F{} {}'.format(st_filter, bamfile)
+    what = shlex.split(command)
+
+    return subprocess.check_output(what).decode().strip()
+    
 def go(args):
     if args.illumina:
         depth = 10
@@ -113,7 +121,9 @@ def go(args):
 
     pct_covered_bases = depth_covered_bases / ref_length * 100
 
-    
+    ## Number of aligned reads calculaton
+    num_reads = get_num_reads(args.bam)
+
     # Unknown base calcs
     fasta = SeqIO.read(args.fasta, "fasta")
 
@@ -136,6 +146,7 @@ def go(args):
                 'pct_N_bases' : "{:.2f}".format(pct_N_bases),
           'pct_covered_bases' : "{:.2f}".format(pct_covered_bases), 
            'longest_no_N_run' : largest_N_gap,
+          'num_aligned_reads' : num_reads,
                        'fasta': args.fasta, 
                         'bam' : args.bam,
                     'qc_pass' : qc_pass}
