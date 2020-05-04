@@ -46,16 +46,16 @@ else
   echo no differences found for pull request with or without --ref and --bed  >> artifacts/test_artifact.log 
 fi
 
+rm -rf results && rm -rf work && rm -rf .nextflow*
+
 # check it works if the ref is a symlink to a file with no index files next to it
-mkdir ref
-mkdir bwa_index
-export REF_BASENAME=$(basename $REF_FILE)
-cp $REF_FILE.* bwa_index/
-cp $REF_FILE ref/
-ln -s $PWD/ref/$REF_BASENAME bwa_index/$REF_BASENAME
-export REF_FILE=$PWD/bwa_index/$REF_BASENAME
+export REAL_REF=$REF_FILE
+export REF_FILE=$(find work_singularity_profile -type f -name "ref.fa.bwt" | xargs dirname | xargs realpath )/ref.fa
 echo ref file: $REF_FILE
 echo ref file: $REF_FILE >> artifacts/test_artifact.log
+# ($REF_FILE is a symlink, but since we changed the directory name, it is the wrong symlink; recreate it)
+rm $REF_FILE
+ln -s $REAL_REF $REF_FILE
 
 echo Nextflow run --illumina mode with symlinked --ref, --bed .. >> artifacts/test_artifact.log
 NXF_VER=20.03.0-edge nextflow run ./main.nf \
@@ -71,7 +71,7 @@ cp .nextflow.log artifacts/symref_bed.nextflow.log
 find work -name .command.sh \
     | xargs cat | grep 'bwa index' \
     && bash -c "echo test failed\: bwa index ran and shouldn\'t have in --ref, --bed mode >> artifacts/test_artifact.log && exit 1"
-echo "ran with --bed and --ref: did NOT use bwa index" >> artifacts/test_artifact.log
+echo "ran with --bed and --ref: did NOT run bwa index" >> artifacts/test_artifact.log
 
 # clean-up for following tests
-rm -rf results && rm -rf work && rm -rf .nextflow* && rm -rf ref bwa_index
+rm -rf results && rm -rf work && rm -rf .nextflow*
