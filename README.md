@@ -18,6 +18,7 @@ This Nextflow pipeline automates the ARTIC network [nCoV-2019 novel coronavirus 
 `nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] --illumina --prefix "output_file_prefix" --directory /path/to/reads`
 
 You can also use cram file input by passing the --cram flag.
+You can also specify cram file output by passing the --outCram flag.
 
 For production use at large scale, where you will run the workflow many times, you can avoid cloning the scheme repository, creating an ivar bed file and indexing the reference every time by supplying both --ivarBed /path/to/ivar-compatible.bed and --alignerRefPrefix /path/to/bwa-indexed/ref.fa.
 
