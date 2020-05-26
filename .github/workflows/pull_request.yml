@@ -35,6 +35,8 @@ jobs:
       run: bash .github/scripts/test_bed_ref_input.sh
     - name: test --cram input together with --bed and --ref
       run: bash .github/scripts/test_cram_input.sh
+    - name: test --outCram output together with --cram and --ref
+      run: bash .github/scripts/test_cram_output.sh
     - name: if failure, add latest NF log to artifacts
       run: mv .nextflow.log artifacts/failure.nextflow.log
       if: failure()
