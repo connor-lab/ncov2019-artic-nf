@@ -13,6 +13,8 @@ include {articRemoveUnmappedReads} from '../modules/artic.nf'
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
 
+include {bamToCram} from '../modules/out.nf'
+
 include {collateSamples} from '../modules/upload.nf'
 
 
@@ -58,6 +60,11 @@ workflow sequenceAnalysisNanopolish {
                            .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
 
+     if (params.outCram) {
+        bamToCram(qc.pass.map{ it[0] } 
+                        .join (trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) )
+
+      }
 
 
     emit:
