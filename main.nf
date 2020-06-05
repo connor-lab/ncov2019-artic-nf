@@ -3,15 +3,28 @@
 // enable dsl2
 nextflow.preview.dsl = 2
 
+// include modules
+include printHelp from './modules/help.nf'
+
 // import subworkflows
 include {articNcovNanopore} from './workflows/articNcovNanopore.nf' 
 include {ncovIllumina} from './workflows/illuminaNcov.nf'
 include {ncovIlluminaCram} from './workflows/illuminaNcov.nf'
 
+if (params.help){
+    printHelp()
+    exit 0
+}
+
+if (params.profile){
+    println("Profile should have a single dash: -profile")
+    System.exit(1)
+}
 
 if ( params.illumina ) {
    if ( !params.directory ) {
        println("Please supply a directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
+       println("Use --help to print help")
        System.exit(1)
    }
    if ( (params.bed && ! params.ref) || (!params.bed && params.ref) ) {
@@ -38,13 +51,14 @@ if ( params.illumina ) {
        println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
    }
 } else {
-       println("Please select a workflow with --nanopolish, --illumina or --medaka")
+       println("Please select a workflow with --nanopolish, --illumina or --medaka, or use --help to print help")
        System.exit(1)
 }
 
 
 if ( ! params.prefix ) {
      println("Please supply a prefix for your output files with --prefix")
+     println("Use --help to print help")
      System.exit(1)
 } else {
      if ( params.prefix =~ /\// ){
