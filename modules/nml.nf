@@ -25,7 +25,7 @@ process generateIridaReport {
     //conda 'environments/extras.txt'
 
     input:
-    path(irida_upload)
+    path(sample_upload)
     file(samplecsv)
 
     output:
@@ -33,6 +33,6 @@ process generateIridaReport {
 
     script:
     """
-    irida_samples.py --base_dir ${params.outdir} --sample_info ${samplecsv} --prefix ${params.prefix}
+    irida_samples.py --sample_info ${samplecsv} --prefix ${params.prefix} --sample_dir ${sample_upload}
     """
 }
