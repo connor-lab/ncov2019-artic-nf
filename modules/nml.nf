@@ -33,6 +33,6 @@ process generateIridaReport {
 
     script:
     """
-    irida_samples.py --base_dir ${params.outdir} --sample_info ${samplecsv} --prefix ${params.prefix}
+    irida_samples.py --sample_info ${samplecsv} --prefix ${params.prefix} --base_dir $baseDir --out_dir ${params.outdir}
     """
 }
