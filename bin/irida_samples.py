@@ -108,9 +108,6 @@ def main():
     sample_dir = args.sample_dir
 
 
-    with open('SampleList.csv', 'w') as handle:
-        handle.write('[DATA]\n')
-
     # Start processing inputs
     if args.illumina: # Illumina can be paired or single, needs different support than nanopore
         print('Illumina processing is not supported at the moment')
@@ -120,6 +117,11 @@ def main():
     else: # Nanopore data is single end
 
         df_out = parse_sample_csv(sample_csv, prefix, sample_dir)
+        
+
+        # Output
+        with open('SampleList.csv', 'w') as handle:
+            handle.write('[DATA]\n')
         
         df_out.to_csv("SampleList.csv", mode='a', header=True, index=False)
 
