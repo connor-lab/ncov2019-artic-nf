@@ -78,8 +78,10 @@ def parse_sample_csv(sample_csv, prefix, sample_dir):
             
 
             # Check that File is found in output dir
-            if os.path.exists('{}/{}'.format(sample_dir, file_name)):
-                pass
+            file_path = '{}/{}'.format(sample_dir, file_name)
+            soft = '{}/{}'.format(sample_dir, current_line_list[0])
+            if os.path.exists(file_path):
+                subprocess.run('mv {} {}'.format(file_path, soft), shell=True)
 
             else:
                 print('ERROR: File {} not found in {}'.format(file_name, sample_dir))

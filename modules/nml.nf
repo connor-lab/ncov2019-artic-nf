@@ -3,7 +3,7 @@ process copyIridaSamples {
 
     tag { fastq }
 
-    publishDir "${params.outdir}", pattern: "irida_upload", mode: "copy"
+    publishDir "${params.outdir}", pattern: "irida_upload", mode: "symlink"
 
     input:
     file(fastq)
