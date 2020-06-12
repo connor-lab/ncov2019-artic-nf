@@ -19,7 +19,6 @@ process bamToCram {
 
     script:
         """
-        samtools view -C -O cram,embed_ref -T ${ref} -o ${bam.baseName}.cram ${bam}
-        samtools index ${bam.baseName}.cram
+         samtools view --write-index -C -O cram,embed_ref -T ${ref} -o ${bam.baseName}.cram ${bam}
         """
 }
