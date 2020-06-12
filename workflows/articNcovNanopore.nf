@@ -17,6 +17,9 @@ include {bamToCram} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
 
+include {copyIridaSamples} from '../modules/nml.nf'
+include {generateIridaReport} from '../modules/nml.nf'
+
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
@@ -66,6 +69,13 @@ workflow sequenceAnalysisNanopolish {
 
       }
 
+      if (params.irida) {
+       copyIridaSamples(articGuppyPlex.out.fastq.toList())
+      
+       Channel.fromPath("${params.irida}")
+              .set{ ch_irida }
+       generateIridaReport(copyIridaSamples.out, ch_irida)
+     }
 
     emit:
       qc_pass = collateSamples.out
