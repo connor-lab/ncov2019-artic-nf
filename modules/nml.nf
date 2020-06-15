@@ -1,38 +1,20 @@
+process generateIridaReport {
 
-process copyIridaSamples {
+    publishDir "${params.outdir}", pattern: "irida_upload", mode: "copy"
 
-    tag { fastq }
-
-    publishDir "${params.outdir}", pattern: "irida_upload", mode: "symlink"
+    //conda 'environments/extras.txt'
 
     input:
     file(fastq)
+    file(samplecsv)
 
     output:
     path("irida_upload")
 
     script:
     """
-    mkdir -p irida_upload
+    mkdir irida_upload
     mv ${fastq} irida_upload
-    """
-}
-
-process generateIridaReport {
-
-    publishDir "${params.outdir}/irida_upload", pattern: "SampleList.csv", mode: "copy"
-
-    //conda 'environments/extras.txt'
-
-    input:
-    path(sample_upload)
-    file(samplecsv)
-
-    output:
-    file("SampleList.csv")
-
-    script:
-    """
-    irida_samples.py --sample_info ${samplecsv} --prefix ${params.prefix} --sample_dir ${sample_upload}
+    irida_samples.py --sample_info ${samplecsv} --prefix ${params.prefix} --sample_dir irida_upload
     """
 }

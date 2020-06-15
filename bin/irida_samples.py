@@ -76,23 +76,24 @@ def parse_sample_csv(sample_csv, prefix, sample_dir):
                 barcode = current_line_list[2]
 
             file_name = '{}_barcode{}.fastq'.format(prefix, barcode)
+            new_file_name = '{}.fastq'.format(current_line_list[0])
             
 
             # Check that File is found in output dir
             file_path = '{}/{}'.format(sample_dir, file_name)
-            soft = '{}/{}'.format(sample_dir, current_line_list[0])
+            new_file_path = '{}/{}'.format(sample_dir, new_file_name)
             if os.path.exists(file_path):
-                subprocess.run('mv {} {}'.format(file_path, soft), shell=True)
+                subprocess.run('mv {} {}'.format(file_path, new_file_path), shell=True)
 
             else:
-                print('ERROR: File {} not found in {}'.format(file_name, sample_dir))
-                quit()
+                print('WARN: File {} not found in {}'.format(file_name, sample_dir))
+                continue
 
 
             # Set DataFrame for easy output csv
             df_out.at[index, 'Sample_Name'] = current_line_list[0] # Name from input sample info file
             df_out.at[index, 'Project_ID'] = current_line_list[3] # Project number from sample info file
-            df_out.at[index, 'File_Forward'] = file_name
+            df_out.at[index, 'File_Forward'] = new_file_name
 
     return df_out
 
@@ -123,10 +124,10 @@ def main():
         
 
         # Output
-        with open('SampleList.csv', 'w') as handle:
+        with open('{}/SampleList.csv'.format(sample_dir), 'w') as handle:
             handle.write('[DATA]\n')
         
-        df_out.to_csv("SampleList.csv", mode='a', header=True, index=False)
+        df_out.to_csv('{}/SampleList.csv'.format(sample_dir), mode='a', header=True, index=False)
 
 
 if __name__ == "__main__":
