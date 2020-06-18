@@ -9,6 +9,7 @@ include {readTrimming} from '../modules/illumina.nf'
 include {indexReference} from '../modules/illumina.nf'
 include {readMapping} from '../modules/illumina.nf' 
 include {trimPrimerSequences} from '../modules/illumina.nf' 
+include {makeAmpliconstats} from '../modules/illumina.nf'
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
@@ -92,6 +93,8 @@ workflow sequenceAnalysis {
       readMapping(readTrimming.out.combine(ch_preparedRef))
 
       trimPrimerSequences(readMapping.out.combine(ch_bedFile))
+
+      makeAmpliconstats(trimPrimerSequences.out.ptrim.combine(ch_bedFile))
 
       callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))     
 

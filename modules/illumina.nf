@@ -102,6 +102,29 @@ process trimPrimerSequences {
         """
 }
 
+process makeAmpliconstats {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}/${sampleName}", pattern: "*.stats", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}/${sampleName}", pattern: "*.png", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}/${sampleName}", pattern: "*.gp", mode: 'copy'
+
+    input:
+    tuple sampleName, path(bam), path(bedfile)
+
+    output:
+    tuple sampleName, path("${sampleName}.amp.stats"), emit: ampstats
+    tuple sampleName, path("*.png"), emit: amppng
+    tuple sampleName, path("*.gp"), emit: ampgp
+
+    script:
+        """
+        samtools ampliconstats -@8 -d 1,20,100 ${bedfile} ${bam} > ${sampleName}.amp.stats
+        plot-ampliconstats -size 1200,900 ampliconstatData ${sampleName}.amp.stats
+        """
+}
+
 process callVariants {
 
     tag { sampleName }
