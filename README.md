@@ -42,6 +42,8 @@ The repo contains a environment.yml files which automatically build the correct 
 
 --cache /some/dir can be specified to have a fixed, shared location to store the conda build for use by multiple runs of the workflow.
 
+> For samtools-ampliconstats support commited [here](https://github.com/ac55-sanger/ncov2019-artic-nf/commit/aa127d4e98b3ef3bfe887c789ce03cbf483c34ef), you first need to build the conda packages of htslib and samtools from their development repository using the steps at [conda_samtools_development](https://github.com/ac55-sanger/conda_samtools_development) and modifying the `environment.yml` file as instructed [here](https://github.com/ac55-sanger/conda_samtools_development#install-using-an-environment-file). 
+
 #### Executors
 By default, the pipeline just runs on the local machine. You can specify `-profile slurm` to use a SLURM cluster, or `-profile lsf` to use an LSF cluster. In either case you may need to also use one of the COG-UK institutional config profiles (phw or sanger), or provide queue names to use in your own config file.
 
