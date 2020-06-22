@@ -61,7 +61,7 @@ workflow sequenceAnalysisNanopolish {
                            .join(articRemoveUnmappedReads.out))
 
      if (params.outCram) {
-        bamToCram(articMinIONNanopolish.out.ptirm.map{ it[0] } 
+        bamToCram(articMinIONNanopolish.out.ptrim.map{ it[0] } 
                         .join (articDownloadScheme.out.reffasta.combine(ch_preparedRef.map{ it[0] })) )
 
       }
