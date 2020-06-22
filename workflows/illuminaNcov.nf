@@ -94,7 +94,9 @@ workflow sequenceAnalysis {
 
       trimPrimerSequences(readMapping.out.combine(ch_bedFile))
 
-      makeAmpliconstats(trimPrimerSequences.out.ptrim.combine(ch_bedFile))
+      if(params.ampliconstats) {
+        makeAmpliconstats(trimPrimerSequences.out.ptrim.combine(ch_bedFile))
+      }
 
       callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))     
 
