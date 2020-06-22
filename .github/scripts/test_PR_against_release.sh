@@ -40,13 +40,11 @@ find results ./previous_release/results \
      -o -name "*.fq.gz" \
      -o -name "*.bam" \
      -o -name "scheme" | xargs rm -rf
-git diff --stat --no-index results ./previous_release/results > diffs.txt
-if [ -s diffs.txt ]
-then
+if ! git diff --stat --no-index results ./previous_release/results > diffs.txt ; then
   echo "test failed: differences found between PR and previous release" >> artifacts/test_artifact.log
   echo see diffs.txt >> artifacts/test_artifact.log 
   cp diffs.txt artifacts/  
-  exit 1
+  #exit 1
 else
   echo no differences found between PR and previous release >> artifacts/test_artifact.log
 fi
