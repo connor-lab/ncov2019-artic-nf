@@ -79,6 +79,7 @@ workflow {
        }
        else {
 	   Channel.fromFilePairs( params.fastqSearchPath, flat: true)
+	          .filter{ !( it[0] =~ /Undetermined/ ) }
 	          .set{ ch_filePairs }
        }
    }
