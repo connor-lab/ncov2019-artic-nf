@@ -19,7 +19,7 @@ This Nextflow pipeline automates the ARTIC network [nCoV-2019 novel coronavirus 
 
 You can also use cram file input by passing the --cram flag.
 You can also specify cram file output by passing the --outCram flag.
-You can also run apliconstats (from samtools development branch) by passing the --ampliconstats flag.
+You can also run ampliconstats by passing the --ampliconstats flag.
 
 For production use at large scale, where you will run the workflow many times, you can avoid cloning the scheme repository, creating an ivar bed file and indexing the reference every time by supplying both --ivarBed /path/to/ivar-compatible.bed and --alignerRefPrefix /path/to/bwa-indexed/ref.fa.
 
@@ -42,8 +42,6 @@ This repo contains both [Singularity]("https://sylabs.io/guides/3.0/user-guide/i
 The repo contains a environment.yml files which automatically build the correct conda env if `-profile conda` is specifed in the command. Although you'll need `conda` installed, this is probably the easiest way to run this pipeline.
 
 --cache /some/dir can be specified to have a fixed, shared location to store the conda build for use by multiple runs of the workflow.
-
-> For samtools-ampliconstats support commited [here](https://github.com/ac55-sanger/ncov2019-artic-nf/commit/aa127d4e98b3ef3bfe887c789ce03cbf483c34ef), you first need to build the conda packages of htslib and samtools from their development repository using the steps at [conda_samtools_development](https://github.com/ac55-sanger/conda_samtools_development) and modifying the `environment.yml` file as instructed [here](https://github.com/ac55-sanger/conda_samtools_development#install-using-an-environment-file). 
 
 #### Executors
 By default, the pipeline just runs on the local machine. You can specify `-profile slurm` to use a SLURM cluster, or `-profile lsf` to use an LSF cluster. In either case you may need to also use one of the COG-UK institutional config profiles (phw or sanger), or provide queue names to use in your own config file.
