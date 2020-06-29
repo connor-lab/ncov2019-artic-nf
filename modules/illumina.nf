@@ -102,6 +102,28 @@ process trimPrimerSequences {
         """
 }
 
+process makeAmpliconstats {
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.stats", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.png", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.gp", mode: 'copy'
+
+    input:
+    file (ptrim_bams)
+    path(bedfile)
+
+    output:
+    path "nCoV-2019.amp.stats", emit: ampstats
+    path "*.png", emit: amppng
+    path "*.gp", emit: ampgp
+
+    script:
+        """
+        samtools ampliconstats -@8 -d 1,20,100 ${bedfile} *.mapped.primertrimmed.sorted.bam > nCoV-2019.amp.stats
+        plot-ampliconstats -size 1200,900 nCoV-2019-ampliconstats nCoV-2019.amp.stats
+        """
+}
+
 process callVariants {
 
     tag { sampleName }

@@ -9,6 +9,7 @@ include {readTrimming} from '../modules/illumina.nf'
 include {indexReference} from '../modules/illumina.nf'
 include {readMapping} from '../modules/illumina.nf' 
 include {trimPrimerSequences} from '../modules/illumina.nf' 
+include {makeAmpliconstats} from '../modules/illumina.nf'
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
@@ -119,6 +120,15 @@ workflow sequenceAnalysis {
         bamToCram(qc.pass.map{ it[0] } 
                         .join (trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) )
 
+      }
+
+      // Generate ampliconstats only if --ampliconstats parameter is passed
+      if(params.ampliconstats) {
+        // Create a channel to collect only the mapped.primertrimmed.sorted.bam output files from trimPrimerSequences
+
+        trimPrimerSequences.out.ptrim.map{sample, bam -> bam}.collect().set{ ch_ptrim_bam }
+        
+        makeAmpliconstats(ch_ptrim_bam, ch_bedFile)
       }
 
     emit:
