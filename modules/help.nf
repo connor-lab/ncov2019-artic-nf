@@ -41,6 +41,8 @@ def printHelp() {
       --max_length            Maximum read length for artic guppyplex (Default: 700)
       --bwa                   Use BWA for mapping Nanopore reads (Default: false, use Minimap2)
       --outCram               Output cram instead of bam files (Default: false)
+      --minReadsPerBarcode    Minimum number of reads accepted for a single barcode when supplying deplexed Fastq
+                              files as input. Barcodes having fewer reads are ignored. (Default: 100)
  
   Illumina workflow options:
     Mandatory:
