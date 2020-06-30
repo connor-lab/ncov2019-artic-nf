@@ -69,7 +69,7 @@ process readMapping {
 
     script:
         """
-        bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | samtools view -bS | \
+        bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
         samtools sort -o ${sampleName}.sorted.bam
         """
 }
