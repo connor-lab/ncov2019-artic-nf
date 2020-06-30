@@ -92,8 +92,15 @@ workflow {
             // Yes, barcodes!
             Channel.fromPath( nanoporeBarcodeDirs )
                    .filter( ~/.*barcode[0-9]{1,4}$/ )
-                   .filter{ it.listFiles().size() > 5 }
-                   .set{ ch_fastqDirs }
+                   .filter{ d ->
+                            def count = 0
+                            for (x in d.listFiles()) {
+                                if (x.isFile()) {
+                                    count += x.countFastq()
+                                }
+                            }
+                            count > params.minReadsPerBarcode
+                   }.set{ ch_fastqDirs }
        } else if ( nanoporeNoBarcode ){
             // No, no barcodes
             Channel.fromPath( "${params.basecalled_fastq}", type: 'dir', maxDepth: 1 )
