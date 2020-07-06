@@ -7,3 +7,4 @@ dependencies:
   - matplotlib
   - pandas
   - samtools
+  - libxcb
