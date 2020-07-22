@@ -1,5 +1,5 @@
 Bootstrap: docker
-#From: continuumio/miniconda3:latest
+From: continuumio/miniconda3:latest
 %files
 environments/illumina/environment.yml /environment.yml
 environments/extras.yml /extras.yml
@@ -9,9 +9,6 @@ description="Docker image containing all requirements for the ARTIC project's nc
 %post
 
 apt-get update && apt-get install -y g++ git make procps rsync && apt-get clean -y
-
-wget --quiet https://repo.anaconda.com/miniconda/Miniconda2-4.5.11-Linux-x86_64.sh -O ~/miniconda.sh
-/bin/bash ~/miniconda.sh -b -p /opt/conda
 /opt/conda/bin/conda env create -f /environment.yml
 /opt/conda/bin/conda env update -f /extras.yml -n artic-ncov2019-illumina
 PATH=/opt/conda/envs/artic-ncov2019-illumina/bin:$PATH
