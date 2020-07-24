@@ -116,7 +116,7 @@ workflow sequenceAnalysis {
                            .join(trimPrimerSequences.out.mapped))     
 
       if (params.outCram) {
-        bamToCram(qc.pass.map{ it[0] } 
+        bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
                         .join (trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) )
 
       }
