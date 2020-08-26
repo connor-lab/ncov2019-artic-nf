@@ -19,7 +19,7 @@ cp -r work work_singularity_profile
 # run tests against previous previous_release to compare outputs 
 git clone https://github.com/connor-lab/ncov2019-artic-nf.git previous_release 
 cd previous_release
-git checkout 5e00ba938d9e9f903a8da381a87eaff874e09802 
+git checkout 307b09428241f3a03ce4c677628fdc153aed8738 
 # the github runner only has 2 cpus available, so replace for that commit required:
 sed -i s'/cpus = 4/cpus = 2/'g conf/resources.config
 ln -s ../*.sif ./
@@ -44,7 +44,7 @@ if ! git diff --stat --no-index results ./previous_release/results > diffs.txt ;
   echo "test failed: differences found between PR and previous release" >> artifacts/test_artifact.log
   echo see diffs.txt >> artifacts/test_artifact.log 
   cp diffs.txt artifacts/  
-  #exit 1
+  exit 1
 else
   echo no differences found between PR and previous release >> artifacts/test_artifact.log
 fi
