@@ -8,13 +8,13 @@ process articDownloadScheme{
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "scheme", mode: "copy"
 
     output:
-    path "scheme/**/${params.schemeVersion}/*.reference.fasta" , emit: reffasta
-    path "scheme/**/${params.schemeVersion}/${params.scheme}.bed" , emit: bed
-    path "scheme" , emit: scheme
+    path "${params.schemeDir}/${params.scheme}/${params.schemeVersion}/*.reference.fasta" , emit: reffasta
+    path "${params.schemeDir}/${params.scheme}/${params.schemeVersion}/*.primer.bed" , emit: bed
+    path "${params.schemeDir}" , emit: scheme
 
     script:
     """
-    git clone ${params.schemeRepoURL} scheme
+    git clone ${params.schemeRepoURL} ${params.schemeDir}
     """
 }
 
@@ -81,7 +81,7 @@ process articMinIONMedaka {
     artic minion --medaka \
     ${minionFinalConfig} \
     --threads ${task.cpus} \
-    --scheme-directory ${schemeRepo}/${params.schemeDir} \
+    --scheme-directory ${params.schemeDir} \
     --read-file ${fastq} \
     ${params.scheme}/${params.schemeVersion} \
     ${sampleName}
