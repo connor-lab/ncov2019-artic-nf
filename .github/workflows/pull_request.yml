@@ -7,6 +7,8 @@ jobs:
   test:
     name: Run tests
     runs-on: ubuntu-latest
+    env:
+      NXF_ANSI_LOG: false
     steps:
     - uses: actions/checkout@master
     - name: create artifacts dir to save test logs
