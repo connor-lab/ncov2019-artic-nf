@@ -20,6 +20,7 @@ cp -r work work_singularity_profile
 #git clone https://github.com/connor-lab/ncov2019-artic-nf.git previous_release 
 #cd previous_release
 #git checkout 5e00ba938d9e9f903a8da381a87eaff874e09802 
+
 # the github runner only has 2 cpus available, so replace for that commit required:
 #sed -i s'/cpus = 4/cpus = 2/'g conf/resources.config
 #ln -s ../*.sif ./
