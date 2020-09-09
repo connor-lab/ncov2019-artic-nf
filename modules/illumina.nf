@@ -90,9 +90,9 @@ process trimPrimerSequences {
 
     script:
     if (params.allowNoprimer){
-        ivarCmd = "ivar trim -e"
+        ivarCmd = "ivar trim -ef"
     } else {
-        ivarCmd = "ivar trim"
+        ivarCmd = "ivar trim -f"
     }
         """
         samtools view -F4 -o ${sampleName}.mapped.bam ${bam}
