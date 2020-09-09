@@ -81,7 +81,7 @@ process articMinIONMedaka {
     artic minion --medaka \
     ${minionFinalConfig} \
     --threads ${task.cpus} \
-    --scheme-directory ${params.schemeDir} \
+    --scheme-directory ${schemeRepo} \
     --read-file ${fastq} \
     ${params.scheme}/${params.schemeVersion} \
     ${sampleName}
@@ -127,7 +127,7 @@ process articMinIONNanopolish {
     """
     artic minion ${minionFinalConfig} \
     --threads ${task.cpus} \
-    --scheme-directory ${schemeRepo}/${params.schemeDir} \
+    --scheme-directory ${schemeRepo} \
     --read-file ${fastq} \
     --fast5-directory ${fast5Pass} \
     --sequencing-summary ${seqSummary} \
