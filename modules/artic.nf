@@ -19,7 +19,7 @@ process articDownloadScheme{
 }
 
 process articGuppyPlex {
-    tag { samplePrefix + "-" + fastqDir }
+    tag { params.prefix + "-" + fastqDir }
 
     label 'largemem'
 
