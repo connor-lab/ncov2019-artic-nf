@@ -7,4 +7,8 @@ FILENAME = "$1"
 INPUT = "/data/${FILENAME}_input/"
 OUTDIR="results"
 
-nextflow run ncov2019-artic-nf/main.nf -profile docker --nanopolish --prefix "ena" --basecalled_fastq $INPUT --fast5-directory $INPUT --sequencing_summary sequencing_summary.txt --schemeRepoURL "https://github.com/ctr26/primer-schemes"
+# nextflow run ncov2019-artic-nf/main.nf -profile docker --nanopolish --prefix "ena" --basecalled_fastq $INPUT --fast5-directory $INPUT --sequencing_summary sequencing_summary.txt --schemeRepoURL "https://github.com/ctr26/primer-schemes"
+
+nextflow run main.nf -profile k8s --medaka --prefix "ena" --basecalled_fastq $INPUT
+
+# nextflow run main.nf -profile docker --medaka --prefix "ena" --basecalled_fastq $INPUT

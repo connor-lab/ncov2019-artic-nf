@@ -9,4 +9,6 @@ FILENAME = "$1"
 INPUT = "/data/${FILENAME}_input/"
 OUTDIR="results"
 
-nextflow run main.nf -profile docker --illumina --prefix "ena" --directory $INPUT --schemeRepoURL "--recurse-submodules https://github.com/artic-network/artic-ncov2019"
+nextflow run main.nf -profile k8s --medaka --prefix "ena" --directory $INPUT
+
+# nextflow run main.nf -profile docker --illumina --prefix "ena" --directory $INPUT
