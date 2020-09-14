@@ -61,8 +61,8 @@ workflow sequenceAnalysisNanopolish {
                            .join(articRemoveUnmappedReads.out))
 
      if (params.outCram) {
-        bamToCram(qc.pass.map{ it[0] } 
-                        .join (trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) )
+        bamToCram(articMinIONNanopolish.out.ptrim.map{ it[0] } 
+                        .join (articDownloadScheme.out.reffasta.combine(ch_preparedRef.map{ it[0] })) )
 
       }
 
@@ -104,6 +104,11 @@ workflow sequenceAnalysisMedaka {
                            .join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
 
+     if (params.outCram) {
+        bamToCram(articMinIONMedaka.out.ptrim.map{ it[0] } 
+                        .join (articDownloadScheme.out.reffasta.combine(ch_preparedRef.map{ it[0] })) )
+
+      }
     emit:
       qc_pass = collateSamples.out
 
