@@ -35,6 +35,7 @@ workflow sequenceAnalysisNanopolish {
       articGuppyPlex(ch_runFastqDirs.flatten())
 
       articMinIONNanopolish(articGuppyPlex.out.fastq
+                                          .filter{ it.countFastq() > params.minReadsArticGuppyPlex }
                                           .combine(articDownloadScheme.out.scheme)
                                           .combine(ch_fast5Pass)
                                           .combine(ch_seqSummary))
@@ -82,6 +83,7 @@ workflow sequenceAnalysisMedaka {
       articGuppyPlex(ch_runFastqDirs.flatten())
 
       articMinIONMedaka(articGuppyPlex.out.fastq
+                                      .filter{ it.countFastq() > params.minReadsArticGuppyPlex }
                                       .combine(articDownloadScheme.out.scheme))
 
       articRemoveUnmappedReads(articMinIONMedaka.out.mapped)
