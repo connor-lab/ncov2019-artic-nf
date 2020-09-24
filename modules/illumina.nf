@@ -68,10 +68,20 @@ process readMapping {
         tuple(sampleName, path("${sampleName}.sorted.bam"))
 
     script:
-        """
-        bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
-        samtools sort -o ${sampleName}.sorted.bam
-        """
+        if ( params.cleanBamHeader )
+          """
+          ln -s ${forward} sample_1.fq.gz
+          ln -s ${reverse} sample_2.fq.gz
+          
+          bwa mem -t ${task.cpus} ${ref} sample_1.fq.gz sample_2.fq.gz | samtools view -bS | \
+          samtools sort -o ${sampleName}.sorted.bam
+          """
+ 
+       else
+          """
+          bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | samtools view -bS | \
+          samtools sort -o ${sampleName}.sorted.bam
+          """
 }
 
 process trimPrimerSequences {
