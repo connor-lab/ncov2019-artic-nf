@@ -1,10 +1,17 @@
-FROM continuumio/miniconda3:latest
+FROM continuumio/miniconda3:latest AS condabuild
 LABEL authors="Matt Bull" \
       description="Docker image containing all requirements for an Illumina ncov2019 pipeline"
 
 COPY environments/extras.yml /extras.yml
 COPY environments/illumina/environment.yml /environment.yml
-RUN apt-get update && apt-get install -y curl g++ git make procps && apt-get clean -y
-RUN /opt/conda/bin/conda env create -f /environment.yml 
-RUN /opt/conda/bin/conda env update -f /extras.yml -n artic-ncov2019-illumina && /opt/conda/bin/conda clean -a
+RUN /opt/conda/bin/conda update conda && \
+/opt/conda/bin/conda install mamba -c conda-forge && \
+/opt/conda/bin/mamba env create -f /environment.yml && \
+/opt/conda/bin/mamba env update -f /extras.yml -n artic-ncov2019-illumina
+
+FROM debian:buster-slim
+RUN apt-get update && \
+apt-get install -y git procps && \
+apt-get clean -y 
+COPY --from=condabuild /opt/conda/envs/artic-ncov2019-illumina /opt/conda/envs/artic-ncov2019-illumina
 ENV PATH=/opt/conda/envs/artic-ncov2019-illumina/bin:$PATH
