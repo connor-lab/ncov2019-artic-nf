@@ -73,13 +73,13 @@ process readMapping {
           ln -s ${forward} sample_1.fq.gz
           ln -s ${reverse} sample_2.fq.gz
           
-          bwa mem -t ${task.cpus} ${ref} sample_1.fq.gz sample_2.fq.gz | samtools view -bS | \
+          bwa mem -t ${task.cpus} ${ref} sample_1.fq.gz sample_2.fq.gz | \
           samtools sort -o ${sampleName}.sorted.bam
           """
  
        else
           """
-          bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | samtools view -bS | \
+          bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
           samtools sort -o ${sampleName}.sorted.bam
           """
 }
