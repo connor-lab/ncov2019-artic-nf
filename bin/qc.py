@@ -59,6 +59,17 @@ def get_covered_pos(pos_depth, min_depth):
     
     return counter
 
+def get_mean_coverage(pos_depth):
+    counter = 0
+    sum_of_depths = 0
+
+    for con,pos,depth in pos_depth:
+        sum_of_depths = sum_of_depths + int(depth)
+        counter = counter + 1
+    
+    mean_coverage =round(sum_of_depths / counter,2)
+    return mean_coverage
+
 def get_N_positions(fasta):
     n_pos =  [i for i, letter in enumerate(fasta.seq.lower()) if letter == 'n']
 
@@ -120,9 +131,12 @@ def go(args):
     depth_covered_bases = get_covered_pos(depth_pos, depth)
 
     pct_covered_bases = depth_covered_bases / ref_length * 100
-
+    
     ## Number of aligned reads calculaton
     num_reads = get_num_reads(args.bam)
+    
+    ## Mean coverage calculation
+    mean_coverage = get_mean_coverage(depth_pos)
 
     # Unknown base calcs
     fasta = SeqIO.read(args.fasta, "fasta")
@@ -146,8 +160,9 @@ def go(args):
           'pct_covered_bases' : "{:.2f}".format(pct_covered_bases), 
            'longest_no_N_run' : largest_N_gap,
           'num_aligned_reads' : num_reads,
-                       'fasta': args.fasta, 
+                      'fasta' : args.fasta, 
                         'bam' : args.bam,
+              'mean_coverage' : mean_coverage,
                     'qc_pass' : qc_pass}
 
 
