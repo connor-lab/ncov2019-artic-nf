@@ -10,4 +10,4 @@ dependencies:
   - bwa=0.7.17=pl5.22.0_2
   - samtools=1.10
   - trim-galore=0.6.5
-  - ivar=1.2.3
+  - ivar=1.3
