@@ -4,4 +4,4 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - artic
+  - artic=1.1.3
