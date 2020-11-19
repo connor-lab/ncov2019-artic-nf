@@ -19,6 +19,7 @@ This Nextflow pipeline automates the ARTIC network [nCoV-2019 novel coronavirus 
 
 You can also use cram file input by passing the --cram flag.
 You can also specify cram file output by passing the --outCram flag.
+You can also run ampliconstats by passing the --ampliconstats flag.
 
 For production use at large scale, where you will run the workflow many times, you can avoid cloning the scheme repository, creating an ivar bed file and indexing the reference every time by supplying both --ivarBed /path/to/ivar-compatible.bed and --alignerRefPrefix /path/to/bwa-indexed/ref.fa.
 
