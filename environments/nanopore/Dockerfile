@@ -1,13 +1,17 @@
-FROM continuumio/miniconda3:latest
+FROM continuumio/miniconda3:latest AS condabuild
 LABEL authors="Matt Bull" \
       description="Docker image containing all requirements for the ARTIC project's ncov2019 pipeline"
 
-COPY extras.yml /extras.yml
-RUN apt-get update && apt-get install -y curl g++ git make procps && apt-get clean -y
-RUN curl -o /environment.yml -fsSL 'https://raw.githubusercontent.com/artic-network/artic-ncov2019/master/environment.yml'
-RUN /opt/conda/bin/conda env create -f /environment.yml
-RUN /opt/conda/bin/conda env update -f /extras.yml -n artic-ncov2019
-ENV PATH /opt/conda/envs/artic-ncov2019/bin:$PATH
-# RUN conda install nextflow
-RUN git clone --recurse-submodules https://github.com/artic-network/artic-ncov2019 scheme
-ENTRYPOINT ["/opt/conda/envs/artic-ncov2019/bin/artic"]
+COPY environments/extras.yml /extras.yml
+COPY environments/nanopore/environment.yml /environment.yml
+RUN /opt/conda/bin/conda install mamba -c conda-forge && \
+/opt/conda/bin/mamba env create -f /environment.yml && \
+/opt/conda/bin/mamba env update -f /extras.yml -n artic
+
+FROM debian:buster-slim
+RUN apt-get update && \
+apt-get install -y git procps && \
+apt-get clean -y
+COPY --from=condabuild /opt/conda/envs/artic /opt/conda/envs/artic
+ENV PATH=/opt/conda/envs/artic/bin:$PATH
+ENTRYPOINT ["/opt/conda/envs/artic/bin/artic"]

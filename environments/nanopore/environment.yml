@@ -4,5 +4,4 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - artic
-  - nextflow
+  - artic=1.1.3
