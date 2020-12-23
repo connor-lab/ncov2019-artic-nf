@@ -29,6 +29,8 @@ jobs:
        NXF_VER=20.03.0-edge nextflow -version
     - name: test nanopore pipelines
       run: bash .github/scripts/test_nanopore_pipelines.sh
+    - name: test typing functionality
+      run: bash .github/scripts/test_typing.sh
     - name: test PR outputs against previous release
       run: bash .github/scripts/test_PR_against_release.sh
     - name: test -profile sanger
