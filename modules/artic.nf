@@ -46,13 +46,13 @@ process articMinIONMedaka {
 
     label 'largecpu'
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
 
     input:
     tuple file(fastq), file(schemeRepo)
 
     output:
-    file("${sampleName}.*")
+    file("${sampleName}*")
     
     tuple sampleName, file("${sampleName}.primertrimmed.rg.sorted.bam"), emit: ptrim
     tuple sampleName, file("${sampleName}.sorted.bam"), emit: mapped
@@ -94,13 +94,13 @@ process articMinIONNanopolish {
 
     label 'largecpu'
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.*", mode: "copy"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
 
     input:
     tuple file(fastq), file(schemeRepo), file(fast5Pass), file(seqSummary)
 
     output:
-    file("${sampleName}.*")
+    file("${sampleName}*")
     
     tuple sampleName, file("${sampleName}.primertrimmed.rg.sorted.bam"), emit: ptrim
     tuple sampleName, file("${sampleName}.sorted.bam"), emit: mapped
