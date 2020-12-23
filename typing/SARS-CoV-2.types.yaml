@@ -28,6 +28,36 @@ VOC-202012/01:
       - D3L
       - S235F
 
+N501Y.V2:
+  # Note not a complete set of lineage defining mutations but covers triple spike variants 
+  coverage: 0.7
+  variants:
+    S:
+      - D80A
+      - R246I
+      - K417N
+      - E484K
+      - N501Y
+      - D614G
+      - A701V
+  
+    E: 
+      - P71L
+    N: 
+      - T205I
+
+    ORF3a: 
+      - Q57H
+      - S171L
+
+    ORF1ab:
+      - T265I
+      - K1655N
+      - H2799Y
+      - S2900L
+      - K3353R
+      - M3655I
+
 N501Y:
   coverage: 1
   variants:
