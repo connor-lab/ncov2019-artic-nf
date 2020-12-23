@@ -1,0 +1,42 @@
+VOC-202012/01:
+  # https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/947048/Technical_Briefing_VOC_SH_NJL2_SH2.pdf
+  # Table 1
+  coverage: 0.7
+  variants:
+    S:
+      - IHV68I
+      - VY143V
+      - N501Y
+      - A570D
+      - P681H
+      - T716I
+      - S982A
+      - D1118H
+  
+    ORF1ab:
+      - T1001I
+      - A1708D
+      - I2230T
+      - LSGF3674L
+
+    ORF8:
+      - Q27*
+      - R52I
+      - Y73C
+
+    N:
+      - D3L
+      - S235F
+
+N501Y:
+  coverage: 1
+  variants:
+    S:
+      - N501Y
+
+D614G:
+  coverage: 1
+  variants:
+    S:
+      - D614G
+
