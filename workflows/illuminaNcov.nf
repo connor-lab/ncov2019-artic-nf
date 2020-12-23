@@ -125,8 +125,6 @@ workflow sequenceAnalysis {
     emit:
       qc_pass = collateSamples.out
       variants = callVariants.out.variants
-      refFasta = callVariants.out.refFasta
-      
 }
 
 workflow ncovIllumina {

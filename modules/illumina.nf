@@ -131,7 +131,7 @@ process callVariants {
     tuple(sampleName, path(bam), path(ref))
 
     output:
-    tuple sampleName, path("${sampleName}.variants.tsv")
+    tuple sampleName, path("${sampleName}.variants.tsv"), emit: variants
 
     script:
         """
