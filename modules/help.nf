@@ -32,7 +32,7 @@ def printHelp() {
     Optional:
       --outdir                Output directory (Default: ./results)
  
-      --schemeVersion         ARTIC scheme version (Default: 'V2')
+      --schemeVersion         ARTIC scheme version (Default: 'V3')
       --schemeRepoURL         Repo to download your primer scheme from (Default: 'https://github.com/artic-network/artic-ncov2019')
       --schemeDir             Directory within schemeRepoURL that contains primer schemes (Default: 'primer_schemes')
       --scheme                Scheme name (Default: 'nCoV-2019')
@@ -44,6 +44,11 @@ def printHelp() {
       --minReadsPerBarcode    Minimum number of reads accepted for a single barcode when supplying deplexed Fastq
                               files as input. Barcodes having fewer reads are ignored. (Default: 100)
  
+      --gff                   Path to annotation gff for variant consequence calling and typing. (Default: unset, don't run typing unless set)
+      --yaml                  Path to YAML file with typing schemes.
+                              Format: { <typing_scheme_name> : { coverage: <float>, variants: <gene_name>: <[ D614G, IHV68I ]> }}
+
+
   Illumina workflow options:
     Mandatory:
       --prefix                A (unique) string prefix for output files.
@@ -53,7 +58,7 @@ def printHelp() {
     Optional:
       --outdir                Output directory (Default: ./results)
 
-      --schemeVersion         ARTIC scheme version (Default: 'V2')
+      --schemeVersion         ARTIC scheme version (Default: 'V3')
       --schemeRepoURL         Repo to download your primer scheme from (Default: 'https://github.com/artic-network/artic-ncov2019')
       --schemeDir             Directory within schemeRepoURL that contains primer schemes (Default: 'primer_schemes')
       --scheme                Scheme name (Default: 'nCoV-2019')
@@ -62,13 +67,15 @@ def printHelp() {
                               Overrides --scheme* options. (Default: unset, download scheme from git)
       --ref                   Path to iVar-compatible reference fasta file, also requires --bed 
                               Overrides --scheme* options. (Default: unset, download scheme from git)
-
+      --gff                   Path to annotation gff for variant consequence calling and typing. (Default: unset, typing not run unless set)
+      --yaml                  Path to YAML file with typing schemes. 
+                              Format: { <typing_scheme_name> : { coverage: <float>, variants: <gene_name>: <[ D614G, IHV68I ]> }}
       --allowNoprimer         Allow reads that don't have primer sequence? 
                               Depends on your library prep method: ligation == false, tagmentation == true (Default: true)
       --illuminaKeepLen       Length (bp) of reads to keep after primer trimming (Default: 20)
       --illuminaQualThreshold Sliding window quality threshold for keeping 
                               reads after primer trimming (Default: 20)
-      --mpileupDepth          Mpileup depth (Default: 100000)
+      --mpileupDepth          Mpileup depth (Default: unlimited)
       --ivarFreqThreshold     iVar frequency threshold for consensus variant (ivar consensus -t, Default: 0.75)
       --ivarMinDepth          Minimum coverage depth to call variant (ivar consensus -m; ivar variants -m, Default: 10)
       --ivarMinFreqThreshold  iVar frequency threshold to call variant (ivar variants -t, Default: 0.25)

@@ -6,8 +6,7 @@ COPY environments/extras.yml /extras.yml
 COPY environments/illumina/environment.yml /environment.yml
 RUN /opt/conda/bin/conda update conda && \
 /opt/conda/bin/conda install mamba -c conda-forge && \
-/opt/conda/bin/mamba env create -f /environment.yml && \
-/opt/conda/bin/mamba env update -f /extras.yml -n artic-ncov2019-illumina
+/opt/conda/bin/mamba env create -f /environment.yml
 
 FROM debian:buster-slim
 RUN apt-get update && \

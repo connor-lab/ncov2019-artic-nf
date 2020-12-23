@@ -22,7 +22,7 @@ include {collateSamples} from '../modules/upload.nf'
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
-
+include {Genotyping} from './typing.nf'
 
 workflow prepareReferenceFiles {
     // Get reference fasta
@@ -77,6 +77,7 @@ workflow prepareReferenceFiles {
     emit:
       bwaindex = ch_preparedRef
       bedfile = ch_bedFile
+      reffasta = ch_refFasta
 }
 
 
@@ -93,7 +94,7 @@ workflow sequenceAnalysis {
 
       trimPrimerSequences(readMapping.out.combine(ch_bedFile))
 
-      callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))     
+      callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) 
 
       makeConsensus(trimPrimerSequences.out.ptrim)
 
@@ -123,6 +124,7 @@ workflow sequenceAnalysis {
 
     emit:
       qc_pass = collateSamples.out
+      variants = callVariants.out.variants
 }
 
 workflow ncovIllumina {
@@ -135,6 +137,18 @@ workflow ncovIllumina {
       
       // Actually do analysis
       sequenceAnalysis(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
+
+      // Do some typing if we have the correct files
+      if ( params.gff ) {
+          Channel.fromPath("${params.gff}")
+                 .set{ ch_refGff }
+
+          Channel.fromPath("${params.yaml}")
+                 .set{ ch_typingYaml }
+
+          Genotyping(sequenceAnalysis.out.variants, ch_refGff, prepareReferenceFiles.out.reffasta, ch_typingYaml) 
+
+      }
  
       // Upload files to CLIMB
       if ( params.upload ) {
