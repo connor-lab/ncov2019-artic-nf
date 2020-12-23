@@ -11,8 +11,8 @@ process typeVariants {
     tuple sampleName, path(variants), path(gff), path(ref), path(yaml)
 
     output:
-    path "${sampleName}.variants.csv", emit: variants_csv
-    path "${sampleName}.typing.csv", emit: typing_csv
+    path "${sampleName}.variants.csv", optional: true, emit: variants_csv
+    path "${sampleName}.typing.csv", optional: true, emit: typing_csv
     path "${sampleName}.csq.vcf", emit: csq_vcf
 
     script:
