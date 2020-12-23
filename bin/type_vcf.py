@@ -21,6 +21,7 @@ def parse_args(args=None):
     parser.add_argument('-ot', '--output_typing_csv', dest="TYPING_CSV_OUT", required=True, help="Output CSV file with typed variants")
     parser.add_argument('-os', '--output_summary_csv', dest="SUMMARY_CSV_OUT", required=True, help="Output variant summary CSV file")
     parser.add_argument('-af', '--allele_freq_thresh', type=float, dest="ALLELE_FREQ_THRESH", default=0, help="Only output variants where allele frequency greater than this number (default: 0).")
+    parser.add_argument('-dp', '--minimum_depth', type=int, dest="MIN_DEPTH", default=0, help="Only output variants where overall read depth is greater than this number (default: 0).")
     infile = parser.add_mutually_exclusive_group(required=True)
     infile.add_argument('-v', '--vcf', dest='VCF_IN', required=False, help="Input VCF file from either ARTIC pipeline (Nanopolish or Medaka).")
     infile.add_argument('-t', '--tab', dest='TSV_IN', required=False, help="Input iVar tsv file.")
@@ -97,6 +98,8 @@ def ivar_variants_to_vcf_string(FileIn,RefIn):
                 writeLine = True
                 if (CHROM,POS,REF,ALT) in varList:
                     writeLine = False
+                if re.match('^.*N+$', REF):
+                    writeLine = False
                 else:
                     varList.append((CHROM,POS,REF,ALT))
                 if writeLine:
@@ -109,12 +112,12 @@ def ivar_variants_to_vcf_string(FileIn,RefIn):
 
 def csq_annotate_vcf_string(vcfString,RefIn,GffIn):
     # bcftools csq -f fasta -g gff vcf
-    p = run(['bcftools', 'csq', '-f', RefIn, '-g', GffIn], stdout=PIPE,
+    p = run(['bcftools', 'csq', '-v', '0', '-f', RefIn, '-g', GffIn], stdout=PIPE,
             input=vcfString, encoding='ascii')
 
     return p.stdout
 
-def extract_csq_info_from_vcf_string(csqVcf, minAF):
+def extract_csq_info_from_vcf_string(csqVcf, minAF, minDP):
 
     v = io.StringIO(csqVcf)
 
@@ -143,6 +146,12 @@ def extract_csq_info_from_vcf_string(csqVcf, minAF):
     for record in vcf_reader:
 
         if vcf_type == "nanopolish":
+            if record.FILTER:
+                continue
+
+            if int(record.INFO['TotalReads']) < minDP:
+                continue
+
             if float(record.INFO['SupportFraction']) < minAF:
                 continue
 
@@ -150,13 +159,26 @@ def extract_csq_info_from_vcf_string(csqVcf, minAF):
             sampleid = record.samples[0].sample
             record_AF = float(record.genotype(sampleid)['ALT_FREQ'])
 
+            if record.FILTER:
+                continue
+
+            if int(record.INFO['DP']) < minDP:
+                continue
+
             if record_AF < minAF:
                 continue
 
         if vcf_type == "medaka":
+
+             if record.FILTER:
+                 continue
+
              record_tot_DP = int(record.INFO['DP'])
              record_alt_DP = int(record.INFO['AC'][1])
              record_AF = record_alt_DP / record_tot_DP
+
+             if record_tot_DP < minDP:
+                 continue
 
              if record_AF < minAF:
                  continue
@@ -171,7 +193,6 @@ def extract_csq_info_from_vcf_string(csqVcf, minAF):
                     variant_dict = dict(zip(bcsq_keys, variant_BCSQ_list))
                     if variant_dict not in infos:
                        infos.append(variant_dict)
-
 
     return infos
 
@@ -267,7 +288,7 @@ def type_vars_in_sample(types, sample_vars):
             assigned_type = { 'type' : typename, 
                               'num_matching_vars' : count_found,
                               'num_missing_vars' : count_missing,
-                              'coverage' : round(calc_coverage, 2),
+                              'type_coverage' : round(calc_coverage, 2),
                               'found_vars': ';'.join(found_vars_from_type),
                               'missing_vars': ';'.join(missing_vars_from_type),
                               'additional_vars' : ';'.join(additional_vars_list)}
@@ -336,7 +357,7 @@ def main(args=None):
 
     write_csqAnnotatedVcfString_to_file(args.VCF_OUT, csqAnnotatedVcfString)
 
-    infos = extract_csq_info_from_vcf_string(csqAnnotatedVcfString,args.ALLELE_FREQ_THRESH)
+    infos = extract_csq_info_from_vcf_string(csqAnnotatedVcfString,args.ALLELE_FREQ_THRESH, args.MIN_DEPTH)
 
     sample_vars = get_variant_summary(infos)
 
