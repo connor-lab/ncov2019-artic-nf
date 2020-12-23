@@ -1,10 +1,10 @@
 VOC-202012/01:
   # https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/947048/Technical_Briefing_VOC_SH_NJL2_SH2.pdf
   # Table 1
-  coverage: 0.7
+  coverage: 0.7 # Proportion of found variants to call a type
   variants:
-    S:
-      - IHV68I
+    S:          # Gene name
+      - IHV68I  # AA-space type-defining mutation 
       - VY143V
       - N501Y
       - A570D
@@ -29,7 +29,7 @@ VOC-202012/01:
       - S235F
 
 N501Y.V2:
-  # Note not a complete set of lineage defining mutations but covers triple spike variants 
+  # Note not a complete set of type defining mutations but covers triple spike variants 
   coverage: 0.7
   variants:
     S:
