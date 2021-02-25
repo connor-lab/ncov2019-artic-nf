@@ -1,7 +1,7 @@
 // ARTIC processes
 
 process articDownloadScheme{
-    tag params.schemeRepoURL
+    tag 'reference'
 
     label 'internet'
 
@@ -19,7 +19,7 @@ process articDownloadScheme{
 }
 
 process articGuppyPlex {
-    tag { params.prefix + "-" + fastqDir }
+    tag { params.prefix + "_" + fastqDir }
 
     label 'largemem'
 
