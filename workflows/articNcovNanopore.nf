@@ -9,6 +9,8 @@ include {articGuppyPlex} from '../modules/artic.nf'
 include {articMinIONNanopolish} from  '../modules/artic.nf' 
 include {articMinIONMedaka} from  '../modules/artic.nf'
 include {articRemoveUnmappedReads} from '../modules/artic.nf' 
+include {splitSeqSum} from '../modules/artic.nf' 
+
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
@@ -34,11 +36,16 @@ workflow sequenceAnalysisNanopolish {
       
       articGuppyPlex(ch_runFastqDirs.flatten())
 
-      articMinIONNanopolish(articGuppyPlex.out.fastq
-                                          .filter{ it.countFastq() > params.minReadsArticGuppyPlex }
+      splitSeqSum(ch_seqSummary)
+
+      splitSeqSum.out.flatten()
+                             .map {file -> tuple(file.baseName, file) }
+			     .set{ barcodeSeqSums }
+
+      articMinIONNanopolish(articGuppyPlex.out
+                                          .combine(barcodeSeqSums, by:0)
                                           .combine(articDownloadScheme.out.scheme)
-                                          .combine(ch_fast5Pass)
-                                          .combine(ch_seqSummary))
+                                          .combine(ch_fast5Pass, by:0) )
 
       articRemoveUnmappedReads(articMinIONNanopolish.out.mapped)
 
@@ -127,7 +134,9 @@ workflow articNcovNanopore {
     
     main:
       if ( params.nanopolish ) {
-          Channel.fromPath( "${params.fast5_pass}" )
+          Channel.fromPath( "${params.fast5_pass}/*/*.fast5" )
+                 .map {file -> tuple(file.parent.name, file) }
+                 .groupTuple(by: 0)
                  .set{ ch_fast5Pass }
 
           Channel.fromPath( "${params.sequencing_summary}" )

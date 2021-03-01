@@ -29,7 +29,7 @@ process articGuppyPlex {
     path(fastqDir)
 
     output:
-    path "${params.prefix}*.fastq", emit: fastq
+    tuple val(fastqDir.baseName), path("${params.prefix}*.fastq"), emit: fastq
 
     script:
     """
@@ -89,6 +89,22 @@ process articMinIONMedaka {
     """
 }
 
+process splitSeqSum {
+    cpus 1
+
+    input:
+    file(seqSummary)
+
+    output:
+    file("barcodes/*.txt")
+
+    script:
+    """
+    split_summary_by_barcode.py ${seqSummary} barcodes 
+    """
+
+}
+
 process articMinIONNanopolish {
     tag { sampleName }
 
@@ -97,7 +113,7 @@ process articMinIONNanopolish {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
 
     input:
-    tuple file(fastq), file(schemeRepo), file(fast5Pass), file(seqSummary)
+    tuple barcode, file(fastq), file(seqSummary), file(schemeRepo), file(fast5Pass)
 
     output:
     file("${sampleName}*")
@@ -131,7 +147,7 @@ process articMinIONNanopolish {
     --threads ${task.cpus} \
     --scheme-directory ${schemeRepo} \
     --read-file ${fastq} \
-    --fast5-directory ${fast5Pass} \
+    --fast5-directory ./ \
     --sequencing-summary ${seqSummary} \
     ${params.scheme}/${params.schemeVersion} \
     ${sampleName}
