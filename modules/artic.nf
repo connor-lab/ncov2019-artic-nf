@@ -90,6 +90,8 @@ process articMinIONMedaka {
 }
 
 process splitSeqSum {
+    tag 'splitSeqSum'
+
     cpus 1
 
     input:
