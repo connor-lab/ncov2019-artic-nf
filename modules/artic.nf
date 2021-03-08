@@ -92,7 +92,7 @@ process articMinIONMedaka {
 process splitSeqSum {
     tag 'splitSeqSum'
 
-    cpus 1
+    label 'largecpu'
 
     input:
     file(seqSummary)
