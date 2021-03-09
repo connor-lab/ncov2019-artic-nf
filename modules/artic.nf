@@ -44,7 +44,7 @@ process articGuppyPlex {
 process articMinIONMedaka {
     tag { sampleName }
 
-    label 'largecpu'
+    cpus 4
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
 
@@ -92,7 +92,7 @@ process articMinIONMedaka {
 process splitSeqSum {
     tag 'splitSeqSum'
 
-    label 'largecpu'
+    cpus 4
 
     input:
     file(seqSummary)
