@@ -110,7 +110,8 @@ process splitSeqSum {
 process articMinIONNanopolish {
     tag { sampleName }
 
-    label 'largecpu'
+    cpus 4
+    memory '3 GB'
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
 
