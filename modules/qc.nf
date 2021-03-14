@@ -26,14 +26,24 @@ process makeQCCSV {
 process writeQCSummaryCSV {
     tag { params.prefix }
 
+    publishDir "${params.outdir}/", pattern: "*.txt", mode: 'copy'
+
     input:
     val lines
+
+    output:
+    path 'time.txt'
 
     exec:
     file("${params.outdir}/${params.prefix}.qc.csv").withWriter { writer ->
         for ( line in lines ) {
             writer.writeLine(line.join(','))
-         }   
+         }
     }
-}
 
+    script:
+    """
+    date > time.txt
+
+    """
+}
