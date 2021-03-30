@@ -121,6 +121,28 @@ process trimPrimerSequences {
         """
 }
 
+
+
+process makeConsensus {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.primertrimmed.consensus.fa", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(bam))
+
+    output:
+         tuple sampleName, path("${sampleName}.primertrimmed.consensus.fa"), emit: consensus_fasta
+
+    script:
+        """
+        samtools mpileup -aa -A -B -d ${params.mpileupDepth} -Q0 ${bam} | \
+        ivar consensus -t ${params.ivarFreqThreshold} -m ${params.ivarMinDepth} \
+        -n N -p ${sampleName}.primertrimmed.consensus
+        """
+}
+
 process callVariants {
 
     tag { sampleName }
@@ -140,24 +162,21 @@ process callVariants {
         """
 }
 
-process makeConsensus {
 
-    tag { sampleName }
-
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.primertrimmed.consensus.fa", mode: 'copy'
+process pangolin {
+  
+    publishDir "${params.outdir}/", pattern: "${sampleName}.pangolin.csv", mode: 'copy'
 
     input:
-        tuple(sampleName, path(bam))
+    	tuple(sampleName, path(consensus_fasta))
 
     output:
-        tuple(sampleName, path("${sampleName}.primertrimmed.consensus.fa"))
-
+    	tuple(sampleName, path("${sampleName}.pangolin.csv"))
+    
     script:
-        """
-        samtools mpileup -aa -A -B -d ${params.mpileupDepth} -Q0 ${bam} | \
-        ivar consensus -t ${params.ivarFreqThreshold} -m ${params.ivarMinDepth} \
-        -n N -p ${sampleName}.primertrimmed.consensus
-        """
+    	"""
+	pangolin ${consensus_fasta} --outfile ${sampleName}.pangolin.csv 
+    	"""
 }
 
 process cramToFastq {

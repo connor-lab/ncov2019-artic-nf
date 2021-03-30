@@ -8,9 +8,11 @@ include {articDownloadScheme } from '../modules/artic.nf'
 include {readTrimming} from '../modules/illumina.nf' 
 include {indexReference} from '../modules/illumina.nf'
 include {readMapping} from '../modules/illumina.nf' 
-include {trimPrimerSequences} from '../modules/illumina.nf' 
 include {callVariants} from '../modules/illumina.nf'
+include {trimPrimerSequences} from '../modules/illumina.nf' 
+
 include {makeConsensus} from '../modules/illumina.nf' 
+include {pangolin} from '../modules/illumina.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'
@@ -19,6 +21,8 @@ include {writeQCSummaryCSV} from '../modules/qc.nf'
 include {bamToCram} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
+
+
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
@@ -86,7 +90,7 @@ workflow sequenceAnalysis {
       ch_filePairs
       ch_preparedRef
       ch_bedFile
-
+ 
     main:
       readTrimming(ch_filePairs)
 
@@ -98,7 +102,7 @@ workflow sequenceAnalysis {
 
       makeConsensus(trimPrimerSequences.out.ptrim)
 
-      makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
+      makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out.consensus_fasta, by: 0)
                                    .combine(ch_preparedRef.map{ it[0] }))
 
       makeQCCSV.out.csv.splitCsv()
@@ -111,6 +115,8 @@ workflow sequenceAnalysis {
                        .set { qc }
 
       writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
+      
+      pangolin(makeConsensus.out)
 
       collateSamples(qc.pass.map{ it[0] }
                            .join(makeConsensus.out, by: 0)
@@ -125,6 +131,7 @@ workflow sequenceAnalysis {
     emit:
       qc_pass = collateSamples.out
       variants = callVariants.out.variants
+
 }
 
 workflow ncovIllumina {

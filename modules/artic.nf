@@ -106,7 +106,7 @@ process articMinIONNanopolish {
     tuple sampleName, file("${sampleName}.sorted.bam"), emit: mapped
     tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
     tuple sampleName, file("${sampleName}.pass.vcf.gz"), emit: vcf
-
+    
     script:
     // Make an identifier from the fastq filename
     sampleName = fastq.getBaseName().replaceAll(~/\.fastq.*$/, '')
@@ -153,5 +153,24 @@ process articRemoveUnmappedReads {
     """
     samtools view -F4 -o ${sampleName}.mapped.sorted.bam ${bamfile} 
     """
+}
+
+
+process pangolin {
+	
+    publishDir "${params.outdir}/", mode: 'copy', pattern: "${sampleName}.pangolin.csv"
+	
+    
+    input:
+	tuple val(sampleName), path(consensus_fasta)
+
+    output:
+    	tuple val(sampleName), path("${sampleName}.pangolin.csv")
+    
+    script:
+    	
+    	"""
+      	pangolin ${consensus_fasta} --outfile ${sampleName}.pangolin.csv 
+	"""
 }
 

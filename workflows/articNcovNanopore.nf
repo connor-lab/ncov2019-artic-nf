@@ -10,6 +10,7 @@ include {articMinIONNanopolish} from  '../modules/artic.nf'
 include {articMinIONMedaka} from  '../modules/artic.nf'
 include {articRemoveUnmappedReads} from '../modules/artic.nf' 
 
+
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
 
@@ -17,6 +18,8 @@ include {bamToCram} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
 
+
+include {pangolin} from '../modules/artic.nf' 
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
@@ -28,6 +31,9 @@ workflow sequenceAnalysisNanopolish {
       ch_runFastqDirs
       ch_fast5Pass
       ch_seqSummary
+      
+
+
     
     main:
       articDownloadScheme()
@@ -38,7 +44,8 @@ workflow sequenceAnalysisNanopolish {
                                           .filter{ it.countFastq() > params.minReadsArticGuppyPlex }
                                           .combine(articDownloadScheme.out.scheme)
                                           .combine(ch_fast5Pass)
-                                          .combine(ch_seqSummary))
+                                          .combine(ch_seqSummary)
+                                          )
 
       articRemoveUnmappedReads(articMinIONNanopolish.out.mapped)
 
@@ -60,6 +67,9 @@ workflow sequenceAnalysisNanopolish {
      collateSamples(qc.pass.map{ it[0] }
                            .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
+     
+         
+     pangolin(articMinIONNanopolish.out.consensus_fasta)
 
      if (params.outCram) {
         bamToCram(articMinIONNanopolish.out.ptrim.map{ it[0] } 
@@ -72,7 +82,7 @@ workflow sequenceAnalysisNanopolish {
       qc_pass = collateSamples.out
       reffasta = articDownloadScheme.out.reffasta
       vcf = articMinIONNanopolish.out.vcf
-
+      
 }
 
 workflow sequenceAnalysisMedaka {
@@ -107,6 +117,7 @@ workflow sequenceAnalysisMedaka {
      collateSamples(qc.pass.map{ it[0] }
                            .join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
+                                              
 
      if (params.outCram) {
         bamToCram(articMinIONMedaka.out.ptrim.map{ it[0] } 
