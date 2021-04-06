@@ -87,7 +87,7 @@ workflow sequenceAnalysis {
       ch_filePairs
       ch_preparedRef
       ch_bedFile
- 
+
     main:
       readTrimming(ch_filePairs)
 
