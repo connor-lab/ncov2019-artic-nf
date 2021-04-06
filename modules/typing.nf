@@ -100,7 +100,7 @@ process pangolinTyping {
 
     script:
     """
-    pangolin ${consensus_fasta} --outfile ${sampleName}.pangolin.csv 
+    pangolin ${consensus_fasta} --max-ambig 0.2 --outfile ${sampleName}.pangolin.csv 
     """
 }
 
