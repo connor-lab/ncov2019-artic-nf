@@ -87,3 +87,20 @@ process mergeTypingCSVs {
     """
 }
 
+process pangolinTyping {
+
+    publishDir "${params.outdir}/", mode: 'copy', pattern: "${sampleName}.pangolin.csv"
+
+
+    input:
+    tuple val(sampleName), path(consensus_fasta)
+
+    output:
+    tuple val(sampleName), path("${sampleName}.pangolin.csv")
+
+    script:
+    """
+    pangolin ${consensus_fasta} --max-ambig 0.2 --outfile ${sampleName}.pangolin.csv 
+    """
+}
+

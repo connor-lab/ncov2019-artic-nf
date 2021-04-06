@@ -150,7 +150,7 @@ process makeConsensus {
         tuple(sampleName, path(bam))
 
     output:
-        tuple(sampleName, path("${sampleName}.primertrimmed.consensus.fa"))
+        tuple sampleName, path("${sampleName}.primertrimmed.consensus.fa"), emit: consensus_fasta
 
     script:
         """

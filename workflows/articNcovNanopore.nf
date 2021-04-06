@@ -18,6 +18,8 @@ include {bamToCram} from '../modules/out.nf'
 include {collateSamples} from '../modules/upload.nf'
 
 
+include {pangolinTyping} from '../modules/typing.nf' 
+
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
 include {Genotyping} from './typing.nf'
@@ -38,7 +40,8 @@ workflow sequenceAnalysisNanopolish {
                                           .filter{ it.countFastq() > params.minReadsArticGuppyPlex }
                                           .combine(articDownloadScheme.out.scheme)
                                           .combine(ch_fast5Pass)
-                                          .combine(ch_seqSummary))
+                                          .combine(ch_seqSummary)
+                                          )
 
       articRemoveUnmappedReads(articMinIONNanopolish.out.mapped)
 
@@ -60,6 +63,7 @@ workflow sequenceAnalysisNanopolish {
      collateSamples(qc.pass.map{ it[0] }
                            .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
+     pangolinTyping(articMinIONNanopolish.out.consensus_fasta)
 
      if (params.outCram) {
         bamToCram(articMinIONNanopolish.out.ptrim.map{ it[0] } 
@@ -107,6 +111,7 @@ workflow sequenceAnalysisMedaka {
      collateSamples(qc.pass.map{ it[0] }
                            .join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
+                                              
 
      if (params.outCram) {
         bamToCram(articMinIONMedaka.out.ptrim.map{ it[0] } 
