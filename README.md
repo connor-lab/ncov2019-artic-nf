@@ -6,7 +6,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 
 #### Major changes
 
-* The conda version of the illumina and nanopore tracks automatically run pangolin
+* The illumina and nanopore tracks automatically run pangolin
 
 #### Self-test
 
