@@ -19,7 +19,7 @@ include {bamToCram} from '../modules/out.nf'
 include {collateSamples} from '../modules/upload.nf'
 
 
-include {pangolin} from '../modules/artic.nf' 
+include {pangolinTyping} from '../modules/typing.nf' 
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'

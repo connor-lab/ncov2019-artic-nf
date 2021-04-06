@@ -12,7 +12,7 @@ include {callVariants} from '../modules/illumina.nf'
 include {trimPrimerSequences} from '../modules/illumina.nf' 
 
 include {makeConsensus} from '../modules/illumina.nf' 
-include {pangolin} from '../modules/illumina.nf' 
+include {pangolinTyping} from '../modules/typing.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'

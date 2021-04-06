@@ -155,22 +155,3 @@ process articRemoveUnmappedReads {
     """
 }
 
-
-process pangolin {
-	
-    publishDir "${params.outdir}/", mode: 'copy', pattern: "${sampleName}.pangolin.csv"
-	
-    
-    input:
-	tuple val(sampleName), path(consensus_fasta)
-
-    output:
-    	tuple val(sampleName), path("${sampleName}.pangolin.csv")
-    
-    script:
-    	
-    	"""
-      	pangolin ${consensus_fasta} --outfile ${sampleName}.pangolin.csv 
-	"""
-}
-

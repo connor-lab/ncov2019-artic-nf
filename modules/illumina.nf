@@ -163,22 +163,6 @@ process callVariants {
 }
 
 
-process pangolin {
-  
-    publishDir "${params.outdir}/", pattern: "${sampleName}.pangolin.csv", mode: 'copy'
-
-    input:
-    	tuple(sampleName, path(consensus_fasta))
-
-    output:
-    	tuple(sampleName, path("${sampleName}.pangolin.csv"))
-    
-    script:
-    	"""
-	pangolin ${consensus_fasta} --outfile ${sampleName}.pangolin.csv 
-    	"""
-}
-
 process cramToFastq {
     /**
     * Converts CRAM to fastq (http://bio-bwa.sourceforge.net/)
