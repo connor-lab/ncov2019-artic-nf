@@ -10,7 +10,6 @@ include {articMinIONNanopolish} from  '../modules/artic.nf'
 include {articMinIONMedaka} from  '../modules/artic.nf'
 include {articRemoveUnmappedReads} from '../modules/artic.nf' 
 
-
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
 
@@ -31,9 +30,6 @@ workflow sequenceAnalysisNanopolish {
       ch_runFastqDirs
       ch_fast5Pass
       ch_seqSummary
-      
-
-
     
     main:
       articDownloadScheme()
@@ -67,9 +63,7 @@ workflow sequenceAnalysisNanopolish {
      collateSamples(qc.pass.map{ it[0] }
                            .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
-     
-         
-     pangolin(articMinIONNanopolish.out.consensus_fasta)
+     pangolinTyping(articMinIONNanopolish.out.consensus_fasta)
 
      if (params.outCram) {
         bamToCram(articMinIONNanopolish.out.ptrim.map{ it[0] } 
@@ -82,7 +76,7 @@ workflow sequenceAnalysisNanopolish {
       qc_pass = collateSamples.out
       reffasta = articDownloadScheme.out.reffasta
       vcf = articMinIONNanopolish.out.vcf
-      
+
 }
 
 workflow sequenceAnalysisMedaka {

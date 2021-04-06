@@ -8,9 +8,8 @@ include {articDownloadScheme } from '../modules/artic.nf'
 include {readTrimming} from '../modules/illumina.nf' 
 include {indexReference} from '../modules/illumina.nf'
 include {readMapping} from '../modules/illumina.nf' 
-include {callVariants} from '../modules/illumina.nf'
 include {trimPrimerSequences} from '../modules/illumina.nf' 
-
+include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 include {pangolinTyping} from '../modules/typing.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
@@ -21,8 +20,6 @@ include {writeQCSummaryCSV} from '../modules/qc.nf'
 include {bamToCram} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
-
-
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
@@ -116,7 +113,7 @@ workflow sequenceAnalysis {
 
       writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
       
-      pangolin(makeConsensus.out)
+      pangolinTyping(makeConsensus.out)
 
       collateSamples(qc.pass.map{ it[0] }
                            .join(makeConsensus.out, by: 0)
