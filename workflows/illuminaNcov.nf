@@ -21,7 +21,6 @@ include {bamToCram} from '../modules/out.nf'
 include {collateSamples} from '../modules/upload.nf'
 
 // import subworkflows
-include {CLIMBrsync} from './upload.nf'
 include {Genotyping} from './typing.nf'
 
 workflow prepareReferenceFiles {
@@ -149,16 +148,6 @@ workflow ncovIllumina {
           Genotyping(sequenceAnalysis.out.variants, ch_refGff, prepareReferenceFiles.out.reffasta, ch_typingYaml) 
 
       }
- 
-      // Upload files to CLIMB
-      if ( params.upload ) {
-        
-        Channel.fromPath("${params.CLIMBkey}")
-               .set{ ch_CLIMBkey }
-      
-        CLIMBrsync(sequenceAnalysis.out.qc_pass, ch_CLIMBkey )
-      }
-
 }
 
 workflow ncovIlluminaCram {
