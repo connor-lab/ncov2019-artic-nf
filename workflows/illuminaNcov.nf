@@ -149,16 +149,6 @@ workflow ncovIllumina {
           Genotyping(sequenceAnalysis.out.variants, ch_refGff, prepareReferenceFiles.out.reffasta, ch_typingYaml) 
 
       }
- 
-      // Upload files to CLIMB
-      if ( params.upload ) {
-        
-        Channel.fromPath("${params.CLIMBkey}")
-               .set{ ch_CLIMBkey }
-      
-        CLIMBrsync(sequenceAnalysis.out.qc_pass, ch_CLIMBkey )
-      }
-
 }
 
 workflow ncovIlluminaCram {
