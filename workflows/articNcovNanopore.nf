@@ -19,7 +19,6 @@ include {collateSamples} from '../modules/upload.nf'
 
 
 // import subworkflows
-include {CLIMBrsync} from './upload.nf'
 include {Genotyping} from './typing.nf'
 
 // workflow component for artic pipeline
