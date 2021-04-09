@@ -140,7 +140,7 @@ workflow ncovIllumina {
 
       // Do some typing if we have the correct files
       if ( params.variant_definitions ) {
-          Channel.fromPath("${params.variant_definitions}")
+          Channel.fromPath("${params.variant_definitions}", checkIfExists: true)
                  .set{ ch_variantDefinitions }
 
           Genotyping(sequenceAnalysis.out.consensus, prepareReferenceFiles.out.reffasta, ch_variantDefinitions)

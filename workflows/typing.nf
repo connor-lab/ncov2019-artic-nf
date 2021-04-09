@@ -13,10 +13,10 @@ workflow Genotyping {
       alignSeqs(ch_consensus.combine(ch_refFasta))
       
       if ( params.gb ) {
-        Channel.fromPath("${params.gb}")
+        Channel.fromPath("${params.gb}", checkIfExists: true)
                .set{ ch_gb }   
       } else {
-        Channel.fromPath("${baseDir}/conf/dummyfile")
+        Channel.fromPath("${baseDir}/conf/dummyfile", checkIfExists: true)
                .set{ ch_gb }
       }
       

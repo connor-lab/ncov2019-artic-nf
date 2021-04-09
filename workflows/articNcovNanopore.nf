@@ -153,12 +153,11 @@ workflow articNcovNanopore {
 
       // Do some typing if we have the correct files
       if ( params.variant_definitions ) {
-          Channel.fromPath("${params.variant_definitions}")
+          Channel.fromPath("${params.variant_definitions}", checkIfExists: true)
                  .set{ ch_variantDefinitions }
 
           Genotyping(ch_nanopore_consensus, ch_nanopore_reffasta, ch_variantDefinitions)
       }
 
-      }
 }
 
