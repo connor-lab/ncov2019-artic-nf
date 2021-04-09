@@ -124,6 +124,7 @@ workflow sequenceAnalysis {
     emit:
       qc_pass = collateSamples.out
       variants = callVariants.out.variants
+      consensus = makeConsensus.out
 }
 
 workflow ncovIllumina {
@@ -138,15 +139,11 @@ workflow ncovIllumina {
       sequenceAnalysis(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
 
       // Do some typing if we have the correct files
-      if ( params.gff ) {
-          Channel.fromPath("${params.gff}")
-                 .set{ ch_refGff }
+      if ( params.variant_definitions ) {
+          Channel.fromPath("${params.variant_definitions}")
+                 .set{ ch_variantDefinitions }
 
-          Channel.fromPath("${params.yaml}")
-                 .set{ ch_typingYaml }
-
-          Genotyping(sequenceAnalysis.out.variants, ch_refGff, prepareReferenceFiles.out.reffasta, ch_typingYaml) 
-
+          Genotyping(sequenceAnalysis.out.consensus, prepareReferenceFiles.out.reffasta, ch_variantDefinitions)
       }
 }
 
