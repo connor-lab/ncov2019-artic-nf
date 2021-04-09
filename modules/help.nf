@@ -43,10 +43,11 @@ def printHelp() {
       --outCram               Output cram instead of bam files (Default: false)
       --minReadsPerBarcode    Minimum number of reads accepted for a single barcode when supplying deplexed Fastq
                               files as input. Barcodes having fewer reads are ignored. (Default: 100)
- 
-      --gff                   Path to annotation gff for variant consequence calling and typing. (Default: unset, don't run typing unless set)
-      --yaml                  Path to YAML file with typing schemes.
-                              Format: { <typing_scheme_name> : { coverage: <float>, variants: <gene_name>: <[ D614G, IHV68I ]> }}
+
+      --variant_definitions   Path to variant_definitions directory from https://github.com/phe-genomics/variant_definitions.git.
+                              Must point to the directory that contains *.yml and not its parent.
+      --gb                    Path to GenBank file to generate AA consequences of mutations [NC_045512]
+      
 
 
   Illumina workflow options:
@@ -67,9 +68,11 @@ def printHelp() {
                               Overrides --scheme* options. (Default: unset, download scheme from git)
       --ref                   Path to iVar-compatible reference fasta file, also requires --bed 
                               Overrides --scheme* options. (Default: unset, download scheme from git)
-      --gff                   Path to annotation gff for variant consequence calling and typing. (Default: unset, typing not run unless set)
-      --yaml                  Path to YAML file with typing schemes. 
-                              Format: { <typing_scheme_name> : { coverage: <float>, variants: <gene_name>: <[ D614G, IHV68I ]> }}
+      
+      --variant_definitions   Path to variant_definitions directory from https://github.com/phe-genomics/variant_definitions.git.
+                              Must point to the directory that contains *.yml and not its parent.
+      --gb                    Path to GenBank file to generate AA consequences of mutations [NC_045512]
+      
       --allowNoprimer         Allow reads that don't have primer sequence? 
                               Depends on your library prep method: ligation == false, tagmentation == true (Default: true)
       --illuminaKeepLen       Length (bp) of reads to keep after primer trimming (Default: 20)
