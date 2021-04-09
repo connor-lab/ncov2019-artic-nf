@@ -28,6 +28,7 @@ def printHelp() {
                               auto-detected and analysed in parallel.
       --fast5_pass            Directory containing fast5 files - usually fast5_pass. NOT REQUIRED FOR MEDAKA WORKFLOW.
       --sequencing_summary    Path to sequencing_summary.txt. NOT REQUIRED FOR MEDAKA WORKFLOW.
+      --medaka-model          Medaka model e.g. r941_min_fast_g303 NOT REQUIRED FOR NANOPOLISH WORKFLOW.
 
     Optional:
       --outdir                Output directory (Default: ./results)

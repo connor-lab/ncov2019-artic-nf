@@ -31,6 +31,7 @@ echo "Nextflow run current PR in --medaka mode (no barcodes).." >> artifacts/tes
 nextflow run ./main.nf \
        -profile singularity \
        --medaka \
+       --medaka_model r941_min_fast_g303 \
        --basecalled_fastq $PWD/.github/data/nanopore/20200311_1427_X4_FAK72834_a3787181/fastq_pass/ \
        --prefix 20200311_1427_X4_FAK72834_a3787181
 cp .nextflow.log artifacts/medaka.nextflow.log
@@ -40,6 +41,7 @@ echo "Nextflow run current PR in --medaka mode (barcodes).." >> artifacts/test_a
 nextflow run ./main.nf \
        -profile singularity \
        --medaka \
+       --medaka_model r941_min_fast_g303 \
        --basecalled_fastq $PWD/.github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fastq_pass/ \
        --prefix 20200311_1427_X1_FAK72834_a3787181
 
