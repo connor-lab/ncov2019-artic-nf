@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NXF_ANSI_LOG: false
+      NXF_VER: 20.10.0
     steps:
     - uses: actions/checkout@master
     - name: create artifacts dir to save test logs
@@ -26,7 +27,7 @@ jobs:
       run: |
        export PATH=/opt/conda/bin:$PATH
        conda install -c bioconda nextflow
-       NXF_VER=20.03.0-edge nextflow -version
+       nextflow -version
     - name: test nanopore pipelines
       run: bash .github/scripts/test_nanopore_pipelines.sh
     - name: test typing functionality

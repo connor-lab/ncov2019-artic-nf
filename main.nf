@@ -51,6 +51,10 @@ if ( params.illumina ) {
    if (! params.basecalled_fastq ) {
        println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
    }
+   if (! params.medaka_model ) {
+       println("Please supply a medaka model with --medaka_model")
+       System.exit(1)
+   }
 } else {
        println("Please select a workflow with --nanopolish, --illumina or --medaka, or use --help to print help")
        System.exit(1)

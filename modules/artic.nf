@@ -80,6 +80,7 @@ process articMinIONMedaka {
 
     """
     artic minion --medaka \
+    --medaka-model ${params.medaka_model} \
     ${minionFinalConfig} \
     --threads ${task.cpus} \
     --scheme-directory ${schemeRepo} \

@@ -71,6 +71,7 @@ workflow sequenceAnalysisNanopolish {
       qc_pass = collateSamples.out
       reffasta = articDownloadScheme.out.reffasta
       vcf = articMinIONNanopolish.out.vcf
+      consensus = articMinIONNanopolish.out.consensus_fasta
 
 }
 
@@ -116,7 +117,7 @@ workflow sequenceAnalysisMedaka {
       qc_pass = collateSamples.out
       reffasta = articDownloadScheme.out.reffasta
       vcf = articMinIONMedaka.out.vcf
-
+      consensus = articMinIONMedaka.out.consensus_fasta
 }
 
 
@@ -138,23 +139,25 @@ workflow articNcovNanopore {
 
           sequenceAnalysisNanopolish.out.reffasta.set{ ch_nanopore_reffasta }
 
+          sequenceAnalysisNanopolish.out.consensus.set{ ch_nanopore_consensus }
+
       } else if ( params.medaka ) {
           sequenceAnalysisMedaka(ch_fastqDirs)
 
           sequenceAnalysisMedaka.out.vcf.set{ ch_nanopore_vcf }
 
           sequenceAnalysisMedaka.out.reffasta.set{ ch_nanopore_reffasta }
+
+          sequenceAnalysisMedaka.out.consensus.set{ ch_nanopore_consensus }
       }
 
-      if ( params.gff ) {
-          Channel.fromPath("${params.gff}")
-                 .set{ ch_refGff }
+      // Do some typing if we have the correct files
+      if ( params.variant_definitions ) {
+          Channel.fromPath("${params.variant_definitions}", checkIfExists: true)
+                 .set{ ch_variantDefinitions }
 
-          Channel.fromPath("${params.yaml}")
-                 .set{ ch_typingYaml }
-
-          Genotyping(ch_nanopore_vcf, ch_refGff, ch_nanopore_reffasta, ch_typingYaml)
-
+          Genotyping(ch_nanopore_consensus, ch_nanopore_reffasta, ch_variantDefinitions)
       }
+
 }
 
