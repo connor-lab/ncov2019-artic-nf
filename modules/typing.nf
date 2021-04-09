@@ -1,47 +1,47 @@
-
-process typeVariants {
-
+process alignSeqs {
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}/msa", mode: 'copy', overwrite: false, pattern: "${sampleName}.muscle.aln"
+ 
     tag { sampleName }
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}/variants", pattern: "${sampleName}.variants.csv", mode: 'copy'
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}/vcf", pattern: "${sampleName}.csq.vcf", mode: 'copy'
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}/typing", pattern: "${sampleName}.typing.csv", mode: 'copy'
-
     input:
-    tuple sampleName, path(variants), path(gff), path(ref), path(yaml)
+      tuple sampleName, path(sample), path(reference)
 
     output:
-    path "${sampleName}.variants.csv", optional: true, emit: variants_csv
-    path "${sampleName}.typing.csv", optional: true, emit: typing_csv
-    path "${sampleName}.csq.vcf", emit: csq_vcf
+      tuple sampleName, path("${sampleName}.muscle.aln")
 
     script:
-    if( params.illumina )
+      """
+      sed "s/>.*/>${sampleName}/g" $sample > ${sampleName}.clean.fa
+      cat $reference ${sampleName}.clean.fa > pre.aln
+      muscle -in pre.aln -out ${sampleName}.muscle.aln
+      """
+}
+
+process typeVariants {
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}/typing_json", mode: 'copy', overwrite: true, pattern: "${sampleName}.json.gz"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}/variant_csv", mode: 'copy', overwrite: true, pattern: "${sampleName}.csv"
+ 
+    tag { sampleName }
+
+    input:
+      tuple sampleName, refName, path(msa), path(yaml_dir), path(gb)
+
+    output:
+      path("aln2type.${sampleName}.csv"), emit: typing_csv optional true
+      path("${sampleName}.csv"), emit: variants_csv optional true
+      path("${sampleName}.json.gz") optional true
+
+    script:
+      if ( gb.getBaseName() != 'dummyfile' ){
         """
-        type_vcf.py \
-        -i ${sampleName} \
-        -y ${yaml} \
-        -ov ${sampleName}.csq.vcf \
-        -ot ${sampleName}.typing.csv \
-        -os ${sampleName}.variants.csv \
-        -dp ${params.csqDpThreshold} \
-        -af ${params.csqAfThreshold} \
-        -t ${variants} \
-        ${gff} ${ref}
+        aln2type --gb ${gb} --output_unclassified . . aln2type.${sampleName}.csv ${refName} ${msa} ${yaml_dir}/*.yml
         """
-    else
+      } else {
         """
-        type_vcf.py \
-        -i ${sampleName} \
-        -y ${yaml} \
-        -ov ${sampleName}.csq.vcf \
-        -ot ${sampleName}.typing.csv \
-        -os ${sampleName}.variants.csv \
-        -dp ${params.csqDpThreshold} \
-        -af ${params.csqAfThreshold} \
-        -v ${variants} \
-        ${gff} ${ref}
+        aln2type --output_unclassified . . aln2type.${sampleName}.csv ${refName} ${msa} ${yaml_dir}/*.yml
         """
+      }
+      
 }
 
 process mergeTypingCSVs {
