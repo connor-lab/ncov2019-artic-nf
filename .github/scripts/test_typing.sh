@@ -10,7 +10,7 @@ git clone https://github.com/phe-genomics/variant_definitions.git
 
 # write test log as github Action artifact
 echo "Nextflow run current PR in --nanopolish mode with typing.." >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+nextflow run ./main.nf \
        -profile singularity \
        --gb $PWD/typing/NC_045512.2.gb \
        --variant_definitions  $PWD/variant_definitions/variant_yaml \
@@ -23,7 +23,7 @@ cp .nextflow.log artifacts/nanopolish_typing.nextflow.log
 rm -rf results && rm -rf work && rm -rf .nextflow*
 
 echo "Nextflow run current PR in --medaka mode with typing .." >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+nextflow run ./main.nf \
        -profile singularity \
        --medaka \
        --gb $PWD/typing/NC_045512.2.gb \
@@ -34,7 +34,7 @@ cp .nextflow.log artifacts/medaka_typing.nextflow.log
 rm -rf results && rm -rf work && rm -rf .nextflow*
 
 echo Nextflow run current PR in --illumina mode with typing.. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+nextflow run ./main.nf \
        -profile singularity \
        --gb $PWD/typing/NC_045512.2.gb \
        --variant_definitions  $PWD/variant_definitions/variant_yaml \

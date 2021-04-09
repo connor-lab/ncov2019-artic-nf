@@ -10,7 +10,7 @@ export REPO=$PWD
 echo REPO=$REPO >> artifacts/test_artifact.log
 cd ..
 echo PWD=$PWD >> $REPO/artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run $REPO \
+nextflow run $REPO \
        -profile conda \
        --cache $REPO/conda_cache_dir \
        --directory $REPO/.github/data/fastqs/ \
@@ -25,7 +25,7 @@ cat .nextflow.log | grep 'Conda create complete env=/home/runner/work/ncov2019-a
 rm -rf results && rm -rf work && rm -rf .nextflow*
 # second NF run will use the conda env created in the previous run
 echo re-run pipeline with conda --cache.. >> $REPO/artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run $REPO \
+nextflow run $REPO \
        -profile conda \
        --cache $REPO/conda_cache_dir \
        --directory $REPO/.github/data/fastqs/ \
