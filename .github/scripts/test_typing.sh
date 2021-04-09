@@ -26,6 +26,7 @@ echo "Nextflow run current PR in --medaka mode with typing .." >> artifacts/test
 nextflow run ./main.nf \
        -profile singularity \
        --medaka \
+       --medaka_model r941_min_fast_g303 \
        --gb $PWD/typing/NC_045512.2.gb \
        --variant_definitions  $PWD/variant_definitions/variant_yaml \
        --basecalled_fastq $PWD/.github/data/nanopore/20200311_1427_X4_FAK72834_a3787181/fastq_pass/ \
