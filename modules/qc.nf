@@ -22,7 +22,6 @@ process makeQCCSV {
     """
 }
 
-
 process writeQCSummaryCSV {
     tag { params.prefix }
 
@@ -37,3 +36,38 @@ process writeQCSummaryCSV {
     }
 }
 
+process fastqc {
+
+  publishDir "${params.outdir}/fastqc", mode: 'copy', overwrite: true
+
+  input:
+  tuple(sampleName, path(forward), path(reverse))
+
+  output:
+  file "*fastqc*"
+
+  """
+  fastqc ${forward} ${reverse} --format fastq --threads ${task.cpus}
+  """
+
+}
+
+process multiqc {
+    tag { params.prefix }
+    publishDir "${params.outdir}/multiqc", mode: 'copy'
+
+    input:
+    path trimLogList
+    path mapLogList
+    path qcLogList
+
+    output:
+    file '*multiqc.html'
+    file '*multiqc_data/multiqc_data.json'
+
+    script:
+    """
+    multiqc . --filename ${params.prefix}_multiqc.html --data-format json \
+    --cl_config "picard_config: { general_stats_target_coverage: [10,30,50,100] }"
+    """
+}

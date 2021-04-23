@@ -8,6 +8,7 @@ process readTrimming {
     tag { sampleName }
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: '*_val_{1,2}.fq.gz', mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: '*_trimming_report.txt', mode: 'copy'
 
     cpus 2
 
@@ -15,7 +16,8 @@ process readTrimming {
     tuple(sampleName, path(forward), path(reverse))
 
     output:
-    tuple(sampleName, path("*_val_1.fq.gz"), path("*_val_2.fq.gz")) optional true
+    path "*_trimming_report.txt", optional: true, emit: log
+    tuple sampleName, path("*_val_1.fq.gz"), path("*_val_2.fq.gz"), optional: true, emit: trim
 
     script:
     """
@@ -60,17 +62,21 @@ process readMapping {
     label 'largecpu'
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.sorted.bam", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
 
     input:
         tuple sampleName, path(forward), path(reverse), path(ref), path("*")
 
     output:
-        tuple(sampleName, path("${sampleName}.sorted.bam"))
+        tuple sampleName, path("${sampleName}.sorted.bam"), emit: map
+        path "*.txt", emit: log
 
     script:
       """
       bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
       samtools sort -o ${sampleName}.sorted.bam
+      picard CollectWgsMetrics -I ${sampleName}.sorted.bam -O ${sampleName}.sorted.metrics.txt -R ${ref} \
+      --COVERAGE_CAP 1000000 --LOCUS_ACCUMULATION_CAP 1000000
       """
 }
 

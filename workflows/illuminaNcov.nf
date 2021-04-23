@@ -16,6 +16,9 @@ include {cramToFastq} from '../modules/illumina.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
+include {fastqc} from '../modules/qc.nf'
+include {multiqc} from '../modules/qc.nf'
+
 
 include {bamToCram} from '../modules/out.nf'
 
@@ -89,11 +92,13 @@ workflow sequenceAnalysis {
       ch_bedFile
 
     main:
+      fastqc(ch_filePairs)
+
       readTrimming(ch_filePairs)
 
-      readMapping(readTrimming.out.combine(ch_preparedRef))
+      readMapping(readTrimming.out.trim.combine(ch_preparedRef))
 
-      trimPrimerSequences(readMapping.out.combine(ch_bedFile))
+      trimPrimerSequences(readMapping.out.map.combine(ch_bedFile))
 
       callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) 
 
@@ -114,6 +119,8 @@ workflow sequenceAnalysis {
       writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
       
       pangolinTyping(makeConsensus.out)
+
+      multiqc(readTrimming.out.log.collect(), readMapping.out.log.collect(), fastqc.out.collect())
 
       collateSamples(qc.pass.map{ it[0] }
                            .join(makeConsensus.out, by: 0)
