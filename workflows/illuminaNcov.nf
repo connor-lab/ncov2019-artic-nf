@@ -21,6 +21,7 @@ include {multiqc} from '../modules/qc.nf'
 
 
 include {bamToCram} from '../modules/out.nf'
+include {stream2file} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
 
@@ -117,8 +118,9 @@ workflow sequenceAnalysis {
                        .set { qc }
 
       writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
-      
-      pangolinTyping(makeConsensus.out)
+
+      pangolinTyping(makeConsensus.out.consensus_fasta)
+
 
       multiqc(readTrimming.out.log.collect(), readMapping.out.log.collect(), fastqc.out.collect())
 
