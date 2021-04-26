@@ -89,14 +89,14 @@ process mergeTypingCSVs {
 
 process pangolinTyping {
 
-    publishDir "${params.outdir}/", mode: 'copy', pattern: "${sampleName}.pangolin.csv"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}.pangolin.csv"
 
 
     input:
     tuple val(sampleName), path(consensus_fasta)
 
     output:
-    tuple val(sampleName), path("${sampleName}.pangolin.csv")
+    tuple val(sampleName), path("${sampleName}.pangolin.csv"), emit: pangolin
 
     script:
     """

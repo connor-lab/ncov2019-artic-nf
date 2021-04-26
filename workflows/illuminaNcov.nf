@@ -18,6 +18,7 @@ include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
 
 include {bamToCram} from '../modules/out.nf'
+include {stream2file} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
 
@@ -112,8 +113,9 @@ workflow sequenceAnalysis {
                        .set { qc }
 
       writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
-      
-      pangolinTyping(makeConsensus.out)
+
+      pangolinTyping(makeConsensus.out.consensus_fasta)
+
 
       collateSamples(qc.pass.map{ it[0] }
                            .join(makeConsensus.out, by: 0)
