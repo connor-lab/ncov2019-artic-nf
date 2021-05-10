@@ -75,8 +75,9 @@ process readMapping {
       """
       bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
       samtools sort -o ${sampleName}.sorted.bam
-      picard CollectWgsMetrics -I ${sampleName}.sorted.bam -O ${sampleName}.sorted.metrics.txt -R ${ref} \
-      --COVERAGE_CAP 1000000 --LOCUS_ACCUMULATION_CAP 1000000
+      #picard CollectWgsMetrics -I ${sampleName}.sorted.bam -O ${sampleName}.sorted.metrics.txt -R ${ref} \
+      --COVERAGE_CAP 1000000 --LOCUS_ACCUMULATION_CAP 1000000 --MAX_RECORDS_IN_RAM 50000
+      touch ${sampleName}_override.txt
       """
 }
 
