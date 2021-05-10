@@ -210,7 +210,7 @@ def get_variant_summary(info):
         dna_r = re.compile("(?P<refpos>[0-9]+)(?P<refnucl>[A-Z\*]+)>(?P<varnucl>[A-Z\*]+)")
         dna_var = dna_r.match(variant['dna_change']).groupdict()
 
-        if 'synonymous' not in variant['consequence']:
+        if 'synonymous' not in variant['consequence'] and 'stop_retained' not in variant['consequence']:
 
             if 'frameshift' in variant['consequence']:
 

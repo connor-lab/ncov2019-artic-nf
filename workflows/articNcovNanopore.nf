@@ -21,7 +21,6 @@ include {collateSamples} from '../modules/upload.nf'
 include {pangolinTyping} from '../modules/typing.nf' 
 
 // import subworkflows
-include {CLIMBrsync} from './upload.nf'
 include {Genotyping} from './typing.nf'
 
 // workflow component for artic pipeline
@@ -161,13 +160,6 @@ workflow articNcovNanopore {
 
           Genotyping(ch_nanopore_vcf, ch_refGff, ch_nanopore_reffasta, ch_typingYaml)
 
-      }
-      if ( params.upload ) {
-
-        Channel.fromPath("${params.CLIMBkey}")
-               .set{ ch_CLIMBkey }
-
-        CLIMBrsync(sequenceAnalysis.out.qc_pass, ch_CLIMBkey )
       }
 }
 
