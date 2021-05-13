@@ -182,3 +182,26 @@ process cramToFastq {
         """
 }
 
+process getObjFiles {
+    /**
+    * fetches fastq files from object store using OCI bulk download (https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.24.4/oci_cli_docs/cmdref/os/object/bulk-download.html)
+    * @input
+    * @output
+    */
+
+    input:
+        tuple bucket, prefix
+
+    output:
+        tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz")
+
+    script:
+        """
+	oci os object bulk-download \
+		-bn $bucket \
+		--download-dir ./ \
+		--overwrite \
+		--auth instance_principal \
+		--prefix $prefix
+        """
+}

@@ -11,6 +11,7 @@ include {makeFastqSearchPath} from './modules/util.nf'
 include {articNcovNanopore} from './workflows/articNcovNanopore.nf' 
 include {ncovIllumina} from './workflows/illuminaNcov.nf'
 include {ncovIlluminaCram} from './workflows/illuminaNcov.nf'
+include {ncovIlluminaObj} from './workflows/illuminaNcov.nf'
 
 if (params.help){
     printHelp()
@@ -23,7 +24,7 @@ if (params.profile){
 }
 
 if ( params.illumina ) {
-   if ( !params.directory ) {
+   if ( !params.directory && !params.objstore ) {
        println("Please supply a directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
        println("Use --help to print help")
        System.exit(1)
@@ -78,6 +79,12 @@ workflow {
                   .map { file -> tuple(file.baseName, file) }
                   .set{ ch_cramFiles }
        }
+       else if (params.objstore) {
+           Channel.fromPath( "${params.objstore}" )
+                  .splitCsv()
+                  .map { row -> tuple(row[0], row[1]) }
+                  .set{ ch_objFiles }
+       }
        else {
            fastqSearchPath = makeFastqSearchPath( params.illuminaPrefixes, params.illuminaSuffixes, params.fastq_exts )
 
@@ -120,6 +127,9 @@ workflow {
      } else if ( params.illumina ) {
          if ( params.cram ) {
             ncovIlluminaCram(ch_cramFiles)
+         }
+         else if ( params.objstore ) {
+            ncovIlluminaObj(ch_objFiles)
          }
          else {
             ncovIllumina(ch_filePairs)

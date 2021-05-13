@@ -12,6 +12,7 @@ include {trimPrimerSequences} from '../modules/illumina.nf'
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
+include {getObjFiles} from '../modules/illumina.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
@@ -172,3 +173,13 @@ workflow ncovIlluminaCram {
       ncovIllumina(cramToFastq.out)
 }
 
+workflow ncovIlluminaObj {
+    take:
+      ch_objFiles
+    main:
+      // get fastq files from objstore
+      getObjFiles(ch_objFiles)
+
+      // Run standard pipeline
+      ncovIllumina(getObjFiles.out)
+}
