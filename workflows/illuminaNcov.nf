@@ -21,6 +21,9 @@ include {bamToCram} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
 
+include {pango} from '../modules/analysis.nf'
+include {nextclade} from '../modules/analysis.nf'
+
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
 include {Genotyping} from './typing.nf'
@@ -115,7 +118,10 @@ workflow sequenceAnalysis {
 
       collateSamples(qc.pass.map{ it[0] }
                            .join(makeConsensus.out, by: 0)
-                           .join(trimPrimerSequences.out.mapped))     
+                           .join(trimPrimerSequences.out.mapped)) 
+
+      pango(makeConsensus.out)    
+      nextclade(makeConsensus.out)    
 
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
