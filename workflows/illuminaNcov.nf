@@ -23,6 +23,8 @@ include {collateSamples} from '../modules/upload.nf'
 
 include {pango} from '../modules/analysis.nf'
 include {nextclade} from '../modules/analysis.nf'
+include {getVariantDefinitions} from '../modules/analysis.nf'
+include {aln2type} from '../modules/analysis.nf'
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
@@ -121,7 +123,9 @@ workflow sequenceAnalysis {
                            .join(trimPrimerSequences.out.mapped)) 
 
       pango(makeConsensus.out)    
-      nextclade(makeConsensus.out)    
+      nextclade(makeConsensus.out)
+      getVariantDefinitions()
+      aln2type(makeConsensus.out.combine(getVariantDefinitions.out).combine(ch_preparedRef))  
 
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 

@@ -37,3 +37,40 @@ process nextclade {
         --output-json ${sampleName}.json
     """
 }
+
+process getVariantDefinitions {
+    output:
+    path('variant_definitions') 
+
+    script:
+    """
+    git clone https://github.com/phe-genomics/variant_definitions
+    """
+}
+
+
+
+process aln2type {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/analysis/nextclade/${params.prefix}", mode: 'copy'
+
+    input:
+    tuple(sampleName,  path(fasta),path(variant_definitions), path(reffasta), path("*"))
+
+    output:
+    tuple(sampleName, path("${sampleName}.csv"))
+
+    script:
+    """
+    cat $reffasta  ${fasta} > unaligned.fasta
+    mafft --auto unaligned.fasta > aln.fasta
+    aln2type sample_json_out \
+	sample_csv_out \
+	${sampleName}.csv \
+	MN908947.3 \
+	aln.fasta \
+	variant_definitions/variant_yaml/*.yml
+
+    """
+}
