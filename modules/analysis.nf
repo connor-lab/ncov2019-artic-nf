@@ -53,13 +53,13 @@ process getVariantDefinitions {
 process aln2type {
     tag { sampleName }
 
-    publishDir "${params.outdir}/analysis/nextclade/${params.prefix}", mode: 'copy'
+    publishDir "${params.outdir}/analysis/aln2type/${params.prefix}", mode: 'copy'
 
     input:
     tuple(sampleName,  path(fasta),path(variant_definitions), path(reffasta), path("*"))
 
     output:
-    tuple(sampleName, path("${sampleName}.csv"))
+    tuple(sampleName, path("${sampleName}.csv")) optional true
 
     script:
     """
