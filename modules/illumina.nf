@@ -205,3 +205,29 @@ process getObjFiles {
 		--prefix $prefix
         """
 }
+
+process viridian {
+    /**
+    * runs viridian workflow https://github.com/iqbal-lab-org/viridian_workflow
+    * @input
+    * @output
+    */
+
+    publishDir "${params.outdir}/viridian"
+
+    input:
+        tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path(bedfile), path('ref.fa'),path("*")
+
+    output:
+        tuple prefix, path("${prefix}_outdir/")
+
+    script:
+        """
+        viridian_workflow run_one_sample \
+		ref.fa \
+		${bedfile} \
+		${prefix}_1.fastq.gz \
+		${prefix}_2.fastq.gz \
+		${prefix}_outdir/
+        """
+}
