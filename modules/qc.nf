@@ -37,25 +37,49 @@ process writeQCSummaryCSV {
 }
 
 process fastqc {
+    tag { sampleName }
 
-  publishDir "${params.outdir}/fastqc", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/fastqc", mode: 'copy', overwrite: true
 
-  input:
-  tuple(sampleName, path(forward), path(reverse))
+    input:
+    tuple(sampleName, path(forward), path(reverse))
 
-  output:
-  file "*fastqc*"
+    output:
+    file "*fastqc*"
 
-  """
-  fastqc ${forward} ${reverse} --format fastq --threads ${task.cpus}
-  """
+    """
+    fastqc ${forward} ${reverse} --format fastq --threads ${task.cpus}
+    """
 
 }
 
-process multiqc {
-    tag { params.prefix }
-    publishDir "${params.outdir}/multiqc", mode: 'copy'
+process mappingStatistics {
+    tag { sampleName }
 
+    label 'largemem'
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
+
+    input:
+        tuple(sampleName, path(bam), path(ref))
+
+    output:
+        path "*.txt"
+
+    script:
+    """
+    picard ${params.picardJavaSettings} CollectWgsMetrics -I ${sampleName}.mapped.primertrimmed.sorted.bam \
+    -O ${sampleName}.mapped.primertrimmed.sorted.metrics.txt -R ${ref} ${params.wgsMetricsOptions}      
+    """
+}
+
+process multiqc {   
+    tag { params.prefix }
+    
+    label 'largemem'
+    
+    publishDir "${params.outdir}/multiqc", mode: 'copy'
+    
     input:
     path trimLogList
     path mapLogList
@@ -68,6 +92,6 @@ process multiqc {
     script:
     """
     multiqc . --filename ${params.prefix}_multiqc.html --data-format json \
-    --cl_config "picard_config: { general_stats_target_coverage: [10,30,50,100] }"
+    ${params.multiqcOptions}
     """
 }
