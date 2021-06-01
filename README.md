@@ -14,7 +14,8 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 
 ##### Illumina
 
-`./nextflow run main.nf -profile conda/singularity,sge --illumina --prefix "test_illumina" --directory .github/data/fastqs/`
+`./nextflow run main.nf -profile conda/singularity,sge --illumina --prefix "test_illumina" \ 
+        --directory .github/data/fastqs/`
 
 ##### Nanopore
 
