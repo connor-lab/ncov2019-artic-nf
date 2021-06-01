@@ -117,6 +117,8 @@ workflow sequenceAnalysis {
                        .set { qc }
 
       writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
+      
+      mappingStatistics(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
 
       pangolinTyping(makeConsensus.out.consensus_fasta)
       
