@@ -1,3 +1,0 @@
-sample_name,pct_N_bases,pct_covered_bases,longest_no_N_run,num_aligned_reads,fasta,bam,qc_pass
-subsample2,12.29,87.71,4800,117721,subsample2.primertrimmed.consensus.fa,subsample2.mapped.primertrimmed.sorted.bam,TRUE
-subsample1,89.37,10.63,758,10956,subsample1.primertrimmed.consensus.fa,subsample1.mapped.primertrimmed.sorted.bam,FALSE

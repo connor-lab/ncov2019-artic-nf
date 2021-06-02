@@ -1,2 +1,0 @@
-taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,version,pangolin_version,pangoLEARN_version,pango_version,status,note
-Consensus_subsample2.primertrimmed.consensus_threshold_0.75_quality_20,B.28,0.0,0.9999131492096578,,,,PLEARN-v1.2.6,3.0.3,2021-05-27,v1.2.6,passed_qc,
