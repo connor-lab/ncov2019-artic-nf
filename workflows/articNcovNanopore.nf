@@ -9,14 +9,16 @@ include {articGuppyPlex} from '../modules/artic.nf'
 include {articMinIONNanopolish} from  '../modules/artic.nf' 
 include {articMinIONMedaka} from  '../modules/artic.nf'
 include {articRemoveUnmappedReads} from '../modules/artic.nf' 
+
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
+
 include {bamToCram} from '../modules/out.nf'
+
 include {collateSamples} from '../modules/upload.nf'
+
+
 include {pangolinTyping} from '../modules/typing.nf' 
-
-include {nextclade} from '../modules/typing.nf'
-
 
 // import subworkflows
 include {Genotyping} from './typing.nf'
@@ -60,10 +62,7 @@ workflow sequenceAnalysisNanopolish {
      collateSamples(qc.pass.map{ it[0] }
                            .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
-     
      pangolinTyping(articMinIONNanopolish.out.consensus_fasta)
-     
-     nextclade(articMinIONNanopolish.out.consensus_fasta)
 
      if (params.outCram) {
         bamToCram(articMinIONNanopolish.out.ptrim.map{ it[0] } 
@@ -163,3 +162,4 @@ workflow articNcovNanopore {
 
       }
 }
+
