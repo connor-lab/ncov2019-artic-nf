@@ -1,13 +1,14 @@
 [toc]
 # gms-artic in ngp-gms
 
-ssh xxxxxx@xx.x.gu.se
-password
+## 1. login to the system
+ssh xxxxxx@xx.x.gu.se \
+password \
 $
 
 ==NOTE: sge process is not supported on the /gms-storage-aws/, so need to run the pipeline locally from /home==
 
-## Run Illumina pipeline
+## 2. Run Illumina pipeline
 ```
 $ [your home]
 $ cp /gms-storage-aws/gms-artic/ .
@@ -17,7 +18,7 @@ $ nextflow run main.nf -profile singularity,sge \
     --outdir illumina_test
 ```
 
-## Run Nanopore Pipeline
+## 3. Run Nanopore Pipeline
 ```
 $ [your home]
 $ cp /gms-storage-aws/gms-artic/ .
