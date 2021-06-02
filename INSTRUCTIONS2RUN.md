@@ -1,7 +1,7 @@
 [toc]
 # gms-artic in ngp-gms
 
-ssh xxxxxx@gms-submit01-p.gu.gu.se
+ssh xxxxxx@xx.x.gu.se
 password
 $
 
