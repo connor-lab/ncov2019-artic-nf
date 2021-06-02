@@ -117,3 +117,4 @@ process nextclade {
     cat tmp.tsv | tr -d "\r" > ${sampleName}_clade.tsv
     """
 }
+
