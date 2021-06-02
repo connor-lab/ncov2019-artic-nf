@@ -18,4 +18,4 @@ dependencies:
       - git+https://github.com/cov-lineages/pangoLEARN.git
       - git+https://github.com/cov-lineages/pangolin.git
       - git+https://github.com/cov-lineages/constellations.git 
-      - git+https://github.com/cov-lineages/scorpio.git
+      - git+https://github.com/cov-lineages/scorpio.git     
