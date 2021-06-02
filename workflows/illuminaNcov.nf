@@ -13,6 +13,7 @@ include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 include {pangolinTyping} from '../modules/typing.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
+include {nextclade} from '../modules/typing.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
@@ -121,6 +122,8 @@ workflow sequenceAnalysis {
       mappingStatistics(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
 
       pangolinTyping(makeConsensus.out.consensus_fasta)
+      
+      nextclade(makeConsensus.out.consensus_fasta)
 
       multiqc(readTrimming.out.log.collect(), mappingStatistics.out.collect(), fastqc.out.collect())
 

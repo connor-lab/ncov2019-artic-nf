@@ -1,0 +1,3 @@
+sample_name,pct_N_bases,pct_covered_bases,longest_no_N_run,num_aligned_reads,fasta,bam,qc_pass
+test_nanopore_barcode07,75.25,25.59,969,1251,test_nanopore_barcode07.consensus.fasta,test_nanopore_barcode07.primertrimmed.rg.sorted.bam,FALSE
+test_nanopore_barcode09,74.29,25.49,965,1156,test_nanopore_barcode09.consensus.fasta,test_nanopore_barcode09.primertrimmed.rg.sorted.bam,FALSE

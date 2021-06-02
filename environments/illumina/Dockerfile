@@ -14,5 +14,3 @@ apt-get install -y git procps && \
 apt-get clean -y 
 COPY --from=condabuild /opt/conda/envs/artic-ncov2019-illumina /opt/conda/envs/artic-ncov2019-illumina
 ENV PATH=/opt/conda/envs/artic-ncov2019-illumina/bin:$PATH
-ENV LC_ALL C.UTF-8
-ENV LANG C.UTF-8

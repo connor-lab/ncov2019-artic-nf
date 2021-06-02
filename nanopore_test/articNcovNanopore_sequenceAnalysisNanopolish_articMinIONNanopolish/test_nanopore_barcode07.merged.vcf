@@ -1,0 +1,20 @@
+##fileformat=VCFv4.2
+##nanopolish_window=MN908947.3:1-29902
+##INFO=<ID=TotalReads,Number=1,Type=Integer,Description="The number of event-space reads used to call the variant">
+##INFO=<ID=SupportFraction,Number=1,Type=Float,Description="The fraction of event-space reads that support the variant">
+##INFO=<ID=SupportFractionByStrand,Number=2,Type=Float,Description="Fraction of event-space reads that support the variant for each strand">
+##INFO=<ID=BaseCalledReadsWithVariant,Number=1,Type=Integer,Description="The number of base-space reads that support the variant">
+##INFO=<ID=BaseCalledFraction,Number=1,Type=Float,Description="The fraction of base-space reads that support the variant">
+##INFO=<ID=AlleleCount,Number=1,Type=Integer,Description="The inferred number of copies of the allele">
+##INFO=<ID=StrandSupport,Number=4,Type=Integer,Description="Number of reads supporting the REF and ALT allele, by strand">
+##INFO=<ID=StrandFisherTest,Number=1,Type=Integer,Description="Strand bias fisher test">
+##INFO=<ID=SOR,Number=1,Type=Float,Description="StrandOddsRatio test from GATK">
+##INFO=<ID=RefContext,Number=1,Type=String,Description="The reference sequence context surrounding the variant call">
+##INFO=<ID=Pool,Number=1,Type=String,Description="The pool name">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample
+MN908947.3	241	.	C	T	222.3	PASS	TotalReads=29;SupportFraction=0.879155;SupportFractionByStrand=0.960408,0.803319;BaseCalledReadsWithVariant=23;BaseCalledFraction=0.69697;AlleleCount=1;StrandSupport=1,3,13,12;StrandFisherTest=3;SOR=0.322227;RefContext=GGTTTCGTCCG;Pool=nCoV-2019_1	GT	1
+MN908947.3	1001	.	G	GA	37.4	PASS	TotalReads=44;SupportFraction=0.602652;SupportFractionByStrand=0.677836,0.483243;BaseCalledReadsWithVariant=13;BaseCalledFraction=0.254902;AlleleCount=1;StrandSupport=9,9,18,8;StrandFisherTest=5;SOR=1.68074;RefContext=GTTCTGAAAAG;Pool=nCoV-2019_1	GT	1
+MN908947.3	8113	.	A	AG	64.4	PASS	TotalReads=23;SupportFraction=0.619378;SupportFractionByStrand=0.834985,0.126562;BaseCalledReadsWithVariant=5;BaseCalledFraction=0.2;AlleleCount=1;StrandSupport=3,6,13,1;StrandFisherTest=33;SOR=4.06452;RefContext=ACTGCAGAAGC;Pool=nCoV-2019_1	GT	1
+MN908947.3	23403	.	A	G	419.8	PASS	TotalReads=37;SupportFraction=0.750884;SupportFractionByStrand=0.669128,0.921207;BaseCalledReadsWithVariant=28;BaseCalledFraction=0.7;AlleleCount=1;StrandSupport=8,1,17,11;StrandFisherTest=14;SOR=0.090964;RefContext=TCAGGATGTTA;Pool=nCoV-2019_1	GT	1
+MN908947.3	24878	.	C	CA	25.6	PASS	TotalReads=24;SupportFraction=0.63357;SupportFractionByStrand=0.606766,0.660374;BaseCalledReadsWithVariant=5;BaseCalledFraction=0.192308;AlleleCount=1;StrandSupport=5,4,7,8;StrandFisherTest=0;SOR=0.667355;RefContext=TAACACAAAGG;Pool=nCoV-2019_2	GT	1

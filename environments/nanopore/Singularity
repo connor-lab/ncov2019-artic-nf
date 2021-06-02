@@ -28,6 +28,8 @@ apt-get clean -y
 
 %environment
 export PATH=/opt/conda/envs/artic/bin:$PATH
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
 
 %runscript
 exec "/opt/conda/envs/artic/bin/artic" "$@"

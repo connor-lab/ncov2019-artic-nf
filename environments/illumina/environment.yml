@@ -4,11 +4,9 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - python=3
   - biopython=1.74
   - libxcb
-  - matplotlib=3.3.3
-  - pandas=0.23.0=py36_1
+  - matplotlib>=3.3.3
   - bwa=0.7.17=pl5.22.0_2
   - samtools=1.10
   - bcftools=1.10
@@ -18,13 +16,18 @@ dependencies:
   - pyyaml=5.3.1
   - pip=19.3.1
   - gofasta
-  - snakemake-minimal=5.13
+  - usher
+  - python>=3.7
+  - snakemake-minimal>=5.13
   - minimap2=2.17
   - picard=2.25.2
   - fastqc=0.11.9
   - multiqc=1.10.1
+  - nextclade_js=0.14.3
   - pip:
       - pandas == 1.0.1
       - scikit-learn >= 0.23.1
       - git+https://github.com/cov-lineages/pangoLEARN.git
       - git+https://github.com/cov-lineages/pangolin.git
+      - git+https://github.com/cov-lineages/constellations.git 
+      - git+https://github.com/cov-lineages/scorpio.git
