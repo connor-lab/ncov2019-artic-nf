@@ -219,13 +219,14 @@ process viridian {
         tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path(bedfile), path('ref.fa'),path("*")
 
     output:
-        tuple prefix, path("${prefix}_outdir/")
+        tuple prefix, path("${prefix}_outdir/viridian/consensus.final_assembly.fa")
 
     script:
         """
+        wget https://raw.githubusercontent.com/iqbal-lab-org/viridian_workflow/master/data/nCoV-artic-v3.bed
         viridian_workflow run_one_sample \
 		ref.fa \
-		${bedfile} \
+		nCoV-artic-v3.bed \
 		${prefix}_1.fastq.gz \
 		${prefix}_2.fastq.gz \
 		${prefix}_outdir/

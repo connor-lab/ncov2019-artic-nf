@@ -131,15 +131,15 @@ workflow sequenceAnalysis {
       aln2type(makeConsensus.out.combine(getVariantDefinitions.out).combine(ch_preparedRef))  
 
 
-      emit:
-      qc_pass = collateSamples.out
-      variants = callVariants.out.variants
 
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
                         .join (trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) )
 
       }
+      emit:
+      qc_pass = collateSamples.out
+      variants = callVariants.out.variants
 }
 
 workflow sequenceAnalysisViridian {
@@ -150,6 +150,11 @@ workflow sequenceAnalysisViridian {
 
     main:
       viridian(ch_filePairs.combine(ch_bedFile).combine(ch_preparedRef))
+      
+      pango(viridian.out)    
+      nextclade(viridian.out)
+      getVariantDefinitions()
+      aln2type(viridian.out.combine(getVariantDefinitions.out).combine(ch_preparedRef))  
 
 }
 
