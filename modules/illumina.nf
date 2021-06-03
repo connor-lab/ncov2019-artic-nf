@@ -193,9 +193,10 @@ process getObjFiles {
         tuple bucket, prefix
 
     output:
-        tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz")
+        tuple prefix, path("${prefix}_C1.fastq.gz"), path("${prefix}_C2.fastq.gz")
 
     script:
+	db=params.krakdb
         """
 	oci os object bulk-download \
 		-bn $bucket \
@@ -203,7 +204,18 @@ process getObjFiles {
 		--overwrite \
 		--auth instance_principal \
 		--prefix $prefix
-        """
+
+	kraken2 --paired -db ${db} \
+		--report ${prefix}_summary.txt \
+		--output ${prefix}_read_classification \
+        	${prefix}_1.fastq.gz ${prefix}_2.fastq.gz
+
+        awk '\$3==\"9606\" { print \$2 }' ${prefix}_read_classification >> kraken2_human_read_list
+        awk '\$3!=\"9606\" { print \$2 }' ${prefix}_read_classification >> kraken2_nonhuman_read_list
+
+	seqtk subseq ${prefix}_1.fastq.gz kraken2_nonhuman_read_list | gzip > "${prefix}_C1.fastq.gz"
+	seqtk subseq ${prefix}_2.fastq.gz kraken2_nonhuman_read_list | gzip > "${prefix}_C2.fastq.gz"
+	"""
 }
 
 process viridian {
