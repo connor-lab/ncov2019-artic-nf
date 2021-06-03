@@ -206,6 +206,7 @@ process getObjFiles {
 		--prefix $prefix
 
 	kraken2 --paired -db ${db} \
+		--memory-mapping \
 		--report ${prefix}_summary.txt \
 		--output ${prefix}_read_classification \
         	${prefix}_1.fastq.gz ${prefix}_2.fastq.gz
