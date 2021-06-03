@@ -19,6 +19,7 @@ include {collateSamples} from '../modules/upload.nf'
 
 
 include {pangolinTyping} from '../modules/typing.nf' 
+include {nextclade} from '../modules/typing.nf'
 
 // import subworkflows
 include {Genotyping} from './typing.nf'
@@ -63,6 +64,8 @@ workflow sequenceAnalysisNanopolish {
                            .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
      pangolinTyping(articMinIONNanopolish.out.consensus_fasta)
+     
+     nextclade(articMinIONNanopolish.out.consensus_fasta)
 
      if (params.outCram) {
         bamToCram(articMinIONNanopolish.out.ptrim.map{ it[0] } 
