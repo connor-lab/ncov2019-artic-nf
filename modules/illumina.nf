@@ -182,3 +182,66 @@ process cramToFastq {
         """
 }
 
+process getObjFiles {
+    /**
+    * fetches fastq files from object store using OCI bulk download (https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.24.4/oci_cli_docs/cmdref/os/object/bulk-download.html)
+    * @input
+    * @output
+    */
+
+    input:
+        tuple bucket, prefix
+
+    output:
+        tuple prefix, path("${prefix}_C1.fastq.gz"), path("${prefix}_C2.fastq.gz")
+
+    script:
+	db=params.krakdb
+        """
+	oci os object bulk-download \
+		-bn $bucket \
+		--download-dir ./ \
+		--overwrite \
+		--auth instance_principal \
+		--prefix $prefix
+
+	kraken2 --paired -db ${db} \
+		--memory-mapping \
+		--report ${prefix}_summary.txt \
+		--output ${prefix}_read_classification \
+        	${prefix}_1.fastq.gz ${prefix}_2.fastq.gz
+
+        awk '\$3==\"9606\" { print \$2 }' ${prefix}_read_classification >> kraken2_human_read_list
+        awk '\$3!=\"9606\" { print \$2 }' ${prefix}_read_classification >> kraken2_nonhuman_read_list
+
+	seqtk subseq ${prefix}_1.fastq.gz kraken2_nonhuman_read_list | gzip > "${prefix}_C1.fastq.gz"
+	seqtk subseq ${prefix}_2.fastq.gz kraken2_nonhuman_read_list | gzip > "${prefix}_C2.fastq.gz"
+	"""
+}
+
+process viridian {
+    /**
+    * runs viridian workflow https://github.com/iqbal-lab-org/viridian_workflow
+    * @input
+    * @output
+    */
+
+    publishDir "${params.outdir}/viridian"
+
+    input:
+        tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path(bedfile), path('ref.fa'),path("*")
+
+    output:
+        tuple prefix, path("${prefix}_outdir/viridian/consensus.final_assembly.fa")
+
+    script:
+        """
+        wget https://raw.githubusercontent.com/iqbal-lab-org/viridian_workflow/master/data/nCoV-artic-v3.bed
+        viridian_workflow run_one_sample \
+		ref.fa \
+		nCoV-artic-v3.bed \
+		${prefix}_1.fastq.gz \
+		${prefix}_2.fastq.gz \
+		${prefix}_outdir/
+        """
+}

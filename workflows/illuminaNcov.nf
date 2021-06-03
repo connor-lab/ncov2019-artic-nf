@@ -12,6 +12,8 @@ include {trimPrimerSequences} from '../modules/illumina.nf'
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
+include {getObjFiles} from '../modules/illumina.nf'
+include {viridian} from '../modules/illumina.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
@@ -19,6 +21,11 @@ include {writeQCSummaryCSV} from '../modules/qc.nf'
 include {bamToCram} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
+
+include {pango} from '../modules/analysis.nf'
+include {nextclade} from '../modules/analysis.nf'
+include {getVariantDefinitions} from '../modules/analysis.nf'
+include {aln2type} from '../modules/analysis.nf'
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
@@ -88,6 +95,7 @@ workflow sequenceAnalysis {
       ch_bedFile
 
     main:
+
       readTrimming(ch_filePairs)
 
       readMapping(readTrimming.out.combine(ch_preparedRef))
@@ -114,17 +122,40 @@ workflow sequenceAnalysis {
 
       collateSamples(qc.pass.map{ it[0] }
                            .join(makeConsensus.out, by: 0)
-                           .join(trimPrimerSequences.out.mapped))     
+                           .join(trimPrimerSequences.out.mapped))
+      
+
+      pango(makeConsensus.out)    
+      nextclade(makeConsensus.out)
+      getVariantDefinitions()
+      aln2type(makeConsensus.out.combine(getVariantDefinitions.out).combine(ch_preparedRef))  
+
+
 
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
                         .join (trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) )
 
       }
-
-    emit:
+      emit:
       qc_pass = collateSamples.out
       variants = callVariants.out.variants
+}
+
+workflow sequenceAnalysisViridian {
+    take:
+      ch_filePairs
+      ch_preparedRef
+      ch_bedFile
+
+    main:
+      viridian(ch_filePairs.combine(ch_bedFile).combine(ch_preparedRef))
+      
+      pango(viridian.out)    
+      nextclade(viridian.out)
+      getVariantDefinitions()
+      aln2type(viridian.out.combine(getVariantDefinitions.out).combine(ch_preparedRef))  
+
 }
 
 workflow ncovIllumina {
@@ -136,8 +167,12 @@ workflow ncovIllumina {
       prepareReferenceFiles()
       
       // Actually do analysis
+      if (params.varCaller=='iVar') {
       sequenceAnalysis(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
-
+      }
+      else if (params.varCaller=='viridian') {
+      sequenceAnalysisViridian(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
+      }
       // Do some typing if we have the correct files
       if ( params.gff ) {
           Channel.fromPath("${params.gff}")
@@ -172,3 +207,13 @@ workflow ncovIlluminaCram {
       ncovIllumina(cramToFastq.out)
 }
 
+workflow ncovIlluminaObj {
+    take:
+      ch_objFiles
+    main:
+      // get fastq files from objstore
+      getObjFiles(ch_objFiles)
+
+      // Run standard pipeline
+      ncovIllumina(getObjFiles.out)
+}
