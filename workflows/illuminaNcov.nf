@@ -26,6 +26,7 @@ include {pango} from '../modules/analysis.nf'
 include {nextclade} from '../modules/analysis.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {aln2type} from '../modules/analysis.nf'
+include {makeReport} from '../modules/analysis.nf'
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
@@ -152,9 +153,19 @@ workflow sequenceAnalysisViridian {
       viridian(ch_filePairs.combine(ch_bedFile).combine(ch_preparedRef))
       
       pango(viridian.out)    
+
       nextclade(viridian.out)
+
       getVariantDefinitions()
+
       aln2type(viridian.out.combine(getVariantDefinitions.out).combine(ch_preparedRef))  
+
+      makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out,by:0))
+
+      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
+		storeDir:"${params.outdir}/analysis/report/${params.prefix}" , 
+		keepHeader:true,
+		skip:1)
 
 }
 

@@ -74,3 +74,22 @@ process aln2type {
 
     """
 }
+
+
+process makeReport {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/analysis/report/${params.prefix}", mode: 'copy'
+
+    input:
+    tuple(sampleName, path('pango.csv'), path('aln2type.csv'), path('nextclade_tree.json'), path('nextclade.tsv'),
+		path('nextclade.json'))
+
+    output:
+    path("${sampleName}_report.tsv"), emit: tsv
+
+    script:
+    """
+    makeReport.py ${sampleName}
+    """
+}
