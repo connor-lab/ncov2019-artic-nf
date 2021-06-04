@@ -7,7 +7,8 @@ dependencies:
   - artic=1.1.3
   - pyyaml=5.3.1
   - pip=19.3.1
-  - gofasta
+  - gofasta=0.0.4
+  - usher=0.2.0
   - snakemake-minimal=5.13
   - minimap2=2.17
   - pip:
@@ -15,3 +16,5 @@ dependencies:
       - scikit-learn >= 0.23.1
       - git+https://github.com/cov-lineages/pangoLEARN.git
       - git+https://github.com/cov-lineages/pangolin.git
+      - git+https://github.com/cov-lineages/constellations.git
+      - git+https://github.com/cov-lineages/scorpio.git
