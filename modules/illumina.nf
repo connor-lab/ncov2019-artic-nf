@@ -189,6 +189,8 @@ process getObjFiles {
     * @output
     */
 
+    tag { prefix }
+
     input:
         tuple bucket, prefix
 
@@ -225,6 +227,8 @@ process viridian {
     * @input
     * @output
     */
+
+    tag { prefix }
 
     publishDir "${params.outdir}/viridian"
 
