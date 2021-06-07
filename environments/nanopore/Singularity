@@ -6,7 +6,7 @@ environments/nanopore/environment.yml /environment.yml
 environments/extras.yml /extras.yml
 
 %labels
-authors="Matt Bull" 
+authors="Matt Bull"
 description="Docker image containing all requirements for the ARTIC project's ncov2019 pipeline"
 
 %post
@@ -33,4 +33,3 @@ export LANG=C.UTF-8
 
 %runscript
 exec "/opt/conda/envs/artic/bin/artic" "$@"
-
