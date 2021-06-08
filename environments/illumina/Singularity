@@ -2,10 +2,6 @@ Bootstrap: docker
 From: continuumio/miniconda3:latest
 Stage: condabuild
 
-%environment
-export LC_ALL=C.UTF-8
-export LANG=C.UTF-8
-
 %files
 environments/illumina/environment.yml /environment.yml
 environments/extras.yml /extras.yml
