@@ -19,25 +19,25 @@ process articDownloadScheme{
 }
 
 process articGuppyPlex {
-    tag { params.prefix + "_" + fastqDir }
+    tag { prefix }
 
     label 'largemem'
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${params.prefix}*.fastq", mode: "copy"
 
     input:
-    path(fastqDir)
+    tuple(prefix, path(fastq))
 
     output:
-    tuple val(fastqDir.baseName), path("${params.prefix}*.fastq"), emit: fastq
+    tuple val(prefix), path("${prefix}_.fastq"), emit: fastq
 
     script:
     """
     artic guppyplex \
     --min-length ${params.min_length} \
     --max-length ${params.max_length} \
-    --prefix ${params.prefix} \
-    --directory ${fastqDir}
+    --prefix ${prefix} \
+    --directory ./
     """
 }
 
@@ -49,7 +49,7 @@ process articMinIONMedaka {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
 
     input:
-    tuple file(fastq), file(schemeRepo)
+    tuple sampleName, file(fastq), file(schemeRepo)
 
     output:
     file("${sampleName}*")
@@ -61,7 +61,7 @@ process articMinIONMedaka {
 
     script:
     // Make an identifier from the fastq filename
-    sampleName = fastq.getBaseName().replaceAll(~/\.fastq.*$/, '')
+    //sampleName = fastq.getBaseName().replaceAll(~/\.fastq.*$/, '')
 
     // Configure artic minion pipeline
     minionRunConfigBuilder = []
@@ -172,5 +172,47 @@ process articRemoveUnmappedReads {
     """
     samtools view -F4 -o ${sampleName}.mapped.sorted.bam ${bamfile} 
     """
+}
+
+process getObjFilesONT {
+    /**
+    * fetches fastq files from object store using OCI bulk download (https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.24.4/oci_cli_docs/cmdref/os/object/bulk-download.html)
+    * @input
+    * @output
+    */
+
+    tag { prefix }
+
+    input:
+        tuple bucket, prefix
+
+    output:
+        tuple prefix, path("${prefix}.fastq.gz")
+
+    script:
+	db=params.krakdb
+        """
+	oci os object bulk-download \
+		-bn $bucket \
+		--download-dir ./ \
+		--overwrite \
+		--auth instance_principal \
+		--prefix $prefix
+
+	kraken2 -db ${db} \
+		--memory-mapping \
+		--report ${prefix}_summary.txt \
+		--output ${prefix}_read_classification \
+        	*.fastq.gz 
+
+        awk '\$3==\"9606\" { print \$2 }' ${prefix}_read_classification >> kraken2_human_read_list
+        awk '\$3!=\"9606\" { print \$2 }' ${prefix}_read_classification >> kraken2_nonhuman_read_list
+
+        seqs=*.fastq.gz
+        for seq in \${seqs}
+        do
+	    seqtk subseq \${seq} kraken2_nonhuman_read_list | gzip >> "${prefix}.fastq.gz"
+	done
+	"""
 }
 

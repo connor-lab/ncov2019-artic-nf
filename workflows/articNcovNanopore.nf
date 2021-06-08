@@ -10,7 +10,7 @@ include {articMinIONNanopolish} from  '../modules/artic.nf'
 include {articMinIONMedaka} from  '../modules/artic.nf'
 include {articRemoveUnmappedReads} from '../modules/artic.nf' 
 include {splitSeqSum} from '../modules/artic.nf' 
-
+include {getObjFilesONT} from '../modules/artic'
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
@@ -19,6 +19,12 @@ include {bamToCram} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
 
+//analysis
+include {pango} from '../modules/analysis.nf'
+include {nextclade} from '../modules/analysis.nf'
+include {getVariantDefinitions} from '../modules/analysis.nf'
+include {aln2type} from '../modules/analysis.nf'
+include {makeReport} from '../modules/analysis.nf'
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
@@ -89,10 +95,15 @@ workflow sequenceAnalysisMedaka {
     main:
       articDownloadScheme()
 
-      articGuppyPlex(ch_runFastqDirs.flatten())
+      if (params.objstore) {
+          getObjFilesONT(ch_runFastqDirs)
+          articGuppyPlex(getObjFilesONT.out)
+      }
+      else {
+          articGuppyPlex(ch_runFastqDirs.flatten())
+      }
 
-      articMinIONMedaka(articGuppyPlex.out.fastq
-                                      .filter{ it.countFastq() > params.minReadsArticGuppyPlex }
+      articMinIONMedaka(articGuppyPlex.out
                                       .combine(articDownloadScheme.out.scheme))
 
       articRemoveUnmappedReads(articMinIONMedaka.out.mapped)
@@ -114,6 +125,22 @@ workflow sequenceAnalysisMedaka {
      collateSamples(qc.pass.map{ it[0] }
                            .join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
+
+      // analysis
+      pango(articMinIONMedaka.out.consensus_fasta)
+
+      nextclade(articMinIONMedaka.out.consensus_fasta)
+
+      getVariantDefinitions()
+
+      aln2type(articMinIONMedaka.out.consensus_fasta.combine(getVariantDefinitions.out).combine(articDownloadScheme.out.reffasta)combine(articDownloadScheme.out.bed))
+
+      makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out,by:0))
+
+      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
+                storeDir:"${params.outdir}/analysis/report/${params.prefix}" ,
+                keepHeader:true,
+                skip:1)
 
      if (params.outCram) {
         bamToCram(articMinIONMedaka.out.ptrim.map{ it[0] } 
