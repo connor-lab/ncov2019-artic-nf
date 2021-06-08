@@ -49,7 +49,7 @@ if ( params.illumina ) {
        System.exit(1)
    }
 } else if ( params.medaka ) {
-   if (! params.basecalled_fastq ) {
+   if (! params.basecalled_fastq && !params.objstore ) {
        println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
    }
 } else {
@@ -98,6 +98,13 @@ workflow {
        nanoporeBarcodeDirs = file("${params.basecalled_fastq}/barcode*", type: 'dir', maxdepth: 1 )
        nanoporeNoBarcode = file("${params.basecalled_fastq}/*.fastq", type: 'file', maxdepth: 1)
 
+       if (params.objstore) {
+           Channel.fromPath( "${params.objstore}" )
+                  .splitCsv()
+                  .map { row -> tuple(row[0], row[1]) }
+                  .set{ ch_objFiles }
+       }
+       else{
        if( nanoporeBarcodeDirs ) {
             // Yes, barcodes!
             Channel.fromPath( nanoporeBarcodeDirs )
@@ -120,10 +127,16 @@ workflow {
             System.exit(1)
       }
    }
+   }
 
    main:
      if ( params.nanopolish || params.medaka ) {
+	if ( params.objstore ) {
+	     articNcovNanopore(ch_objFiles)
+	}
+	else {
          articNcovNanopore(ch_fastqDirs)
+	}
      } else if ( params.illumina ) {
          if ( params.cram ) {
             ncovIlluminaCram(ch_cramFiles)

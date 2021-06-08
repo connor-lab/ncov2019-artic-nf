@@ -127,11 +127,19 @@ workflow sequenceAnalysis {
       
 
       pango(makeConsensus.out)    
+
       nextclade(makeConsensus.out)
+
       getVariantDefinitions()
+
       aln2type(makeConsensus.out.combine(getVariantDefinitions.out).combine(ch_preparedRef))  
 
+      makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out,by:0))
 
+      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
+		storeDir:"${params.outdir}/analysis/report/${params.prefix}" , 
+		keepHeader:true,
+		skip:1)
 
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
