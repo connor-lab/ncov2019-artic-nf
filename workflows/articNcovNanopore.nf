@@ -11,6 +11,7 @@ include {articMinIONMedaka} from  '../modules/artic.nf'
 include {articRemoveUnmappedReads} from '../modules/artic.nf' 
 include {splitSeqSum} from '../modules/artic.nf' 
 include {getObjFilesONT} from '../modules/artic'
+include {articMinIONViridian} from '../modules/artic'
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
@@ -154,6 +155,36 @@ workflow sequenceAnalysisMedaka {
 
 }
 
+workflow sequenceAnalysisViridian {
+    take:
+      ch_runFastqDirs
+
+    main:
+      articDownloadScheme()
+
+      getObjFilesONT(ch_runFastqDirs)
+
+      articMinIONViridian(getObjFilesONT.out
+                                      .combine(articDownloadScheme.out.scheme))
+
+
+      // analysis
+      pango(articMinIONViridian.out)
+
+      nextclade(articMinIONViridian.out)
+
+      getVariantDefinitions()
+
+      aln2type(articMinIONViridian.out.combine(getVariantDefinitions.out).combine(articDownloadScheme.out.reffasta)combine(articDownloadScheme.out.bed))
+
+      makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out,by:0))
+
+      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
+                storeDir:"${params.outdir}/analysis/report/${params.prefix}" ,
+                keepHeader:true,
+                skip:1)
+
+}
 
 workflow articNcovNanopore {
     take:
@@ -181,6 +212,9 @@ workflow articNcovNanopore {
           sequenceAnalysisMedaka.out.vcf.set{ ch_nanopore_vcf }
 
           sequenceAnalysisMedaka.out.reffasta.set{ ch_nanopore_reffasta }
+           
+      } else if ( params.viridian ) {
+          sequenceAnalysisViridian(ch_fastqDirs)
       }
 
       if ( params.gff ) {

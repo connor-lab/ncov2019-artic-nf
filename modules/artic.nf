@@ -216,3 +216,31 @@ process getObjFilesONT {
 	"""
 }
 
+process articMinIONViridian {
+    /**
+    * runs viridian workflow https://github.com/iqbal-lab-org/viridian_workflow
+    * @input
+    * @output
+    */
+
+    tag { prefix }
+
+    publishDir "${params.outdir}/viridian"
+
+    input:
+        tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo)
+
+    output:
+        tuple prefix, path("${prefix}_outdir/viridian/consensus.final_assembly.fa")
+
+    script:
+        """
+        wget https://raw.githubusercontent.com/iqbal-lab-org/viridian_workflow/master/data/nCoV-artic-v3.bed
+        viridian_workflow run_one_sample_ont \
+		${schemeRepo}/nCoV-2019/V3/nCoV-2019.reference.fasta \
+		nCoV-artic-v3.bed \
+		${prefix}.fastq.gz \
+		${prefix}_outdir/
+        """
+}
+
