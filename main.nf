@@ -142,7 +142,7 @@ workflow {
    }
 
    main:
-     if ( params.nanopolish || params.medaka || params.viridian ) {
+     if ( params.nanopolish || params.medaka || (params.viridian && !params.illumina )) {
 	if ( params.objstore ) {
 	     articNcovNanopore(ch_objFiles)
 	}
