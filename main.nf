@@ -13,6 +13,14 @@ include {ncovIllumina} from './workflows/illuminaNcov.nf'
 include {ncovIlluminaCram} from './workflows/illuminaNcov.nf'
 include {ncovIlluminaObj} from './workflows/illuminaNcov.nf'
 
+
+if (params.varCaller == 'medaka'){
+    params.medaka=true
+}
+else if (params.varCaller == 'viridian' && !params.illumina){
+    params.viridian=true
+}
+
 if (params.help){
     printHelp()
     exit 0
@@ -49,6 +57,10 @@ if ( params.illumina ) {
        System.exit(1)
    }
 } else if ( params.medaka ) {
+   if (! params.basecalled_fastq && !params.objstore ) {
+       println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
+   }
+} else if ( params.viridian ) {
    if (! params.basecalled_fastq && !params.objstore ) {
        println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
    }
@@ -130,7 +142,7 @@ workflow {
    }
 
    main:
-     if ( params.nanopolish || params.medaka ) {
+     if ( params.nanopolish || params.medaka || (params.viridian && !params.illumina )) {
 	if ( params.objstore ) {
 	     articNcovNanopore(ch_objFiles)
 	}

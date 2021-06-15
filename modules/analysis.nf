@@ -67,6 +67,7 @@ process aln2type {
     mafft --auto unaligned.fasta > aln.fasta
     aln2type sample_json_out \
 	sample_csv_out \
+	--output_unclassified \
 	${sampleName}.csv \
 	MN908947.3 \
 	aln.fasta \
