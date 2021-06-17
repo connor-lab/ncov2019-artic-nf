@@ -144,19 +144,20 @@ process makeConsensus {
 
     tag { sampleName }
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.primertrimmed.consensus.fa", mode: 'copy'
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy'
 
     input:
         tuple(sampleName, path(bam))
 
     output:
-        tuple(sampleName, path("${sampleName}.primertrimmed.consensus.fa"))
+        tuple(sampleName, path("${sampleName}.fasta"))
 
     script:
         """
         samtools mpileup -aa -A -B -d ${params.mpileupDepth} -Q0 ${bam} | \
         ivar consensus -t ${params.ivarFreqThreshold} -m ${params.ivarMinDepth} \
         -n N -p ${sampleName}.primertrimmed.consensus
+        cp ${sampleName}.primertrimmed.consensus.fa ${sampleName}.fasta
         """
 }
 
@@ -230,13 +231,13 @@ process viridian {
 
     tag { prefix }
 
-    publishDir "${params.outdir}/viridian"
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy'
 
     input:
         tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path(bedfile), path('ref.fa'),path("*")
 
     output:
-        tuple prefix, path("${prefix}_outdir/viridian/consensus.final_assembly.fa")
+        tuple prefix, path("${prefix}.fasta")
 
     script:
         """
@@ -247,5 +248,6 @@ process viridian {
 		${prefix}_1.fastq.gz \
 		${prefix}_2.fastq.gz \
 		${prefix}_outdir/
+        cp ${prefix}_outdir/viridian/consensus.final_assembly.fa ${prefix}.fasta
         """
 }

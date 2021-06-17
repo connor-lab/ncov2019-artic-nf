@@ -12,13 +12,15 @@ include {articNcovNanopore} from './workflows/articNcovNanopore.nf'
 include {ncovIllumina} from './workflows/illuminaNcov.nf'
 include {ncovIlluminaCram} from './workflows/illuminaNcov.nf'
 include {ncovIlluminaObj} from './workflows/illuminaNcov.nf'
-
+include {ncovAnalysis} from './workflows/analysis'
 
 if (params.varCaller == 'medaka'){
     params.medaka=true
 }
 else if (params.varCaller == 'viridian' && !params.illumina){
     params.viridian=true
+} else {
+    params.viridian = false
 }
 
 if (params.help){
@@ -64,6 +66,10 @@ if ( params.illumina ) {
    if (! params.basecalled_fastq && !params.objstore ) {
        println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
    }
+} else if ( params.analysis ) {
+   if ( params.consensus_seqs ) {
+       println("Please supply a directory containing consensus with --consensus_seqs")
+}
 } else {
        println("Please select a workflow with --nanopolish, --illumina or --medaka, or use --help to print help")
        System.exit(1)
@@ -85,7 +91,13 @@ if ( ! params.prefix ) {
 
 // main workflow
 workflow {
-   if ( params.illumina ) {
+   if (params.analysis) {
+           Channel.fromPath( "${params.consensus_seqs}/**.fasta")
+                  .map { file -> tuple(file.simpleName, file) }
+                  .view()
+                  .set{ ch_consensusFiles }
+       }
+   else if ( params.illumina ) {
        if (params.cram) {
            Channel.fromPath( "${params.directory}/**.cram" )
                   .map { file -> tuple(file.baseName, file) }
@@ -159,7 +171,9 @@ workflow {
          else {
             ncovIllumina(ch_filePairs)
          }
-     } else {
+      } else if (params.analysis) {
+            ncovAnalysis(ch_consensusFiles)
+      } else {
          println("Please select a workflow with --nanopolish, --illumina or --medaka")
      }
      
