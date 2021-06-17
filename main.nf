@@ -92,7 +92,7 @@ if ( ! params.prefix ) {
 // main workflow
 workflow {
    if (params.analysis) {
-           Channel.fromPath( "${params.consensus_seqs}/**.fasta")
+           Channel.fromPath( "${params.consensus_seqs}/consensus_seqs/*.fasta")
                   .map { file -> tuple(file.simpleName, file) }
                   .view()
                   .set{ ch_consensusFiles }
