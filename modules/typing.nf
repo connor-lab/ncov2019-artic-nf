@@ -90,7 +90,7 @@ process mergeTypingCSVs {
 process pangolinTyping {
     tag { sampleName }
 
-    publishDir "${params.outdir}/AnalysisReport/pangolinTyping/", mode: 'copy', pattern: "${sampleName}.pangolin.csv"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}.pangolin.csv"
 
 
     input:
@@ -110,7 +110,7 @@ process nextclade {
 
     label 'nextclade'
     
-    publishDir "${params.outdir}/AnalysisReport/nextclade/", mode: 'copy', pattern: "${sampleName}_clade.tsv"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}_clade.tsv"
     
     input:
         tuple val(sampleName), path(consensus_fasta)
