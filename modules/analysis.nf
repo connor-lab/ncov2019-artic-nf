@@ -12,7 +12,7 @@ process getVariantDefinitions {
 process makeReport {
     tag { sampleName }
 
-    publishDir "${params.outdir}/AnalysisReport/${params.prefix}", mode: 'copy', pattern: "${sampleName}_report.tsv"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}_report.tsv"
 
     input:
     tuple(sampleName, path('pangolinTyping.csv'), path('nextclade_tree.json'), path('nextclade.tsv'),
