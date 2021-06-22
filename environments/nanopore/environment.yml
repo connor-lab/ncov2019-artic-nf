@@ -6,6 +6,7 @@ channels:
 dependencies:
   - artic=1.1.3
   - pyyaml=5.3.1
+  - python>=3.6
   - pip=19.3.1
   - gofasta=0.0.4
   - usher=0.2.0
@@ -15,8 +16,3 @@ dependencies:
   - pip:
       - pandas == 1.0.1
       - scikit-learn >= 0.23.1
-      - git+https://github.com/cov-lineages/pangoLEARN.git
-      - git+https://github.com/cov-lineages/pangolin.git
-      - git+https://github.com/cov-lineages/constellations.git
-      - git+https://github.com/cov-lineages/scorpio.git
-      - git+https://github.com/cov-lineages/pango-designation.git 
