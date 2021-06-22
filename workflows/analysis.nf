@@ -10,6 +10,7 @@ include {getVariantDefinitions} from '../modules/analysis.nf'
 include {aln2type} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
 include {articDownloadScheme} from '../modules/artic.nf'
+include {FN4_upload} from '../modules/analysis.nf'
 
 workflow ncovAnalysis {
     take:
@@ -42,6 +43,8 @@ workflow downstreamAnalysis {
               storeDir:"${params.outdir}/analysis/report/${params.prefix}" ,
               keepHeader:true,
               skip:1)
+
+    FN4_upload(consensus.combine(getVariantDefinitions.out).combine(ch_preparedRef).combine(ch_bedFile))
 
 }
     

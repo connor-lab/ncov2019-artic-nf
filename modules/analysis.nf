@@ -94,3 +94,28 @@ process makeReport {
     makeReport.py ${sampleName}
     """
 }
+
+process FN4_upload {
+    tag { sampleName }
+
+    input:
+    tuple(sampleName,  path(fasta),path(variant_definitions), path(reffasta), path("*"))
+
+    script:
+    """
+    mafft --auto \
+        --thread 1 \
+        --addfull ${fasta} \
+        --keeplength $reffasta \
+        > ${sampleName}_wuhan.fa
+
+    FN4ormater.py -i ${sampleName}_wuhan.fa -r MN908947.3 -s ${sampleName} -o ${sampleName}.fasta
+
+    oci os object put \
+	-bn FN4-queue \
+        --auth instance_principal \
+	--file ${sampleName}.fasta \
+	--metadata "{\\"sampleID\\":\\"$sampleName\\"}"
+
+    """
+}
