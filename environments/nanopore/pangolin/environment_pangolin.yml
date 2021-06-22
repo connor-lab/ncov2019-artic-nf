@@ -1,0 +1,19 @@
+name: pangolin
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - biopython=1.74
+  - minimap2>=2.16
+  - pip=19.3.1
+  - python>=3.7
+  - snakemake-minimal>=5.13
+  - gofasta
+  - usher
+  - pip:
+    - pandas==1.0.1
+    - git+https://github.com/cov-lineages/pangoLEARN.git
+    - git+https://github.com/cov-lineages/scorpio.git
+    - git+https://github.com/cov-lineages/constellations.git
+    - git+https://github.com/cov-lineages/pango-designation.git
