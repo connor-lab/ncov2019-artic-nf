@@ -30,6 +30,7 @@ include {makeReport} from '../modules/analysis.nf'
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
 include {Genotyping} from './typing.nf'
+include {downstreamAnalysis} from './analysis.nf'
 
 // workflow component for artic pipeline
 workflow sequenceAnalysisNanopolish {
@@ -127,21 +128,7 @@ workflow sequenceAnalysisMedaka {
                            .join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
 
-      // analysis
-      pango(articMinIONMedaka.out.consensus_fasta)
-
-      nextclade(articMinIONMedaka.out.consensus_fasta)
-
-      getVariantDefinitions()
-
-      aln2type(articMinIONMedaka.out.consensus_fasta.combine(getVariantDefinitions.out).combine(articDownloadScheme.out.reffasta)combine(articDownloadScheme.out.bed))
-
-      makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out,by:0))
-
-      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
-                storeDir:"${params.outdir}/analysis/report/${params.prefix}" ,
-                keepHeader:true,
-                skip:1)
+     downstreamAnalysis(articMinIONMedaka.out.consensus_fasta, articDownloadScheme.out.reffasta, articDownloadScheme.out.bed)     
 
      if (params.outCram) {
         bamToCram(articMinIONMedaka.out.ptrim.map{ it[0] } 
@@ -169,20 +156,7 @@ workflow sequenceAnalysisViridian {
 
 
       // analysis
-      pango(articMinIONViridian.out)
-
-      nextclade(articMinIONViridian.out)
-
-      getVariantDefinitions()
-
-      aln2type(articMinIONViridian.out.combine(getVariantDefinitions.out).combine(articDownloadScheme.out.reffasta)combine(articDownloadScheme.out.bed))
-
-      makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out,by:0))
-
-      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
-                storeDir:"${params.outdir}/analysis/report/${params.prefix}" ,
-                keepHeader:true,
-                skip:1)
+      downstreamAnalysis(articMinIONViridian.out, articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
 
 }
 

@@ -47,6 +47,7 @@ process articMinIONMedaka {
     cpus 4
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
+    publishDir "${params.outdir}/consensus_seqs/", pattern: "${sampleName}.consensus.fasta", mode: "copy"
 
     input:
     tuple sampleName, file(fastq), file(schemeRepo)
@@ -225,13 +226,13 @@ process articMinIONViridian {
 
     tag { prefix }
 
-    publishDir "${params.outdir}/viridian"
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy'
 
     input:
         tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo)
 
     output:
-        tuple prefix, path("${prefix}_outdir/viridian/consensus.final_assembly.fa")
+        tuple prefix, path("${prefix}.fasta")
 
     script:
         """
@@ -241,6 +242,7 @@ process articMinIONViridian {
 		nCoV-artic-v3.bed \
 		${prefix}.fastq.gz \
 		${prefix}_outdir/
+        cp ${prefix}_outdir/viridian/consensus.final_assembly.fasta ${prefix}.fasta
         """
 }
 

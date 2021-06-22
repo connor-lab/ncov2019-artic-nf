@@ -31,6 +31,7 @@ include {makeReport} from '../modules/analysis.nf'
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
 include {Genotyping} from './typing.nf'
+include {downstreamAnalysis} from './analysis.nf'
 
 workflow prepareReferenceFiles {
     // Get reference fasta
@@ -126,27 +127,15 @@ workflow sequenceAnalysis {
                            .join(trimPrimerSequences.out.mapped))
       
 
-      pango(makeConsensus.out)    
-
-      nextclade(makeConsensus.out)
-
-      getVariantDefinitions()
-
-      aln2type(makeConsensus.out.combine(getVariantDefinitions.out).combine(ch_preparedRef))  
-
-      makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out,by:0))
-
-      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
-		storeDir:"${params.outdir}/analysis/report/${params.prefix}" , 
-		keepHeader:true,
-		skip:1)
-
+      downstreamAnalysis(makeConsensus.out, ch_preparedRef, ch_bedFile)
+      
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
                         .join (trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) )
 
       }
       emit:
+      consensus = makeConsensus.out
       qc_pass = collateSamples.out
       variants = callVariants.out.variants
 }
@@ -159,22 +148,9 @@ workflow sequenceAnalysisViridian {
 
     main:
       viridian(ch_filePairs.combine(ch_bedFile).combine(ch_preparedRef))
-      
-      pango(viridian.out)    
-
-      nextclade(viridian.out)
-
-      getVariantDefinitions()
-
-      aln2type(viridian.out.combine(getVariantDefinitions.out).combine(ch_preparedRef))  
-
-      makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out,by:0))
-
-      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
-		storeDir:"${params.outdir}/analysis/report/${params.prefix}" , 
-		keepHeader:true,
-		skip:1)
-
+     
+      downstreamAnalysis(viridian.out, ch_preparedRef, ch_bedFile)
+  
 }
 
 workflow ncovIllumina {
@@ -235,4 +211,5 @@ workflow ncovIlluminaObj {
 
       // Run standard pipeline
       ncovIllumina(getObjFiles.out)
+
 }
