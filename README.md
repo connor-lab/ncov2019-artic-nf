@@ -36,7 +36,7 @@ $ nextflow run main.nf -profile singularity,sge \
     --fast5_pass .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fast5_pass/ \
     --sequencing_summary .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/sequencing_summary_FAK72834_298b7829.txt \
     --scheme-directory primer_schemes/midnight/nCoV-2019/V1/ \
-     --outdir nanopore_test
+    --outdir nanopore_test
 ```
 
 
