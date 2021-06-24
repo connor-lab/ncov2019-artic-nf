@@ -11,16 +11,19 @@ include {readMapping} from '../modules/illumina.nf'
 include {trimPrimerSequences} from '../modules/illumina.nf' 
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
+include {callConsensusFreebayes} from '../modules/illumina.nf'
+
 include {pangolinTyping} from '../modules/typing.nf' 
-include {cramToFastq} from '../modules/illumina.nf'
 include {nextclade} from '../modules/typing.nf'
+include {getVariantDefinitions} from '../modules/analysis.nf'
+include {makeReport} from '../modules/analysis.nf'
+include {cramToFastq} from '../modules/illumina.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
 include {fastqc} from '../modules/qc.nf'
-include {mappingStatistics} from '../modules/qc.nf'
 include {multiqc} from '../modules/qc.nf'
-
+include {mappingStatistics} from '../modules/qc.nf'
 
 include {bamToCram} from '../modules/out.nf'
 
@@ -101,6 +104,9 @@ workflow sequenceAnalysis {
 
       trimPrimerSequences(readMapping.out.combine(ch_bedFile))
 
+      freebayes_out = callConsensusFreebayes(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))     
+      freebayes_consensus_out = freebayes_out[0]
+
       callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) 
 
       makeConsensus(trimPrimerSequences.out.ptrim)
@@ -121,15 +127,25 @@ workflow sequenceAnalysis {
 
       mappingStatistics(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
 
+      multiqc(readTrimming.out.log.collect(), mappingStatistics.out.collect(), fastqc.out.collect())
+      
+      collateSamples(qc.pass.map{ it[0] }
+                           .join(makeConsensus.out, by: 0)
+                           .join(trimPrimerSequences.out.mapped))     
+      
       pangolinTyping(makeConsensus.out.consensus_fasta)
       
       nextclade(makeConsensus.out.consensus_fasta)
 
-      multiqc(readTrimming.out.log.collect(), mappingStatistics.out.collect(), fastqc.out.collect())
+      getVariantDefinitions()
 
-      collateSamples(qc.pass.map{ it[0] }
-                           .join(makeConsensus.out, by: 0)
-                           .join(trimPrimerSequences.out.mapped))     
+      makeReport(pangolinTyping.out.combine(nextclade.out,by:0))
+
+      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
+		  storeDir:"${params.outdir}/AnalysisReport/${params.prefix}" , 
+		  keepHeader:true,
+		  skip:1)
+
 
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 

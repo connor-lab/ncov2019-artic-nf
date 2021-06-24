@@ -88,6 +88,7 @@ process mergeTypingCSVs {
 }
 
 process pangolinTyping {
+    tag { sampleName }
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}.pangolin.csv"
 
@@ -105,16 +106,24 @@ process pangolinTyping {
 }
 
 process nextclade {
+    tag { sampleName }
+
     label 'nextclade'
+    
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}_clade.tsv"
+    
     input:
         tuple val(sampleName), path(consensus_fasta)
+    
     output:
-        tuple val(sampleName), path("${sampleName}_clade.tsv"), emit: determine_mutation
+        tuple(sampleName, path("${sampleName}_tree.json"),
+	    path("${sampleName}.tsv"),path("${sampleName}.json"))
+    
     script:
     """
-    nextclade --input-fasta ${consensus_fasta} --output-tsv tmp.tsv
-    cat tmp.tsv | tr -d "\r" > ${sampleName}_clade.tsv
+    nextclade --input-fasta ${consensus_fasta} \
+        --output-tree ${sampleName}_tree.json \
+        --output-tsv ${sampleName}.tsv \
+        --output-json ${sampleName}.json
     """
 }
-

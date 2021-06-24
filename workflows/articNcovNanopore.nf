@@ -13,13 +13,14 @@ include {articRemoveUnmappedReads} from '../modules/artic.nf'
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
 
+include {pangolinTyping} from '../modules/typing.nf' 
+include {nextclade} from '../modules/typing.nf'
+include {getVariantDefinitions} from '../modules/analysis.nf'
+include {makeReport} from '../modules/analysis.nf'
+
 include {bamToCram} from '../modules/out.nf'
 
 include {collateSamples} from '../modules/upload.nf'
-
-
-include {pangolinTyping} from '../modules/typing.nf' 
-include {nextclade} from '../modules/typing.nf'
 
 // import subworkflows
 include {Genotyping} from './typing.nf'
@@ -58,14 +59,25 @@ workflow sequenceAnalysisNanopolish {
                        }
                        .set { qc }
 
-     writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
+      writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
 
-     collateSamples(qc.pass.map{ it[0] }
-                           .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
-                           .join(articRemoveUnmappedReads.out))
-     pangolinTyping(articMinIONNanopolish.out.consensus_fasta)
+      collateSamples(qc.pass.map{ it[0] }
+                        .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
+                        .join(articRemoveUnmappedReads.out))
      
-     nextclade(articMinIONNanopolish.out.consensus_fasta)
+      pangolinTyping(articMinIONNanopolish.out.consensus_fasta)
+     
+      nextclade(articMinIONNanopolish.out.consensus_fasta)
+     
+      getVariantDefinitions()
+     
+      makeReport(pangolinTyping.out.combine(nextclade.out,by:0))
+     
+      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
+                        storeDir:"${params.outdir}/analysis/report/${params.prefix}" , 
+                        keepHeader:true,
+                        skip:1)
+
 
      if (params.outCram) {
         bamToCram(articMinIONNanopolish.out.ptrim.map{ it[0] } 

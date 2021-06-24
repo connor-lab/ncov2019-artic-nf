@@ -15,6 +15,34 @@ password \
 $
 
 ==NOTE: sge process is not supported on the /gms-storage-aws/, so need to run the pipeline locally from /home==
+--------------
+#### # Things to consider before running the pipeline
+1. Update the Singularity container once in a week
+2. Pangolin version is updating almost every week/twice per week.
+3. For different nanopore pipelines, need to use different primers;
+primer-schemes are designed as per Nanopore protocol, need to choose the right one, before executing the run, 
+```--scheme-directory primer_schemes/[artic/midnight/eden]/nCoV-2019/[Version number]/```
+4. Separate Pangolin Singularity container required for the Nanopore analysis. Need to update the container regularly.
+```docker pull staphb/pangolin:latest
+https://hub.docker.com/r/staphb/pangolin/tags?page=1&ordering=last_updated
+```
+5. Available Containers
+    A. Cloud - 
+    i. Singularity - Illumina, Nanopore, Pangolin
+    ```
+    singularity pull library://jd2112/gms-artic-illumina/gms-artic-illumina.sif:latest
+    singularity pull library://jd2112/gms-artic-illumina/gms-artic-nanopore.sif:latest
+    singularity pull library://jd2112/gms-artic-illumina/pangolin:latest
+    ```
+    ii. Docker - Illumina, Nanopore, Pangolin
+    ```
+    docker pull jd21/gms-artic_illumina:latest
+    docker pull jd21/gms-artic_nanopore:latest
+    docker pull jd21/pangolin:latest
+    ```
+    B. Local
+    iii.Singularity 
+    iv. Conda
 
 ###### 2. Run Illumina pipeline
 ```
@@ -35,7 +63,8 @@ $ nextflow run main.nf -profile singularity,sge \
     --basecalled_fastq .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fastq_pass/ \
     --fast5_pass .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fast5_pass/ \
     --sequencing_summary .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/sequencing_summary_FAK72834_298b7829.txt \
-     --outdir nanopore_test
+    --scheme-directory primer_schemes/midnight/nCoV-2019/V1/ \
+    --outdir nanopore_test
 ```
 
 

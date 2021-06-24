@@ -137,8 +137,9 @@ process callVariants {
 
     script:
         """
+        samtools faidx ${ref}
         samtools mpileup -A -d 0 --reference ${ref} -B -Q 0 ${bam} |\
-        ivar variants -r ${ref} -m ${params.ivarMinDepth} -p ${sampleName}.variants -q ${params.ivarMinVariantQuality} -t ${params.ivarMinFreqThreshold}
+        ivar variants -r ${ref} -m ${params.varMinDepth} -p ${sampleName}.variants -q ${params.varMinVariantQuality} -t ${params.varMinFreqThreshold}
         """
 }
 
@@ -157,8 +158,63 @@ process makeConsensus {
     script:
         """
         samtools mpileup -aa -A -B -d ${params.mpileupDepth} -Q0 ${bam} | \
-        ivar consensus -t ${params.ivarFreqThreshold} -m ${params.ivarMinDepth} \
+        ivar consensus -t ${params.varFreqThreshold} -m ${params.varMinDepth} \
         -n N -p ${sampleName}.primertrimmed.consensus
+        """
+}
+
+process callConsensusFreebayes {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.consensus.fasta", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.variants.norm.vcf", mode: 'copy'
+
+    input:
+    tuple(sampleName, path(bam), path(ref))
+
+    output:
+    tuple sampleName, path("${sampleName}.consensus.fasta")
+    tuple sampleName, path("${sampleName}.variants.norm.vcf")
+
+    script:
+        """
+        # the sed is to fix the header until a release is made with this fix
+        # https://github.com/freebayes/freebayes/pull/549
+        freebayes -p 1 \
+                  -f ${ref} \
+                  -F 0.2 \
+                  -C 1 \
+                  --pooled-continuous \
+                  --min-coverage ${params.varMinDepth} \
+                  --gvcf --gvcf-dont-use-chunk true ${bam} | sed s/QR,Number=1,Type=Integer/QR,Number=1,Type=Float/ > ${sampleName}.gvcf
+
+        # make depth mask, split variants into ambiguous/consensus
+        # NB: this has to happen before bcftools norm or else the depth mask misses any bases exposed during normalization
+        process_gvcf.py -d ${params.varMinDepth} \
+                        -l ${params.varMinFreqThreshold} \
+                        -u ${params.varFreqThreshold} \
+                        -m ${sampleName}.mask.txt \
+                        -v ${sampleName}.variants.vcf \
+                        -c ${sampleName}.consensus.vcf ${sampleName}.gvcf
+
+        # normalize variant records into canonical VCF representation
+        for v in "variants" "consensus"; do
+            bcftools norm -f ${ref} ${sampleName}.\$v.vcf > ${sampleName}.\$v.norm.vcf
+        done
+
+        # split the consensus sites file into a set that should be IUPAC codes and all other bases, using the ConsensusTag in the VCF
+        for vt in "ambiguous" "fixed"; do
+            cat ${sampleName}.consensus.norm.vcf | awk -v vartag=ConsensusTag=\$vt '\$0 ~ /^#/ || \$0 ~ vartag' > ${sampleName}.\$vt.norm.vcf
+            bgzip -f ${sampleName}.\$vt.norm.vcf
+            tabix -f -p vcf ${sampleName}.\$vt.norm.vcf.gz
+        done
+
+        # apply ambiguous variants first using IUPAC codes. this variant set cannot contain indels or the subsequent step will break
+        bcftools consensus -f ${ref} -I ${sampleName}.ambiguous.norm.vcf.gz > ${sampleName}.ambiguous.fasta
+
+        # apply remaining variants, including indels
+        bcftools consensus -f ${sampleName}.ambiguous.fasta -m ${sampleName}.mask.txt ${sampleName}.fixed.norm.vcf.gz | sed s/MN908947.3/${sampleName}/ > ${sampleName}.consensus.fasta
         """
 }
 
