@@ -36,9 +36,9 @@ https://hub.docker.com/r/staphb/pangolin/tags?page=1&ordering=last_updated
     ```
     ii. Docker - Illumina, Nanopore, Pangolin
     ```
-    docker push jd21/gms-artic_illumina:latest
-    docker push jd21/gms-artic_nanopore:latest
-    docker push jd21/pangolin:latest
+    docker pull jd21/gms-artic_illumina:latest
+    docker pull jd21/gms-artic_nanopore:latest
+    docker pull jd21/pangolin:latest
     ```
     B. Local
     iii.Singularity 
