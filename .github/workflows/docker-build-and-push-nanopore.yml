@@ -53,7 +53,8 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
       - name: Push latest
-        if: ${{ github.event_name != 'pull_request' && startsWith(github.event.ref, 'refs/tags/v')}}
+        if: ${{ github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/v')}}
         run: |
-          docker tag $IMAGE_NAME $IMAGE_ID:latest
-          docker push $IMAGE_ID:latest
+          LATEST=latest
+          docker tag $IMAGE_NAME $IMAGE_ID:$LATEST
+          docker push $IMAGE_ID:$LATEST
