@@ -1,0 +1,120 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/./master/nextflow_schema.json",
+    "title": ". pipeline parameters",
+    "description": "Nextflow for running the Artic ncov2019 pipeline",
+    "type": "object",
+    "definitions": {
+        "input_output_options": {
+            "title": "Input/output options",
+            "type": "object",
+            "fa_icon": "fas fa-terminal",
+            "description": "Define where the pipeline should find input data and save output data.",
+            "properties": {
+                "outdir": {
+                    "type": "string",
+                    "description": "The output directory where the results will be saved.",
+                    "default": "results",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "basecalled_fastq": {
+                    "type": "string"
+                },
+                "fast5_pass": {
+                    "type": "string"
+                },
+                "medaka": {
+                    "type": "boolean"
+                },
+                "illumina": {
+                    "type": "boolean"
+                },
+                "nanopolish": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "generic_options": {
+            "title": "Generic options",
+            "type": "object",
+            "fa_icon": "fas fa-file-import",
+            "description": "Less common options for the pipeline, typically set in a config file.",
+            "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
+            "properties": {
+                "help": {
+                    "type": "boolean",
+                    "description": "Display help text.",
+                    "hidden": true,
+                    "fa_icon": "fas fa-question-circle"
+                },
+                "tracedir": {
+                    "type": "string",
+                    "description": "Directory to keep pipeline Nextflow logs and reports.",
+                    "default": "${params.outdir}/pipeline_info",
+                    "fa_icon": "fas fa-cogs",
+                    "hidden": true
+                }
+            }
+        },
+        "max_job_request_options": {
+            "title": "Max job request options",
+            "type": "object",
+            "fa_icon": "fab fa-acquisitions-incorporated",
+            "description": "Set the top limit for requested resources for any single job.",
+            "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details."
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/generic_options"
+        },
+        {
+            "$ref": "#/definitions/max_job_request_options"
+        }
+    ],
+    "properties": {
+        "cache": {
+            "type": "string"
+        },
+        "directory": {
+            "type": "string"
+        },
+        "prefix": {
+            "type": "string"
+        },
+        "sequencing_summary": {
+            "type": "string"
+        },
+        "ref": {
+            "type": "string"
+        },
+        "bed": {
+            "type": "string"
+        },
+        "gff": {
+            "type": "string"
+        },
+        "profile": {
+            "type": "string"
+        },
+        "schemeRepoURL": {
+            "type": "string",
+            "default": "https://github.com/artic-network/primer-schemes.git"
+        },
+        "schemeDir": {
+            "type": "string",
+            "default": "primer-schemes"
+        },
+        "scheme": {
+            "type": "string",
+            "default": "nCoV-2019"
+        },
+        "schemeVersion": {
+            "type": "string",
+            "default": "V3"
+        }
+    }
+}
