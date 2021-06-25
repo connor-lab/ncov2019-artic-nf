@@ -9,7 +9,7 @@ RUN /opt/conda/bin/conda install mamba -c conda-forge && \
 
 FROM debian:buster-slim
 RUN apt-get update && \
-apt-get install -y git procps && \
+apt-get install -y git procps wget && \
 apt-get clean -y
 COPY --from=condabuild /opt/conda/envs/artic /opt/conda/envs/artic
 ENV PATH=/opt/conda/envs/artic/bin:$PATH

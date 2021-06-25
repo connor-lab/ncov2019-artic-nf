@@ -14,7 +14,9 @@ process articDownloadScheme{
 
     script:
     """
-    git clone ${params.schemeRepoURL} ${params.schemeDir}
+    wget https://codeload.github.com/artic-network/primer-schemes/tar.gz/refs/tags/v1.1.1 -O primer-schemes.tar.gz
+    tar xvfz primer-schemes.tar.gz
+    mv primer-schemes-1.1.1 primer-schemes
     """
 }
 
