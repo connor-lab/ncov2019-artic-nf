@@ -28,8 +28,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build image
-        run: docker build . --file environments/nanopore/Dockerfile --tag $IMAGE_NAME-nanopore --label "runnumber=${GITHUB_RUN_ID}"
-        run: docker build . --file environments/illumina/Dockerfile --tag $IMAGE_NAME-illumina --label "runnumber=${GITHUB_RUN_ID}"
+        run: |
+          docker build . --file environments/nanopore/Dockerfile --tag $IMAGE_NAME-nanopore --label "runnumber=${GITHUB_RUN_ID}"
+          docker build . --file environments/illumina/Dockerfile --tag $IMAGE_NAME-illumina --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Log in to registry
         if: ${{ github.event_name != 'pull_request' }}
@@ -60,4 +61,3 @@ jobs:
           docker push $IMAGE_ID:latest-nanopore
           docker tag $IMAGE_NAME-illumina $IMAGE_ID:latest-illumina
           docker push $IMAGE_ID:latest-illumina
-          
