@@ -52,3 +52,8 @@ jobs:
           echo VERSION=$VERSION
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+      - name: Push latest
+        if: ${{ github.event_name != 'pull_request' && startsWith(github.event.release.tag_name, 'v')}}
+        run: |
+          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          docker push $IMAGE_ID:latest
