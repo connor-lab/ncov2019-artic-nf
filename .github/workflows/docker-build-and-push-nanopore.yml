@@ -7,8 +7,6 @@ on:
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
-  # Run tests for any PRs.
-  pull_request:
 
 env:
   REGISTRY: ghcr.io
@@ -33,6 +31,7 @@ jobs:
       #   run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Push image
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
 
