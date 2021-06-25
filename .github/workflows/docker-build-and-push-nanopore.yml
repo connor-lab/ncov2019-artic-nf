@@ -27,8 +27,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      name: tag number
-      run : echo ${{ github.event.release.tag_name }}
+      - name: tag number
+        run : echo ${{ github.event.release.tag_name }}
 
       # - name: Build image
       #   run: docker build . --file environments/nanopore/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
