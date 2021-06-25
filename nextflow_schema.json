@@ -5,8 +5,8 @@
     "description": "Nextflow for running the Artic ncov2019 pipeline",
     "type": "object",
     "definitions": {
-        "input_output_options": {
-            "title": "Input/output options",
+        "output_options": {
+            "title": "Output options",
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
@@ -17,22 +17,54 @@
                     "default": "./results",
                     "fa_icon": "fas fa-folder-open"
                 },
-                "basecalled_fastq": {
-                    "type": "string"
-                },
-                "fast5_pass": {
-                    "type": "string"
-                },
-                "medaka": {
-                    "type": "boolean"
-                },
-                "illumina": {
-                    "type": "boolean"
-                },
-                "nanopolish": {
-                    "type": "boolean"
+                "prefix": {
+                    "type": "string",
+                    "description": "A prefix for your output files"
                 }
             }
+        },
+        "nanopore_parameters": {
+            "title": "Nanopore Parameters",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "basecalled_fastq": {
+                    "type": "string",
+                    "description": "A directory containing basecalled fastqs",
+                    "help_text": "This is the output directory from guppy_barcoder or guppy_basecaller, usually fastq_pass"
+                },
+                "medaka": {
+                    "type": "boolean",
+                    "description": "correct the consensus sequence using medaka"
+                },
+                "nanopolish": {
+                    "type": "boolean",
+                    "description": "correct the consensus sequence using nanopolish"
+                },
+                "fast5_pass": {
+                    "type": "string",
+                    "description": "A directory containing fast5 files (only required when specifying nanopolish)"
+                }
+            },
+            "fa_icon": "fas fa-dna"
+        },
+        "illumina_parameters": {
+            "title": "Illumina parameters",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "illumina": {
+                    "type": "boolean",
+                    "description": "Specify this to use Illumina reads"
+                },
+                "directory": {
+                    "type": "string",
+                    "description": "A directory containing fastqs or CRAMs"
+                }
+            },
+            "fa_icon": "far fa-lightbulb"
         },
         "generic_options": {
             "title": "Generic options",
@@ -55,34 +87,24 @@
                     "hidden": true
                 }
             }
-        },
-        "max_job_request_options": {
-            "title": "Max job request options",
-            "type": "object",
-            "fa_icon": "fab fa-acquisitions-incorporated",
-            "description": "Set the top limit for requested resources for any single job.",
-            "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details."
         }
     },
     "allOf": [
         {
-            "$ref": "#/definitions/input_output_options"
+            "$ref": "#/definitions/output_options"
+        },
+        {
+            "$ref": "#/definitions/nanopore_parameters"
+        },
+        {
+            "$ref": "#/definitions/illumina_parameters"
         },
         {
             "$ref": "#/definitions/generic_options"
-        },
-        {
-            "$ref": "#/definitions/max_job_request_options"
         }
     ],
     "properties": {
         "cache": {
-            "type": "string"
-        },
-        "directory": {
-            "type": "string"
-        },
-        "prefix": {
             "type": "string"
         },
         "sequencing_summary": {
