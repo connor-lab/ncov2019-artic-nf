@@ -8,7 +8,7 @@ process typeVariants {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}/typing", pattern: "${sampleName}.typing.csv", mode: 'copy'
 
     input:
-    tuple sampleName, path(variants), path(gff), path(ref), path(yaml)
+    tuple val(sampleName), path(variants), path(gff), path(ref), path(yaml)
 
     output:
     path "${sampleName}.variants.csv", optional: true, emit: variants_csv

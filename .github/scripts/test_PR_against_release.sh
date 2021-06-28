@@ -6,7 +6,7 @@ export PATH=/opt/conda/bin:$PATH
 singularity --version
 # write test log as github Action artifact
 echo Nextflow run current PR in --illumina mode.. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.1 nextflow run ./main.nf \
        -profile singularity \
        --directory $PWD/.github/data/fastqs/ \
        --illumina \
@@ -25,7 +25,7 @@ git checkout tags/v1.1.1
 sed -i s'/cpus = 4/cpus = 2/'g conf/resources.config
 ln -s ../*.sif ./
 echo Nextflow run previous release in --illumina mode.. >> ../artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.1 nextflow run ./main.nf \
        -profile singularity \
        --directory $PWD/../.github/data/fastqs/ \
        --illumina \

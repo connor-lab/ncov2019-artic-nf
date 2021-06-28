@@ -15,18 +15,18 @@ jobs:
       run: mkdir artifacts
     - name: install Singularity
       run: |
-       bash .github/scripts/install_singularity.sh
+        bash .github/scripts/install_singularity.sh
     - name: Build pipeline Singularity containers
       run: |
-       echo $(which singularity)
-       bash scripts/build_singularity_containers.sh
+        echo $(which singularity)
+        bash scripts/build_singularity_containers.sh
     - name: install Conda
       run: bash .github/scripts/install_conda.sh
     - name: install Nextflow via Conda
       run: |
-       export PATH=/opt/conda/bin:$PATH
-       conda install -c bioconda nextflow
-       NXF_VER=20.03.0-edge nextflow -version
+        export PATH=/opt/conda/bin:$PATH
+        conda install -c bioconda nextflow
+        NXF_VER=21.04.1 nextflow -version
     - name: test nanopore pipelines
       run: bash .github/scripts/test_nanopore_pipelines.sh
     - name: test typing functionality
