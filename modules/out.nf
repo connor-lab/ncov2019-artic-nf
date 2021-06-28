@@ -11,11 +11,11 @@ process bamToCram {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${bam.baseName}.cram.crai", mode: 'copy'
 
     input:
-        tuple(sampleName, path(bam), path(ref))
+        tuple(val(sampleName), path(bam), path(ref))
 
     output:
-        tuple sampleName, path("${bam.baseName}.cram"), emit: cramed
-        tuple sampleName, path("${bam.baseName}.cram.crai"), emit: cramedidx
+        tuple val(sampleName), path("${bam.baseName}.cram"), emit: cramed
+        tuple val(sampleName), path("${bam.baseName}.cram.crai"), emit: cramedidx
 
     script:
         """

@@ -6,7 +6,7 @@ export PATH=/opt/conda/bin:$PATH
 # there are only 2 available cpus in the github runner execution
 sed -i s'/cpus = 4/cpus = 2/'g conf/coguk/sanger.config
 echo run pipeline in --illumina mode with --sanger profile.. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.1 nextflow run ./main.nf \
        -profile sanger,singularity \
        --directory $PWD/.github/data/fastqs/ \
        --illumina \
