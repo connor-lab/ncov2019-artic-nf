@@ -6,7 +6,7 @@ export PATH=/opt/conda/bin:$PATH
 singularity --version
 # write test log as github Action artifact
 echo "Nextflow run current PR in --nanopolish mode with typing.." >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.1 nextflow run ./main.nf \
        -profile singularity \
        --gff $PWD/typing/MN908947.3.gff \
        --yaml $PWD/typing/SARS-CoV-2.types.yaml \
@@ -19,7 +19,7 @@ cp .nextflow.log artifacts/nanopolish_typing.nextflow.log
 rm -rf results && rm -rf work && rm -rf .nextflow*
 
 echo "Nextflow run current PR in --medaka mode with typing .." >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.1 nextflow run ./main.nf \
        -profile singularity \
        --medaka \
        --gff $PWD/typing/MN908947.3.gff \
@@ -30,7 +30,7 @@ cp .nextflow.log artifacts/medaka_typing.nextflow.log
 rm -rf results && rm -rf work && rm -rf .nextflow*
 
 echo Nextflow run current PR in --illumina mode with typing.. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.1 nextflow run ./main.nf \
        -profile singularity \
        --gff $PWD/typing/MN908947.3.gff \
        --yaml $PWD/typing/SARS-CoV-2.types.yaml \

@@ -13,4 +13,3 @@ apt-get install -y git procps && \
 apt-get clean -y
 COPY --from=condabuild /opt/conda/envs/artic /opt/conda/envs/artic
 ENV PATH=/opt/conda/envs/artic/bin:$PATH
-ENTRYPOINT ["/opt/conda/envs/artic/bin/artic"]

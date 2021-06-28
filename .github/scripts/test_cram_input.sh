@@ -14,7 +14,7 @@ echo bed file: $BED_FILE
 sed -i s'/cpus = 4/cpus = 2/'g conf/coguk/sanger.config
 singularity --version
 echo Nextflow run --illumina mode with --ref, --bed and --cram.. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.1 nextflow run ./main.nf \
        -profile sanger,singularity \
        --ref $REF_FILE \
        --bed $BED_FILE \

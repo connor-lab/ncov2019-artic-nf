@@ -1,0 +1,142 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/./master/nextflow_schema.json",
+    "title": ". pipeline parameters",
+    "description": "Nextflow for running the Artic ncov2019 pipeline",
+    "type": "object",
+    "definitions": {
+        "output_options": {
+            "title": "Output options",
+            "type": "object",
+            "fa_icon": "fas fa-terminal",
+            "description": "Define where the pipeline should find input data and save output data.",
+            "properties": {
+                "outdir": {
+                    "type": "string",
+                    "description": "The output directory where the results will be saved.",
+                    "default": "./results",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "prefix": {
+                    "type": "string",
+                    "description": "A prefix for your output files"
+                }
+            }
+        },
+        "nanopore_parameters": {
+            "title": "Nanopore Parameters",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "basecalled_fastq": {
+                    "type": "string",
+                    "description": "A directory containing basecalled fastqs",
+                    "help_text": "This is the output directory from guppy_barcoder or guppy_basecaller, usually fastq_pass"
+                },
+                "medaka": {
+                    "type": "boolean",
+                    "description": "correct the consensus sequence using medaka"
+                },
+                "nanopolish": {
+                    "type": "boolean",
+                    "description": "correct the consensus sequence using nanopolish"
+                },
+                "fast5_pass": {
+                    "type": "string",
+                    "description": "A directory containing fast5 files (only required when specifying nanopolish)"
+                }
+            },
+            "fa_icon": "fas fa-dna"
+        },
+        "illumina_parameters": {
+            "title": "Illumina parameters",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "illumina": {
+                    "type": "boolean",
+                    "description": "Specify this to use Illumina reads"
+                },
+                "directory": {
+                    "type": "string",
+                    "description": "A directory containing fastqs or CRAMs"
+                }
+            },
+            "fa_icon": "far fa-lightbulb"
+        },
+        "generic_options": {
+            "title": "Generic options",
+            "type": "object",
+            "fa_icon": "fas fa-file-import",
+            "description": "Less common options for the pipeline, typically set in a config file.",
+            "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
+            "properties": {
+                "help": {
+                    "type": "boolean",
+                    "description": "Display help text.",
+                    "hidden": true,
+                    "fa_icon": "fas fa-question-circle"
+                },
+                "tracedir": {
+                    "type": "string",
+                    "description": "Directory to keep pipeline Nextflow logs and reports.",
+                    "default": "${params.outdir}/pipeline_info",
+                    "fa_icon": "fas fa-cogs",
+                    "hidden": true
+                }
+            }
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/definitions/output_options"
+        },
+        {
+            "$ref": "#/definitions/nanopore_parameters"
+        },
+        {
+            "$ref": "#/definitions/illumina_parameters"
+        },
+        {
+            "$ref": "#/definitions/generic_options"
+        }
+    ],
+    "properties": {
+        "cache": {
+            "type": "string"
+        },
+        "sequencing_summary": {
+            "type": "string"
+        },
+        "ref": {
+            "type": "string"
+        },
+        "bed": {
+            "type": "string"
+        },
+        "gff": {
+            "type": "string"
+        },
+        "profile": {
+            "type": "string"
+        },
+        "schemeRepoURL": {
+            "type": "string",
+            "default": "https://github.com/artic-network/primer-schemes.git"
+        },
+        "schemeDir": {
+            "type": "string",
+            "default": "primer-schemes"
+        },
+        "scheme": {
+            "type": "string",
+            "default": "nCoV-2019"
+        },
+        "schemeVersion": {
+            "type": "string",
+            "default": "V3"
+        }
+    }
+}

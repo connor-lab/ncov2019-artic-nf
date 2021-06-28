@@ -14,7 +14,7 @@ echo bed file: $BED_FILE >> artifacts/test_artifact.log
 # run current pull request code
 singularity --version
 echo Nextflow run --illumina mode with --ref, --bed .. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.1 nextflow run ./main.nf \
        -profile singularity \
        --ref $REF_FILE \
        --bed $BED_FILE \
@@ -58,7 +58,7 @@ rm $REF_FILE
 ln -s $REAL_REF $REF_FILE
 
 echo Nextflow run --illumina mode with symlinked --ref, --bed .. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.1 nextflow run ./main.nf \
        -profile singularity \
        --ref $REF_FILE \
        --bed $BED_FILE \
