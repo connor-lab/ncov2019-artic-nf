@@ -242,7 +242,7 @@ process articMinIONViridian {
 		nCoV-artic-v3.bed \
 		${prefix}.fastq.gz \
 		${prefix}_outdir/
-        cp ${prefix}_outdir/viridian/consensus.final_assembly.fasta ${prefix}.fasta
+        cp ${prefix}_outdir/viridian/consensus.final_assembly.fa ${prefix}.fasta
         """
 }
 
