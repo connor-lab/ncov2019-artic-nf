@@ -196,7 +196,7 @@ process getObjFiles {
         tuple bucket, filePrefix, prefix
 
     output:
-        tuple prefix, path("${prefix}_C1.fastq.gz"), path("${prefix}_C2.fastq.gz")
+        tuple prefix, path("${prefix}_C1.filt.fastq.gz"), path("${prefix}_C2.filt.fastq.gz")
 
     script:
 	db=params.krakdb
@@ -217,8 +217,8 @@ process getObjFiles {
         awk '\$3==\"9606\" { print \$2 }' ${prefix}_read_classification >> kraken2_human_read_list
         awk '\$3!=\"9606\" { print \$2 }' ${prefix}_read_classification >> kraken2_nonhuman_read_list
 
-	seqtk subseq ${filePrefix}*1.fastq.gz kraken2_nonhuman_read_list | gzip > "${prefix}_C1.fastq.gz"
-	seqtk subseq ${filePrefix}*2.fastq.gz kraken2_nonhuman_read_list | gzip > "${prefix}_C2.fastq.gz"
+	seqtk subseq ${filePrefix}*1.fastq.gz kraken2_nonhuman_read_list | gzip > "${prefix}_C1.filt.fastq.gz"
+	seqtk subseq ${filePrefix}*2.fastq.gz kraken2_nonhuman_read_list | gzip > "${prefix}_C2.filt.fastq.gz"
 	"""
 }
 
