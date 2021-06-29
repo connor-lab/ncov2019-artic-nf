@@ -185,7 +185,7 @@ process getObjFilesONT {
     tag { prefix }
 
     input:
-        tuple bucket, prefix
+        tuple bucket, filePrefix, prefix
 
     output:
         tuple prefix, path("${prefix}.fastq.gz")
@@ -198,18 +198,18 @@ process getObjFilesONT {
 		--download-dir ./ \
 		--overwrite \
 		--auth instance_principal \
-		--prefix $prefix
+		--prefix $filePrefix
 
 	kraken2 -db ${db} \
 		--memory-mapping \
 		--report ${prefix}_summary.txt \
 		--output ${prefix}_read_classification \
-        	*.fastq.gz 
+        	${filePrefix}**.fastq.gz 
 
         awk '\$3==\"9606\" { print \$2 }' ${prefix}_read_classification >> kraken2_human_read_list
         awk '\$3!=\"9606\" { print \$2 }' ${prefix}_read_classification >> kraken2_nonhuman_read_list
 
-        seqs=*.fastq.gz
+        seqs=${filePrefix}**.fastq.gz
         for seq in \${seqs}
         do
 	    seqtk subseq \${seq} kraken2_nonhuman_read_list | gzip >> "${prefix}.fastq.gz"
