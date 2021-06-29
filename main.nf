@@ -34,7 +34,7 @@ if (params.profile){
 }
 
 if ( params.illumina ) {
-   if ( !params.directory && !params.objstore ) {
+   if ( !params.directory && !params.objstore && !params.catsup) {
        println("Please supply a directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
        println("Use --help to print help")
        System.exit(1)
@@ -59,11 +59,11 @@ if ( params.illumina ) {
        System.exit(1)
    }
 } else if ( params.medaka ) {
-   if (! params.basecalled_fastq && !params.objstore ) {
+   if (! params.basecalled_fastq && !params.objstore && !params.catsup ) {
        println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
    }
 } else if ( params.viridian ) {
-   if (! params.basecalled_fastq && !params.objstore ) {
+   if (! params.basecalled_fastq && !params.objstore && !params.catsup ) {
        println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
    }
 } else if ( params.analysis ) {
@@ -103,10 +103,17 @@ workflow {
                   .map { file -> tuple(file.baseName, file) }
                   .set{ ch_cramFiles }
        }
-       else if (params.objstore) {
+       else if (params.objstore != false) {
            Channel.fromPath( "${params.objstore}" )
                   .splitCsv()
-                  .map { row -> tuple(row[0], row[1]) }
+                  .map { row -> tuple(row[0], row[1], row[1]) }
+                  .set{ ch_objFiles }
+       }
+       else if (params.catsup != false) {
+           Channel.fromPath( "${params.catsup}/sp3data.csv" )
+                  .splitCsv(header: true)
+                  .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
+                  .unique()
                   .set{ ch_objFiles }
        }
        else {
@@ -125,7 +132,15 @@ workflow {
        if (params.objstore) {
            Channel.fromPath( "${params.objstore}" )
                   .splitCsv()
-                  .map { row -> tuple(row[0], row[1]) }
+                  .map { row -> tuple(row[0], row[1], row[1]) }
+                  .set{ ch_objFiles }
+       }
+       else if (params.catsup != false) {
+           Channel.fromPath( "${params.catsup}/sp3data.csv" )
+                  .splitCsv(header: true)
+                  .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
+                  .view()
+                  .unique()
                   .set{ ch_objFiles }
        }
        else{
@@ -155,7 +170,7 @@ workflow {
 
    main:
      if ( params.nanopolish || params.medaka || (params.viridian && !params.illumina )) {
-	if ( params.objstore ) {
+	if ( params.objstore || params.catsup ) {
 	     articNcovNanopore(ch_objFiles)
 	}
 	else {
@@ -165,7 +180,7 @@ workflow {
          if ( params.cram ) {
             ncovIlluminaCram(ch_cramFiles)
          }
-         else if ( params.objstore ) {
+         else if ( params.objstore || params.catsup ) {
             ncovIlluminaObj(ch_objFiles)
          }
          else {

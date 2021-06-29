@@ -113,6 +113,7 @@ process FN4_upload {
 
     oci os object put \
 	-bn FN4-queue \
+	--force \
         --auth instance_principal \
 	--file ${sampleName}.fasta \
 	--metadata "{\\"sampleID\\":\\"$sampleName\\"}"
