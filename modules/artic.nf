@@ -188,7 +188,7 @@ process getObjFilesONT {
         tuple bucket, filePrefix, prefix
 
     output:
-        tuple prefix, path("${prefix}.fastq.gz")
+        tuple prefix, path("${prefix}.filt.fastq.gz")
 
     script:
 	db=params.krakdb
@@ -212,7 +212,7 @@ process getObjFilesONT {
         seqs=${filePrefix}**.fastq.gz
         for seq in \${seqs}
         do
-	    seqtk subseq \${seq} kraken2_nonhuman_read_list | gzip >> "${prefix}.fastq.gz"
+	    seqtk subseq \${seq} kraken2_nonhuman_read_list | gzip >> "${prefix}.filt.fastq.gz"
 	done
 	"""
 }
