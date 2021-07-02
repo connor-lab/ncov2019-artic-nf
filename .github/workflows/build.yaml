@@ -23,7 +23,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: environments/illumina
+          file: environments/illumina/Dockerfile
           tags: oxfordmmm/artic-ncov2019-illumina:latest, oxfordmmm/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
           push: true
           no-cache: true
@@ -73,7 +73,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: environments/nanopore
+          file: environments/nanopore/Dockerfile
           tags: oxfordmmm/artic-ncov2019-nanopore:latest, oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
           push: true
           no-cache: true
