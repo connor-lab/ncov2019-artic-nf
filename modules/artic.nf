@@ -5,7 +5,7 @@ process articDownloadScheme{
 
     label 'internet'
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "scheme", mode: "copy"
+//    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "scheme", mode: "copy"
 
     output:
     path "${params.schemeDir}/${params.scheme}/${params.schemeVersion}/*.reference.fasta" , emit: reffasta
@@ -46,7 +46,7 @@ process articMinIONMedaka {
 
     cpus 4
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
+//    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
     publishDir "${params.outdir}/consensus_seqs/", pattern: "${sampleName}.consensus.fasta", mode: "copy"
 
     input:

@@ -97,7 +97,7 @@ workflow sequenceAnalysisMedaka {
     main:
       articDownloadScheme()
 
-      if (params.objstore) {
+      if (params.objstore || params.catsup) {
           getObjFilesONT(ch_runFastqDirs)
           articGuppyPlex(getObjFilesONT.out)
       }
