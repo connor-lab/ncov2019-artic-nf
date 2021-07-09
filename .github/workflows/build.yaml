@@ -1,0 +1,107 @@
+name: Build ncov2019-artic-nf images
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-illumina-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          file: environments/illumina/Dockerfile
+          tags: oxfordmmm/artic-ncov2019-illumina:latest, oxfordmmm/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
+          push: true
+          no-cache: true
+      -
+        name: Docker digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+  build-illumina-sing:
+    runs-on: ubuntu-latest
+    needs: build-illumina-docker 
+    strategy:
+      matrix:
+        singularity_version:
+          - '3.5.3'
+    container:
+      image: quay.io/singularity/singularity:v${{ matrix.singularity_version }}
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - 
+        name: build singularity
+        run: |
+          singularity build artic-ncov2019-illumina_${{env.RELEASE_VERSION}}.sif docker://oxfordmmm/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artic-ncov2019-illumina_*.sif
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  build-nanopore-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          file: environments/nanopore/Dockerfile
+          tags: oxfordmmm/artic-ncov2019-nanopore:latest, oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
+          push: true
+          no-cache: true
+      -
+        name: Docker digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+  build-nanopore-sing:
+    runs-on: ubuntu-latest
+    needs: build-nanopore-docker 
+    strategy:
+      matrix:
+        singularity_version:
+          - '3.5.3'
+    container:
+      image: quay.io/singularity/singularity:v${{ matrix.singularity_version }}
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - 
+        name: build singularity
+        run: |
+          singularity build artic-ncov2019-nanopore_${{env.RELEASE_VERSION}}.sif docker://oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artic-ncov2019-nanopore_*.sif
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
