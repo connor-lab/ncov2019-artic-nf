@@ -12,7 +12,7 @@ process collateSamples {
     script:
     """
     mkdir ${sampleName}
-    mv ${bam} ${fasta} ${sampleName}
+    mv ${fasta} ${sampleName}
     """
 }
 

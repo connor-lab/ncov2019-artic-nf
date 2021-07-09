@@ -26,8 +26,7 @@ process nextclade {
     tuple(sampleName,  path(fasta))
 
     output:
-    tuple(sampleName, path("${sampleName}_tree.json"),
-	path("${sampleName}.tsv"),path("${sampleName}.json"))
+    tuple(sampleName, path("${sampleName}.tsv"))
 
     script:
     """
@@ -83,11 +82,11 @@ process makeReport {
     publishDir "${params.outdir}/analysis/report/${params.prefix}", mode: 'copy'
 
     input:
-    tuple(sampleName, path('pango.csv'), path('aln2type.csv'), path('nextclade_tree.json'), path('nextclade.tsv'),
-		path('nextclade.json'))
+    tuple(sampleName, path('pango.csv'), path('aln2type.csv'), path('nextclade.tsv'))
 
     output:
     path("${sampleName}_report.tsv"), emit: tsv
+    path("${sampleName}_report.json"), emit: json
 
     script:
     """
