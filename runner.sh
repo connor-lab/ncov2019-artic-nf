@@ -38,6 +38,9 @@ echo "
       DELETING SAMPLE DIRECTORY $ILLUM_RES 
       ======================================="
 
+mkdir $ILLUM_RES
+cp -r $PWD/data/illumina/$ILLUM_RES $PWD/$ILLUM_RES
+wait
 rm -rf $PWD/data/illumina/$ILLUM_RES
 
 elif [ $OUT_DIRS == "artic" ]; then
@@ -65,6 +68,9 @@ echo "
       DELETING SAMPLE DIRECTORY $ARTIC_RES 
       ===================================="
 
+mkdir $ARTIC_RES
+cp -r $PWD/data/artic/$ARTIC_RES $PWD/$ARTIC_RES
+wait
 rm -rf $PWD/data/artic/$ARTIC_RES
 
 else [ $OUT_DIRS == "midnight" ]
@@ -93,5 +99,8 @@ echo "
       DELETING SAMPLE DIRECTORY $MIDNIGHT_RES 
       ======================================="
 
+mkdir $MIDNIGHT_RES
+cp -r $PWD/data/midnight/$MIDNIGHT_RES $PWD/$MIDNIGHT_RES
+wait
 rm -rf $PWD/data/midnight/$MIDNIGHT_RES
 fi
