@@ -24,10 +24,10 @@ echo "
       ====================================== 
       START ANALYSIS WITH ILLUMINA PIPELINE 
       ======================================"
-#nextflow run main.nf -profile singularity \
-#    --illumina --prefix "${ILLUM_RES}_illumina"     \
-#    --directory data/   \
-#    --outdir ${ILLUM_RES}_Results_`date +%Y-%m-%d`
+nextflow run main.nf -profile singularity \
+    --illumina --prefix "${ILLUM_RES}_illumina"     \
+    --directory data/   \
+    --outdir ${ILLUM_RES}_Results_`date +%Y-%m-%d`
 wait
 echo "
      ====================================
@@ -52,12 +52,12 @@ echo "
       ===========================================
       START ANALYSIS WITH NANOPORE ARTIC PIPELINE 
       ==========================================="
-#nextflow run main.nf -profile singularity \
-#    --nanopolish --prefix "${ARTIC_RES}_nanopore" \
-#    --basecalled_fastq data/artic/${ARTIC_RES}/fastq_pass/ \
-#    --fast5_pass data/artic/${ARTIC_RES}/fast5_pass/ \
-#    --sequencing_summary data/artic/${ARTIC_RES}/*.txt \
-#    --outdir ${ARTIC_RES}_Results_`date +%Y-%m-%d`
+nextflow run main.nf -profile singularity \
+    --nanopolish --prefix "${ARTIC_RES}_nanopore" \
+    --basecalled_fastq data/artic/${ARTIC_RES}/fastq_pass/ \
+    --fast5_pass data/artic/${ARTIC_RES}/fast5_pass/ \
+    --sequencing_summary data/artic/${ARTIC_RES}/*.txt \
+    --outdir ${ARTIC_RES}_Results_`date +%Y-%m-%d`
 wait
 echo "
      ======================================
@@ -82,13 +82,13 @@ echo "
       ==============================================
       START ANALYSIS WITH NANOPORE MIDNIGHT PIPELINE 
       =============================================="
-#nextflow run main.nf -profile singularity \
-#    --nanopolish --prefix "${MIDNIGHT_RES}_nanopore" \
-#    --basecalled_fastq data/midnight/${MIDNIGHT_RES}/fastq_pass/ \
-#    --fast5_pass data/midnight/${MIDNIGHT_RES}/fast5_pass/ \
-#    --sequencing_summary data/midnight/${MIDNIGHT_RES}/*.txt \
-#    --scheme-directory primer_schemes/midnight/nCoV-2019/V1/ \
-#    --outdir ${MIDNIGHT_RES}_Results_`date +%Y-%m-%d`
+nextflow run main.nf -profile singularity \
+    --nanopolish --prefix "${MIDNIGHT_RES}_nanopore" \
+    --basecalled_fastq data/midnight/${MIDNIGHT_RES}/fastq_pass/ \
+    --fast5_pass data/midnight/${MIDNIGHT_RES}/fast5_pass/ \
+    --sequencing_summary data/midnight/${MIDNIGHT_RES}/*.txt \
+    --scheme-directory primer_schemes/midnight/nCoV-2019/V1/ \
+    --outdir ${MIDNIGHT_RES}_Results_`date +%Y-%m-%d`
 wait
 echo "
      =========================================
