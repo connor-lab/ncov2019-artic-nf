@@ -8,7 +8,7 @@ def files_to_timestamp(path):
 
 if __name__ == "__main__":
 
-    path_to_watch = "/home/jyotirmoy/Documents/gms-artic-all/gms-artic-v7.1/gms-artic/data/"
+    path_to_watch = "/home/jyotirmoy/Documents/gms-artic/data/"
     #sys.argv[1]
     print('Watching {}..'.format(path_to_watch))
 
@@ -27,9 +27,9 @@ if __name__ == "__main__":
                 if os.path.getmtime(f) != before.get(f):
                     modified.append(f)
 
-        if added: os.system('./run.sh')
+        if added: os.system('./runner.sh')
         if removed: print('Removed: {}'.format(', '.join(removed)))
-        if modified: os.system('./run.sh')
+        if modified: os.system('./runner.sh')
             #print('Modified: {}'.format(', '.join(modified)))
             
 
