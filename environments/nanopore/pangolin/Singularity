@@ -11,6 +11,7 @@ description="Docker image containing all requirements for the ARTIC project's nc
         apt -y clean
         apt -y update
         apt -y install build-essential make
+        apt -y install procps
 
         
         git clone https://github.com/cov-lineages/pangolin.git

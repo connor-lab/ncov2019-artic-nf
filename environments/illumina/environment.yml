@@ -25,10 +25,10 @@ dependencies:
   - minimap2=2.17
   - picard=2.25.2
   - fastqc=0.11.9
-  - multiqc=1.10.1
+  - multiqc=1.11
   - nextclade_js=0.14.4
   - pip:
-      - pandas == 1.0.1
+      - pandas >= 1.1
       - scikit-learn >= 0.23.1
       - git+https://github.com/cov-lineages/pangoLEARN.git
       - git+https://github.com/cov-lineages/pangolin.git
