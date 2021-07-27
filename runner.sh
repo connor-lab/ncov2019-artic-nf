@@ -1,4 +1,5 @@
 #!/bin/bash
+#!/usr/bin/python3
 module load nextflow-20.10.0
 module load singularity-3.7.1
 
@@ -20,28 +21,50 @@ echo "
      ========================================== 
      FOUND ILLUMINA SAMPLE DIRECTORY: $ILLUM_RES  
      ==========================================="
-echo "
-      ====================================== 
-      START ANALYSIS WITH ILLUMINA PIPELINE 
-      ======================================"
-nextflow run main.nf -profile singularity \
-    --illumina --prefix "${ILLUM_RES}_illumina"     \
-    --directory data/   \
-    --outdir ${ILLUM_RES}_Results_`date +%Y-%m-%d`
-wait
-echo "
-     ====================================
-       ILLUMINA ANALYSIS COMPLETED!!!
-     ===================================="
-echo "
-      =======================================
-      DELETING SAMPLE DIRECTORY $ILLUM_RES 
-      ======================================="
 
-mkdir $ILLUM_RES
-cp -r $PWD/data/illumina/$ILLUM_RES $PWD/$ILLUM_RES
+echo "
+     ========================================== 
+     CHECK ILLUMINA METADATA FILE: $ILLUM_RES  
+     ==========================================="
+# Check sample files with metadata file
+python3 sampleValidation.py $PWD/data/illumina/$ILLUM_RES/ >check_samples.out
 wait
-rm -rf $PWD/data/illumina/$ILLUM_RES
+python3 cli.py -i $PWD/data/illumina/$ILLUM_RES/*.csv -s rc/definition.yaml >metadata_check.out
+wait
+echo "
+     ==================================================== 
+     FINISHED CHECKING ILLUMINA METADATA FILE: $ILLUM_RES  
+     ===================================================="
+
+if grep -F "CHECK" check_samples.out || grep -F "not" metadata_check.out
+    then
+        echo "Please check your input files."
+else 
+      echo "
+            ====================================== 
+            START ANALYSIS WITH ILLUMINA PIPELINE 
+            ======================================"
+            nextflow run main.nf -profile singularity \
+                  --illumina --prefix "${ILLUM_RES}_illumina"     \
+                  --directory data/   \
+                  --outdir ${ILLUM_RES}_Results_`date +%Y-%m-%d`
+      wait
+      echo "
+            ====================================
+            ILLUMINA ANALYSIS COMPLETED!!!
+            ===================================="
+      
+      echo "
+            =======================================
+            DELETING SAMPLE DIRECTORY $ILLUM_RES 
+            ======================================="
+
+      mkdir $ILLUM_RES
+      cp -r $PWD/data/illumina/$ILLUM_RES $PWD/$ILLUM_RES
+      wait
+      rm -rf $PWD/data/illumina/$ILLUM_RES
+fi
+
 
 elif [ $OUT_DIRS == "artic" ]; then
 echo "
@@ -49,58 +72,98 @@ echo "
      FOUND NANOPORE ARTIC SAMPLE DIRECTORY: $ARTIC_RES 
      ================================================="
 echo "
-      ===========================================
-      START ANALYSIS WITH NANOPORE ARTIC PIPELINE 
-      ==========================================="
-nextflow run main.nf -profile singularity \
-    --nanopolish --prefix "${ARTIC_RES}_nanopore" \
-    --basecalled_fastq data/artic/${ARTIC_RES}/fastq_pass/ \
-    --fast5_pass data/artic/${ARTIC_RES}/fast5_pass/ \
-    --sequencing_summary data/artic/${ARTIC_RES}/*.txt \
-    --outdir ${ARTIC_RES}_Results_`date +%Y-%m-%d`
-wait
-echo "
-     ======================================
-       NANOPORE ARTIC ANALYSIS COMPLETED!!!  
-     ======================================"
-echo "
-      ====================================
-      DELETING SAMPLE DIRECTORY $ARTIC_RES 
-      ===================================="
+     ========================================== 
+     CHECK ARTIC METADATA FILE: $ARTIC_RES  
+     ==========================================="
 
-mkdir $ARTIC_RES
-cp -r $PWD/data/artic/$ARTIC_RES $PWD/$ARTIC_RES
+python3 sampleValidation.py $PWD/data/artic/$ARTIC_RES/ >check_samples.out
 wait
-rm -rf $PWD/data/artic/$ARTIC_RES
+python3 cli.py -i $PWD/data/artic/$ARTIC_RES/*.csv -s rc/definition.yaml >metadata_check.out
+wait
 
-else [ $OUT_DIRS == "midnight" ]
+echo "
+     ==================================================== 
+     FINISHED CHECKING ARTIC METADATA FILE: $ARTIC_RES
+     ===================================================="
+
+if grep -F "CHECK" check_samples.out || grep -F "not" metadata_check.out
+then
+      echo "Please check your input files." 
+else
+      echo "
+            ===========================================
+            START ANALYSIS WITH NANOPORE ARTIC PIPELINE 
+            ==========================================="
+            nextflow run main.nf -profile singularity \
+                  --nanopolish --prefix "${ARTIC_RES}_nanopore" \
+                  --basecalled_fastq data/artic/${ARTIC_RES}/fastq_pass/ \
+                  --fast5_pass data/artic/${ARTIC_RES}/fast5_pass/ \
+                  --sequencing_summary data/artic/${ARTIC_RES}/*.txt \
+                  --outdir ${ARTIC_RES}_Results_`date +%Y-%m-%d`
+      wait
+      echo "
+            ======================================
+            NANOPORE ARTIC ANALYSIS COMPLETED!!!  
+            ======================================"
+      echo "
+            ====================================
+            DELETING SAMPLE DIRECTORY $ARTIC_RES 
+            ===================================="
+
+      mkdir $ARTIC_RES
+      cp -r $PWD/data/artic/$ARTIC_RES $PWD/$ARTIC_RES
+      wait
+      rm -rf $PWD/data/artic/$ARTIC_RES
+fi
+
+else [[ $OUT_DIRS == "midnight" ]]
 echo "
      ==============================================
      FOUND NANOPORE SAMPLE DIRECTORY: $MIDNIGHT_RES 
      =============================================="
 echo "
-      ==============================================
-      START ANALYSIS WITH NANOPORE MIDNIGHT PIPELINE 
-      =============================================="
-nextflow run main.nf -profile singularity \
-    --nanopolish --prefix "${MIDNIGHT_RES}_nanopore" \
-    --basecalled_fastq data/midnight/${MIDNIGHT_RES}/fastq_pass/ \
-    --fast5_pass data/midnight/${MIDNIGHT_RES}/fast5_pass/ \
-    --sequencing_summary data/midnight/${MIDNIGHT_RES}/*.txt \
-    --scheme-directory primer_schemes/midnight/nCoV-2019/V1/ \
-    --outdir ${MIDNIGHT_RES}_Results_`date +%Y-%m-%d`
-wait
-echo "
-     =========================================
-       NANOPORE MIDNIGHT ANALYSIS COMPLETED!!!  
-     ========================================="
-echo "
-      =======================================
-      DELETING SAMPLE DIRECTORY $MIDNIGHT_RES 
-      ======================================="
+     =========================================== 
+     CHECK MIDNIGHT METADATA FILE: $MIDNIGHT_RES
+     ==========================================="
 
-mkdir $MIDNIGHT_RES
-cp -r $PWD/data/midnight/$MIDNIGHT_RES $PWD/$MIDNIGHT_RES
+python3 sampleValidation.py $PWD/data/midnight/$MIDNIGHT_RES/ >check_samples.out
 wait
-rm -rf $PWD/data/midnight/$MIDNIGHT_RES
+python3 cli.py -i $PWD/data/midnight/$MIDNIGHT_RES/*.csv -s rc/definition.yaml >metadata_check.out
+wait
+
+echo "
+     ======================================================= 
+     FINISHED CHECKING MIDNIGHT METADATA FILE: $MIDNIGHT_RES
+     ======================================================="
+if grep -F "CHECK" check_samples.out || grep -F "not" metadata_check.out
+    then
+        echo "Please check your input files."
+else
+
+      echo "
+            ==============================================
+            START ANALYSIS WITH NANOPORE MIDNIGHT PIPELINE 
+            =============================================="
+            nextflow run main.nf -profile singularity \
+                  --nanopolish --prefix "${MIDNIGHT_RES}_nanopore" \
+                  --basecalled_fastq data/midnight/${MIDNIGHT_RES}/fastq_pass/ \
+                  --fast5_pass data/midnight/${MIDNIGHT_RES}/fast5_pass/ \
+                  --sequencing_summary data/midnight/${MIDNIGHT_RES}/*.txt \
+                  --scheme-directory primer_schemes/midnight/nCoV-2019/V1/ \
+                  --outdir ${MIDNIGHT_RES}_Results_`date +%Y-%m-%d`
+      wait
+      echo "
+            =========================================
+            NANOPORE MIDNIGHT ANALYSIS COMPLETED!!!  
+            ========================================="
+      echo "
+            =======================================
+            DELETING SAMPLE DIRECTORY $MIDNIGHT_RES 
+            ======================================="
+
+      mkdir $MIDNIGHT_RES
+      cp -r $PWD/data/midnight/$MIDNIGHT_RES $PWD/$MIDNIGHT_RES
+      wait
+      rm -rf $PWD/data/midnight/$MIDNIGHT_RES
+fi
 fi

@@ -29,8 +29,8 @@ if __name__ == "__main__":
 
         if added: os.system('./runner.sh')
         if removed: print('Removed: {}'.format(', '.join(removed)))
-        if modified: os.system('./runner.sh')
-            #print('Modified: {}'.format(', '.join(modified)))
+        if modified: print('Modified: {}'.format(', '.join(modified)))
+            #os.system('./runner.sh')
             
 
         before = after

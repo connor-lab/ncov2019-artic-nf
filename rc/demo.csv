@@ -1,0 +1,3 @@
+internal_id,selection_criterion,collection_date,files,region_code,lab_code,instrument,platform,library_type,patient_age,patient_status,history,sex,type
+D21-00000,Allmän övervakning,2021-05-22,D21-00000_sdf_R1_.fastq.gz;D21-00000_sdf_R2_.fastq.gz,01,SE110,MiSeq,Illumina,artic,10,Released,bla bla,Female,betacoronavirus
+D21-00001,Allmän övervakning,2021-05-22,D21-00001_sdf_R1_.fastq.gz;D21-00001_sdf_R2_.fastq.gz,07,SE110,NextSeq 550,Illumina,artic,117,Hospitalized,bla blu,Male,betacoronavirus

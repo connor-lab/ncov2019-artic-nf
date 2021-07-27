@@ -1,0 +1,124 @@
+---
+fields:
+    internal_id:
+        distinct: True
+    collection_date:
+        sane_date_pattern:
+            pattern: '%Y-%m-%d'
+            sane_start: '2019-10-01'
+    files:
+        distinct: True
+        pattern: '^.*_R1_*.fastq.gz;.*_R2_*.fastq.gz$|^.*_R1_*.fastq.gz$|^.*_R1_*.fast5$'
+    sex:
+        list:
+            - "Male"
+            - "Female"
+            - "unknown"
+    type:
+        list:
+            - "betacoronavirus"
+    region_code:
+        list:
+            - "01"
+            - "02"
+            - "03"
+            - "04"
+            - "05"
+            - "06"
+            - "07"
+            - "08"
+            - "09"
+            - "10"
+            - "12"
+            - "13"
+            - "14"
+            - "17"
+            - "18"
+            - "19"
+            - "20"
+            - "21"
+            - "22"
+            - "23"
+            - "24"
+            - "25"
+    lab_code:
+        list:
+            - "SE110"
+            - "SE120"
+            - "SE240"
+            - "SE320"
+            - "SE450"
+            - "SE250"
+            - "SE310"
+            - "SE300"
+            - "SE230"
+            - "SE540"
+            - "SE100"
+            - "SE130"
+            - "SE140"
+            - "SE330"
+            - "SE350"
+            - "SE400"
+            - "SE420"
+            - "SE430"
+            - "SE440"
+            - "SE600"
+            - "SE610"
+            - "SE620"
+            - "SE700"
+            - "SE710"
+            - "SE720"
+            - "SE730"
+            - "SENPC"
+            - "SEADG"
+            - "SEABC"
+            - "SEDNC"
+    instrument:
+        list:
+            - "MiSeq"
+            - "NextSeq 500"
+            - "NextSeq 550"
+            - "NextSeq 2000"
+            - "HiSeq 2500"
+            - "Novaseq"
+            - "MinIon"
+            - "GridIon"
+            - "Flongle"
+            - "Ion Torrent"
+    platform:
+        list:
+            - "Qiagen"
+            - "Illumina"
+            - "Oxford Nanopore"
+            - "Thermo Fisher Scientific"
+    library_type:
+        list:
+            - "artic"
+            - "artic midnight"
+            - "illumina"
+    patient_age:
+        range:
+            start: 0
+            end: 118
+    patient_status:
+        list:
+            - "Hospitalized"
+            - "Released"
+            - "Live"
+            - "Deceased"
+            - "unknown"
+    selection_criterion:
+        list:
+            - "Allmän övervakning"
+            - "Allmän övervakning öppenvård"
+            - "Allmän övervakning slutenvård"
+            - "Utlandsvistelse"
+            - "Vaccinationsgenombrott"
+            - "Reinfektion"
+            - "Utbrott"
+            - "Information saknas"
+    history:
+        'lead_trail_whitespace': True
+
+
+
