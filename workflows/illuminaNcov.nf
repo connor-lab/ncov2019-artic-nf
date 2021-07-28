@@ -210,6 +210,6 @@ workflow ncovIlluminaObj {
       getObjFiles(ch_objFiles)
 
       // Run standard pipeline
-      ncovIllumina(getObjFiles.out)
+      ncovIllumina(getObjFiles.out.fqs)
 
 }
