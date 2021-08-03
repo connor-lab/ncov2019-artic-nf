@@ -46,7 +46,11 @@ process articMinIONMedaka {
 
     cpus 4
 
-//    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
+    if (params.TESToutputMODE){
+        publishDir "${params.outdir}/bam", pattern: "*.bam", mode: "copy"
+        publishDir "${params.outdir}/VCF", pattern: "*.vcf", mode: "copy"
+    }
+
     publishDir "${params.outdir}/consensus_seqs/", pattern: "${sampleName}.consensus.fasta", mode: "copy"
 
     input:
@@ -182,13 +186,20 @@ process getObjFilesONT {
     * @output
     */
 
+    if (params.TESToutputMODE){
+       publishDir "${params.outdir}/kraken", pattern: "*_read_classification", mode: 'copy'
+       publishDir "${params.outdir}/kraken", pattern: "*_summary.txt", mode: 'copy'
+    }
+
     tag { prefix }
 
     input:
         tuple bucket, filePrefix, prefix
 
     output:
-        tuple prefix, path("${prefix}.filt.fastq.gz")
+        tuple prefix, path("${prefix}.filt.fastq.gz"), emit: fqs
+        tuple prefix, file("${prefix}_summary.txt"), path("${prefix}_read_classification"), emit: kraken
+
 
     script:
 	db=params.krakdb
@@ -226,13 +237,15 @@ process articMinIONViridian {
 
     tag { prefix }
 
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy'
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta"
+    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json"
 
     input:
         tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo)
 
     output:
-        tuple prefix, path("${prefix}.fasta")
+        tuple prefix, path("${prefix}.fasta"), emit: consensus
+        tuple prefix, path("${prefix}.viridian_cov.json"), emit: coverage
 
     script:
         """
@@ -243,6 +256,7 @@ process articMinIONViridian {
 		${prefix}.fastq.gz \
 		${prefix}_outdir/
         cp ${prefix}_outdir/viridian/consensus.final_assembly.fa ${prefix}.fasta
+        cp ${prefix}_outdir/sample.json ${prefix}.viridian_cov.json
         """
 }
 

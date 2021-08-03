@@ -99,7 +99,7 @@ workflow sequenceAnalysisMedaka {
 
       if (params.objstore || params.catsup) {
           getObjFilesONT(ch_runFastqDirs)
-          articGuppyPlex(getObjFilesONT.out)
+          articGuppyPlex(getObjFilesONT.out.fqs)
       }
       else {
           articGuppyPlex(ch_runFastqDirs.flatten())
@@ -156,7 +156,7 @@ workflow sequenceAnalysisViridian {
 
 
       // analysis
-      downstreamAnalysis(articMinIONViridian.out, articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
+      downstreamAnalysis(articMinIONViridian.out.consensus, articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
 
 }
 

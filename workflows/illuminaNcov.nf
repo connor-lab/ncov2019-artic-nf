@@ -149,7 +149,7 @@ workflow sequenceAnalysisViridian {
     main:
       viridian(ch_filePairs.combine(ch_bedFile).combine(ch_preparedRef))
      
-      downstreamAnalysis(viridian.out, ch_preparedRef, ch_bedFile)
+      downstreamAnalysis(viridian.out.consensus, ch_preparedRef, ch_bedFile)
   
 }
 
