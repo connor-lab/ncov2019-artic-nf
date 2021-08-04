@@ -151,7 +151,7 @@ workflow sequenceAnalysisViridian {
 
       getObjFilesONT(ch_runFastqDirs)
 
-      articMinIONViridian(getObjFilesONT.out
+      articMinIONViridian(getObjFilesONT.out.fqs
                                       .combine(articDownloadScheme.out.scheme))
 
 
