@@ -239,9 +239,11 @@ process viridian {
 
     tag { prefix }
 
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy'
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.vcf"
     publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json"
-
+    if (params.TESToutputMODE){
+        publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf"
+    }
 
     input:
         tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path(bedfile), path('ref.fa'),path("*")
@@ -249,6 +251,7 @@ process viridian {
     output:
         tuple prefix, path("${prefix}.fasta"), emit: consensus
         tuple prefix, path("${prefix}.viridian_cov.json"), emit: coverage
+        tuple prefix, path("${prefix}.vcf"), emit: vcfs
 
 
     script:
@@ -262,5 +265,6 @@ process viridian {
 		${prefix}_outdir/
         cp ${prefix}_outdir/viridian/consensus.final_assembly.fa ${prefix}.fasta
         cp ${prefix}_outdir/sample.json ${prefix}.viridian_cov.json
+	cp ${prefix}_outdir/varifier/04.truth.vcf ${prefix}.vcf
         """
 }

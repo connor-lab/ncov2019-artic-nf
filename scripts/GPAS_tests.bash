@@ -46,6 +46,7 @@ nextflow run \
         --pipeline_name oxforduni-ncov2019-artic-nf-nanopore \
         --run_uuid ffdd1e7f-2aaa-43a7-a230-f6b991bf4631 \
         --head_node_ip 10.0.1.2 \
+	--TESToutputMODE true \
         --outdir /work/output/ont_artic_test \
         > nextflow.txt
 
@@ -65,7 +66,8 @@ nextflow  run \
         --pipeline_name oxforduni-ncov2019-artic-nf-nanopore \
         --run_uuid b6a04e93-e031-4a80-9ece-0a279f9b1fe4 \
         --head_node_ip 10.0.1.2 \
-        --outdir /work/output/ont_viridian_test_a03b0d59 \
+	--TESToutputMODE true \
+        --outdir /work/output/ont_viridian_test \
         > nextflow.txt
 
 # illumina_artic_test
@@ -85,6 +87,7 @@ nextflow run /data/pipelines/ncov2019-artic-nf/main.nf \
         --pipeline_name oxforduni-ncov2019-artic-nf-illumina \
         --run_uuid 19f03473-156a-4cec-a947-f7cfd1a03947 \
         --head_node_ip 10.0.1.2 \
+	--TESToutputMODE true \
         --outdir /work/output/illumina_artic_test \
         > nextflow.txt
 
@@ -105,6 +108,7 @@ nextflow run /data/pipelines/ncov2019-artic-nf/main.nf \
         --pipeline_name oxforduni-ncov2019-artic-nf-illumina \
         --run_uuid 387691ae-1f78-444d-a317-23443472b188 \
         --head_node_ip 10.0.1.2 \
+	--TESToutputMODE true \
         --outdir /work/output/illumina_viridian_test \
         > nextflow.txt
 
