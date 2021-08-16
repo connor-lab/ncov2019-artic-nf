@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# ont_artic_test
 
 echo \
 "SARS-CoV-2_reference_ox,mmm-artic-ill-s11511-1
@@ -32,8 +31,11 @@ SARS-CoV-2_reference_ox,mmm-artic-ont-s82718-2
 SARS-CoV-2_reference_ox,mmm-artic-ont-s98244-1" \
 	> /tmp/ONT_data.csv
 
-mkdir -p /work/runs/ont_artic_test
-cd /work/runs/ont_artic_test
+# ont_artic_test
+test_name=ont_artic
+echo Running ${test_name} test workflow
+mkdir -p /work/runs/${test_name}_test
+cd /work/runs/${test_name}_test
 nextflow run \
         /data/pipelines/ncov2019-artic-nf/main.nf \
         -with-trace -with-report -with-timeline -with-dag dag.png \
@@ -47,13 +49,22 @@ nextflow run \
         --run_uuid ffdd1e7f-2aaa-43a7-a230-f6b991bf4631 \
         --head_node_ip 10.0.1.2 \
 	--TESToutputMODE true \
-        --outdir /work/output/ont_artic_test \
+        --outdir /work/output/${test_name}_test \
         > nextflow.txt
 
-# ont_viridian_test
+python3 /data/pipelines/ncov2019-artic-nf/tests/GPAS_tests_summary.py \
+	-w /work/runs/${test_name}_test \
+	-i /work/output/${test_name}_test/ \
+	-t /work/output/${test_name}_test/${test_name}_summary.tsv  \
+	-e /data/pipelines/ncov2019-artic-nf/tests/${test_name}_expected.tsv \
+	-c /work/output/${test_name}_test/${test_name}_comparison.tsv
 
-mkdir -p /work/runs/ont_viridian_test
-cd /work/runs/ont_viridian_test
+# ont_viridian_test
+test_name=ont_viridian
+echo Running ${test_name} test workflow
+mkdir -p /work/runs/${test_name}_test
+cd /work/runs/${test_name}_test
+
 nextflow  run \
         /data/pipelines/ncov2019-artic-nf/main.nf \
         -with-trace -with-report -with-timeline -with-dag dag.png \
@@ -70,10 +81,18 @@ nextflow  run \
         --outdir /work/output/ont_viridian_test \
         > nextflow.txt
 
-# illumina_artic_test
+python3 /data/pipelines/ncov2019-artic-nf/tests/GPAS_tests_summary.py \
+	-w /work/runs/${test_name}_test \
+	-i /work/output/${test_name}_test/ \
+	-t /work/output/${test_name}_test/${test_name}_summary.tsv  \
+	-e /data/pipelines/ncov2019-artic-nf/tests/${test_name}_expected.tsv \
+	-c /work/output/${test_name}_test/${test_name}_comparison.tsv
 
-mkdir -p /work/runs/illumina_artic_test
-cd /work/runs/illumina_artic_test
+# illumina_artic_test
+test_name=illumina_artic
+echo Running ${test_name} test workflow
+mkdir -p /work/runs/${test_name}_test
+cd /work/runs/${test_name}_test
 
 nextflow run /data/pipelines/ncov2019-artic-nf/main.nf \
         -with-trace -with-report -with-timeline -with-dag dag.png \
@@ -88,13 +107,23 @@ nextflow run /data/pipelines/ncov2019-artic-nf/main.nf \
         --run_uuid 19f03473-156a-4cec-a947-f7cfd1a03947 \
         --head_node_ip 10.0.1.2 \
 	--TESToutputMODE true \
-        --outdir /work/output/illumina_artic_test \
+        --outdir /work/output/$_test \
         > nextflow.txt
 
-# illumina_Viridian_test
 
-mkdir -p /work/runs/illumina_viridian_test
-cd /work/runs/illumina_viridian_test
+python3 /data/pipelines/ncov2019-artic-nf/tests/GPAS_tests_summary.py \
+	-w /work/runs/${test_name}_test \
+	-i /work/output/${test_name}_test/ \
+	-t /work/output/${test_name}_test/${test_name}_summary.tsv  \
+	-e /data/pipelines/ncov2019-artic-nf/tests/${test_name}_expected.tsv \
+	-c /work/output/${test_name}_test/${test_name}_comparison.tsv
+
+# illumina_Viridian_test
+test_name=illumina_viridian
+echo Running ${test_name} test workflow
+mkdir -p /work/runs/${test_name}_test
+cd /work/runs/${test_name}_test
+
 
 nextflow run /data/pipelines/ncov2019-artic-nf/main.nf \
         -with-trace -with-report -with-timeline -with-dag dag.png \
@@ -109,6 +138,15 @@ nextflow run /data/pipelines/ncov2019-artic-nf/main.nf \
         --run_uuid 387691ae-1f78-444d-a317-23443472b188 \
         --head_node_ip 10.0.1.2 \
 	--TESToutputMODE true \
-        --outdir /work/output/illumina_viridian_test \
+        --outdir /work/output/${test_name}_test \
         > nextflow.txt
+
+
+python3 /data/pipelines/ncov2019-artic-nf/tests/GPAS_tests_summary.py \
+	-w /work/runs/${test_name}_test \
+	-i /work/output/${test_name}_test/ \
+	-t /work/output/${test_name}_test/${test_name}_summary.tsv  \
+	-e /data/pipelines/ncov2019-artic-nf/tests/${test_name}_expected.tsv \
+	-c /work/output/${test_name}_test/${test_name}_comparison.tsv
+
 

@@ -10,7 +10,7 @@ def getName(s):
     if len(s.split(' '))<2:
         return 'nonesampleprocess'
     n=s.split(' ')[-1][1:-1]
-    if n in ['nanopore','reference','illumina']:
+    if n in ['nanopore','reference','illumina','nCoV-2019.reference.fasta']:
         return 'nonesampleprocess'
     return n
 
@@ -71,7 +71,7 @@ class runTests(unittest.TestCase):
         seqs=os.listdir('{0}/consensus_seqs/'.format(path))
         seqs=[s for s in seqs if s.endswith('.fasta')]
         self.conensus_seqs=[s.replace('.consensus.fasta','') for s in seqs]
-        self.assertCountEqual(self.conensus_seqs, self.samples)
+#        self.assertCountEqual(self.conensus_seqs, self.samples)
 
         results=[]
         for s in seqs:
@@ -139,6 +139,11 @@ class runTests(unittest.TestCase):
             dfs.append(df)
         results=pd.concat(dfs)
         return results
+
+    def readExpected(self, f):
+        df=pd.read_csv(f,sep='\t')
+        return df
+
     
     def run(self):
         nf=self.checkNextflow(self.opts.workpath)
@@ -152,14 +157,29 @@ class runTests(unittest.TestCase):
         df=df.merge(nc,on='sample',how='left')
         al=self.checkAln2type(self.opts.outpath)
         df=df.merge(al,on='sample',how='left')
-        print(df)
+        
+        if self.opts.expectedtsv != None:
+            ex=self.readExpected(self.opts.expectedtsv)
+            dfc=ex.compare(df)
+            dfc.to_csv(self.opts.expectcomparisonedtsv, sep='\t', index=False)
+            if len(dfc) == 0:
+                print('Workflow finished with no discrepencies')
+            else:
+                print('Workflow finished with some discrepencies, see {}'.format(self.opts.expectcomparisonedtsv))
+        df.to_csv(self.opts.outputtsv, sep='\t', index=False)
 
 if __name__ == "__main__":
         # args
         parser = ArgumentParser(description='check for output results')
-        parser.add_argument('-p', '--workpath', required=True,
+        parser.add_argument('-w', '--workpath', required=True,
                 help='nextflow work path')
-        parser.add_argument('-o', '--outpath', required=True,
+        parser.add_argument('-i', '--outpath', required=True,
                 help='nextflow output path')
+        parser.add_argument('-t', '--outputtsv', required=True,
+                help='output tsv')
+        parser.add_argument('-e', '--expectedtsv', required=False,
+                help='expected results tsv')
+        parser.add_argument('-c', '--expectcomparisonedtsv', required=False,
+                help='expected results tsv')
         opts, unknown_args = parser.parse_known_args()
         runTests(opts)
