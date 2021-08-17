@@ -40,6 +40,9 @@ This repo contains both [Singularity]("https://sylabs.io/guides/3.0/user-guide/i
 #### Conda
 The repo contains a environment.yml files which automatically build the correct conda env if `-profile conda` is specifed in the command. Although you'll need `conda` installed, this is probably the easiest way to run this pipeline.
 
+If conda is unable to solve the `artic` environment on first run set `channel_priority` to `strict` with the command `conda config --set channel_priority strict
+`.
+
 --cache /some/dir can be specified to have a fixed, shared location to store the conda build for use by multiple runs of the workflow.
 
 #### Executors
