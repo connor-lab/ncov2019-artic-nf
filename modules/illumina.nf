@@ -7,8 +7,9 @@ process readTrimming {
 
     tag { sampleName }
 
-//    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: '*_val_{1,2}.fq.gz', mode: 'copy'
-
+    if (params.TESToutputMODE){
+       publishDir "${params.outdir}/trimmed_fq/", pattern: '*_val_{1,2}.fq.gz', mode: 'copy'
+    }
     cpus 2
 
     input:
@@ -59,8 +60,6 @@ process readMapping {
 
     label 'largecpu'
 
-//    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.sorted.bam", mode: 'copy'
-
     input:
         tuple sampleName, path(forward), path(reverse), path(ref), path("*")
 
@@ -78,8 +77,9 @@ process trimPrimerSequences {
 
     tag { sampleName }
 
-//    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.bam", mode: 'copy'
-//    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
+    if (params.TESToutputMODE){
+       publishDir "${params.outdir}/bam", pattern: "*.bam", mode: 'copy'
+    }
 
     input:
     tuple sampleName, path(bam), path(bedfile)
@@ -192,11 +192,19 @@ process getObjFiles {
 
     tag { prefix }
 
+    
+    if (params.TESToutputMODE){
+       publishDir "${params.outdir}/kraken", pattern: "*_read_classification", mode: 'copy'
+       publishDir "${params.outdir}/kraken", pattern: "*_summary.txt", mode: 'copy'
+    }
+
+
     input:
         tuple bucket, filePrefix, prefix
 
     output:
-        tuple prefix, path("${prefix}_C1.filt.fastq.gz"), path("${prefix}_C2.filt.fastq.gz")
+        tuple prefix, path("${prefix}_C1.filt.fastq.gz"), path("${prefix}_C2.filt.fastq.gz"), emit: fqs
+        tuple prefix, file("${prefix}_summary.txt"), path("${prefix}_read_classification"), emit: kraken
 
     script:
 	db=params.krakdb
@@ -231,13 +239,20 @@ process viridian {
 
     tag { prefix }
 
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy'
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta"
+    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json"
+    if (params.TESToutputMODE){
+        publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf"
+    }
 
     input:
         tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path(bedfile), path('ref.fa'),path("*")
 
     output:
-        tuple prefix, path("${prefix}.fasta")
+        tuple prefix, path("${prefix}.fasta"), emit: consensus
+        tuple prefix, path("${prefix}.viridian_cov.json"), emit: coverage
+        tuple prefix, path("${prefix}.vcf"), emit: vcfs
+
 
     script:
         """
@@ -249,5 +264,7 @@ process viridian {
 		${prefix}_2.fastq.gz \
 		${prefix}_outdir/
         cp ${prefix}_outdir/viridian/consensus.final_assembly.fa ${prefix}.fasta
+        cp ${prefix}_outdir/sample.json ${prefix}.viridian_cov.json
+	cp ${prefix}_outdir/varifier/04.truth.vcf ${prefix}.vcf
         """
 }
