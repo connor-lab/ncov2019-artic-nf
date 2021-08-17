@@ -239,7 +239,7 @@ process viridian {
 
     tag { prefix }
 
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.vcf"
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta"
     publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json"
     if (params.TESToutputMODE){
         publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf"

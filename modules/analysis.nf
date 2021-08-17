@@ -98,13 +98,13 @@ process FN4_upload {
     tag { sampleName }
 
     input:
-    tuple(sampleName,  path(fasta),path(variant_definitions), path(reffasta), path("*"))
+    tuple(sampleName,  file('consensus.fasta'), path(variant_definitions), path(reffasta), path("*"))
 
     script:
     """
     mafft --auto \
         --thread 1 \
-        --addfull ${fasta} \
+        --addfull 'consensus.fasta' \
         --keeplength $reffasta \
         > ${sampleName}_wuhan.fa
 

@@ -78,7 +78,7 @@ nextflow  run \
         --run_uuid b6a04e93-e031-4a80-9ece-0a279f9b1fe4 \
         --head_node_ip 10.0.1.2 \
 	--TESToutputMODE true \
-        --outdir /work/output/ont_viridian_test \
+        --outdir /work/output/${test_name}_test \
         > nextflow.txt
 
 python3 /data/pipelines/ncov2019-artic-nf/tests/GPAS_tests_summary.py \
@@ -107,7 +107,7 @@ nextflow run /data/pipelines/ncov2019-artic-nf/main.nf \
         --run_uuid 19f03473-156a-4cec-a947-f7cfd1a03947 \
         --head_node_ip 10.0.1.2 \
 	--TESToutputMODE true \
-        --outdir /work/output/$_test \
+        --outdir /work/output/${test_name}_test \
         > nextflow.txt
 
 

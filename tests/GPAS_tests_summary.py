@@ -70,12 +70,12 @@ class runTests(unittest.TestCase):
         # check file is provided, correct length, correct bases, correct INDELs
         seqs=os.listdir('{0}/consensus_seqs/'.format(path))
         seqs=[s for s in seqs if s.endswith('.fasta')]
-        self.conensus_seqs=[s.replace('.consensus.fasta','') for s in seqs]
+        self.conensus_seqs=[s.replace('.fasta','') for s in seqs]
 #        self.assertCountEqual(self.conensus_seqs, self.samples)
 
         results=[]
         for s in seqs:
-            sample=s.replace('.consensus.fasta','')
+            sample=s.replace('.fasta','')
             seq=SeqIO.read(open('{0}/consensus_seqs/{1}'.format(path,s),'rt'), 'fasta')
 
             l=len(seq.seq)

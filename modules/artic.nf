@@ -51,7 +51,7 @@ process articMinIONMedaka {
         publishDir "${params.outdir}/VCF", pattern: "*.vcf", mode: "copy"
     }
 
-    publishDir "${params.outdir}/consensus_seqs/", pattern: "${sampleName}.consensus.fasta", mode: "copy"
+    publishDir "${params.outdir}/consensus_seqs/", pattern: "${sampleName}.fasta", mode: "copy"
 
     input:
     tuple sampleName, file(fastq), file(schemeRepo)
@@ -61,7 +61,7 @@ process articMinIONMedaka {
     
     tuple sampleName, file("${sampleName}.primertrimmed.rg.sorted.bam"), emit: ptrim
     tuple sampleName, file("${sampleName}.sorted.bam"), emit: mapped
-    tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
+    tuple sampleName, file("${sampleName}.fasta"), emit: consensus_fasta
     tuple sampleName, file("${sampleName}.pass.vcf.gz"), emit: vcf
 
     script:
@@ -91,7 +91,7 @@ process articMinIONMedaka {
     --read-file ${fastq} \
     ${params.scheme}/${params.schemeVersion} \
     ${sampleName}
-    ${sampleName}.consensus.fasta ${sampleName}.fasta
+    cp ${sampleName}.consensus.fasta ${sampleName}.fasta
     """
 }
 
