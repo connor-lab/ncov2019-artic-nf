@@ -37,7 +37,7 @@ workflow downstreamAnalysis {
 
     aln2type(consensus.combine(getVariantDefinitions.out).combine(ch_preparedRef).combine(ch_bedFile))
 
-    makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out,by:0))
+    makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out.tsv,by:0))
 
     makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
               storeDir:"${params.outdir}/analysis/report/${params.prefix}" ,
