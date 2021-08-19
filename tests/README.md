@@ -1,6 +1,6 @@
 # Workflow testing
 
-The folder contains scripts and expected results for testing the four potential workflow combinations. These are:
+This folder contains scripts and expected results for testing the four potential workflow combinations. These are:
 
 * Illumina + Viridian workflow
 * Illumina + Artic workflow
@@ -15,11 +15,11 @@ Run the `GPAS_tests.bash` script from the headnode after SSH login.
 bash /data/pipelines/ncov2019-artic-nf/tests/GPAS_tests.bash
 ```
 
-This should run through each sequencing technology and bioinformatics workflows combination. It will report any discrepencies between the outputs produced and outputs expected.
+This should run through each sequencing technology and bioinformatics workflow combination. It will report any discrepencies between the outputs produced and outputs expected.
 
 ## Test dataset
 
-For this testing the core samples are used. These are
+For this testing the "core" test samples are used. These are
 
 ### Illumina
 ```bash
