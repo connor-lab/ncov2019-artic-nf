@@ -114,6 +114,7 @@ class runTests(unittest.TestCase):
         # Check mutations and lineage
         tech=os.listdir('{0}/analysis/nextclade/'.format(path))[0]
         seqs=os.listdir('{0}/analysis/nextclade/{1}/'.format(path,tech))
+        seqs=[s for s in seqs if s.endswith('.tsv')]
         self.pango_reports=[s.replace('.tsv','') for s in seqs]
         dfs=[]
         for s in seqs:

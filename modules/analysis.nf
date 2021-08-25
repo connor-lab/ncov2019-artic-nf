@@ -16,7 +16,6 @@ process pango {
     """
 }
 
-
 process nextclade {
     tag { sampleName }
 
@@ -26,8 +25,8 @@ process nextclade {
     tuple(sampleName,  path(fasta))
 
     output:
-    tuple(sampleName, path("${sampleName}.tsv")), emit: tsv
-    tuple(sampleName, path("${sampleName}.json")), emit: json
+    tuple sampleName, path("${sampleName}.tsv"), emit: tsv
+    tuple sampleName, path("${sampleName}.json"), emit: json
 
     script:
     """
