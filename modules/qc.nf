@@ -42,7 +42,7 @@ process fastqc {
     publishDir "${params.outdir}/fastqc", mode: 'copy', overwrite: true
 
     input:
-    tuple(sampleName, path(forward), path(reverse))
+    tuple sampleName, path(forward), path(reverse)
 
     output:
     file "*fastqc*"
@@ -50,7 +50,6 @@ process fastqc {
     """
     fastqc ${forward} ${reverse} --format fastq --threads ${task.cpus}
     """
-
 }
 
 process mappingStatistics {
@@ -61,19 +60,51 @@ process mappingStatistics {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
 
     input:
-        tuple(sampleName, path(bam), path(ref))
+    tuple sampleName, path(bam), path(ref)
 
     output:
-        path "*.txt"
+    path "*.txt"
 
-    script:
     """
     picard ${params.picardJavaSettings} CollectWgsMetrics -I ${sampleName}.mapped.primertrimmed.sorted.bam \
     -O ${sampleName}.mapped.primertrimmed.sorted.metrics.txt -R ${ref} ${params.wgsMetricsOptions}      
     """
 }
 
-process multiqc {   
+process QCStatsInsert {
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.pdf", mode: 'copy'
+
+    input:
+    tuple sampleName, path(bam), path(ref)
+
+    output:
+    path "${sampleName}_insert_size.metrics.txt", emit: stats
+    path "${sampleName}_insert_size.distribution.pdf"
+
+    """
+    picard CollectInsertSizeMetrics I=${bam} O=${sampleName}_insert_size.metrics.txt \
+    H=${sampleName}_insert_size.distribution.pdf
+    """
+}
+
+process QCStatsAlignment {
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
+
+    input:
+    tuple sampleName, path(bam), path(ref)
+
+    output:
+    path "${sampleName}_alignment.metrics.txt"
+
+    """
+    picard CollectAlignmentSummaryMetrics R=${ref} I=${bam} O=${sampleName}_alignment.metrics.txt
+    """
+}
+
+process multiqc {
     tag { params.prefix }
     
     label 'largemem'
@@ -81,15 +112,16 @@ process multiqc {
     publishDir "${params.outdir}/multiqc", mode: 'copy'
     
     input:
+    path qcLogList
     path trimLogList
     path mapLogList
-    path qcLogList
+    path insertLogList
+    path alignLogList
 
     output:
     file '*multiqc.html'
     file '*multiqc_data/multiqc_data.json'
 
-    script:
     """
     multiqc . --filename ${params.prefix}_multiqc.html --data-format json \
     ${params.multiqcOptions}
