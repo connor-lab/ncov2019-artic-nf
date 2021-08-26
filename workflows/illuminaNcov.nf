@@ -132,7 +132,7 @@ workflow sequenceAnalysis {
 
       QCStatsInsert(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
 
-      QCStatsAlignment(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
+      QCStatsAlignment(readMapping.out.combine(ch_preparedRef.map{ it[0] }))
 
       multiqc(fastqc.out.collect(), readTrimming.out.log.collect(), mappingStatistics.out.collect(),
               QCStatsInsert.out.stats.collect(), QCStatsAlignment.out.collect())
