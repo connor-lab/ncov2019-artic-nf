@@ -16,13 +16,31 @@ process pango {
     """
 }
 
+
+process download_nextclade_files {
+    publishDir "${params.outdir}/analysis/nextclade/${params.prefix}", mode: 'copy'
+    output:
+    file('nextclade_files')
+
+    script:
+    """
+    nextclade_ver=`(nextclade -v)`
+    wget -P nextclade_files https://raw.githubusercontent.com/nextstrain/nextclade/\${nextclade_ver}/data/sars-cov-2/tree.json
+    wget -P nextclade_files https://raw.githubusercontent.com/nextstrain/nextclade/\${nextclade_ver}/data/sars-cov-2/genemap.gff
+    wget -P nextclade_files https://raw.githubusercontent.com/nextstrain/nextclade/\${nextclade_ver}/data/sars-cov-2/qc.json 
+    echo \$nextclade_ver > nextclade_files/version.txt
+    """
+
+}
+
+
 process nextclade {
     tag { sampleName }
 
     publishDir "${params.outdir}/analysis/nextclade/${params.prefix}", mode: 'copy'
 
     input:
-    tuple(sampleName,  path(fasta))
+    tuple(sampleName,  path(fasta), path(reffasta), path(nextclade_files)) 
 
     output:
     tuple sampleName, path("${sampleName}.tsv"), emit: tsv
@@ -31,9 +49,14 @@ process nextclade {
     script:
     """
     nextclade --input-fasta ${fasta} \
-        --output-tree ${sampleName}_tree.json \
-        --output-tsv ${sampleName}.tsv \
-        --output-json ${sampleName}.json
+	--input-root-seq ${reffasta} \
+	--input-gene-map=nextclade_files/genemap.gff \
+	--input-tree=nextclade_files/tree.json \
+	--input-qc-config=nextclade_files/qc.json \
+	--output-json=${sampleName}.json \
+	--output-tsv=${sampleName}.tsv \
+	--output-basename=${sampleName}
+    nextclade_ver=`(nextclade -v)`
     """
 }
 

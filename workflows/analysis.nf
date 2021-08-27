@@ -6,6 +6,7 @@ nextflow.preview.dsl = 2
 // import modules
 include {pango} from '../modules/analysis.nf'
 include {nextclade} from '../modules/analysis.nf'
+include {download_nextclade_files} from '../modules/analysis.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {aln2type} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
@@ -31,7 +32,9 @@ workflow downstreamAnalysis {
     main:
     pango(consensus)
 
-    nextclade(consensus)
+    download_nextclade_files()
+
+    nextclade(consensus.combine(ch_preparedRef).combine(download_nextclade_files.out))
 
     getVariantDefinitions()
 
