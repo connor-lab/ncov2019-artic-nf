@@ -39,7 +39,7 @@ process writeQCSummaryCSV {
 process fastqc {
     tag { sampleName }
 
-    publishDir "${params.outdir}/fastqc", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy', overwrite: true
 
     input:
     tuple sampleName, path(forward), path(reverse)
@@ -52,12 +52,12 @@ process fastqc {
     """
 }
 
-process mappingStatistics {
+process statsCoverage {
     tag { sampleName }
 
     label 'largemem'
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
+    publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
 
     input:
     tuple sampleName, path(bam), path(ref)
@@ -71,27 +71,33 @@ process mappingStatistics {
     """
 }
 
-process QCStatsInsert {
+process statsInsert {
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.pdf", mode: 'copy'
+    publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
+    publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.pdf", mode: 'copy'
 
     input:
     tuple sampleName, path(bam), path(ref)
 
     output:
     path "${sampleName}_insert_size.metrics.txt", emit: stats
-    path "${sampleName}_insert_size.distribution.pdf"
+    path "${sampleName}_insert_size.distribution.pdf", optional: true
 
     """
-    picard CollectInsertSizeMetrics I=${bam} O=${sampleName}_insert_size.metrics.txt \
-    H=${sampleName}_insert_size.distribution.pdf
+    if [[ \$( samtools view -F 4 -F 8 -c ${bam} ) > 0 ]]
+    then
+       picard CollectInsertSizeMetrics I=${bam} O=${sampleName}_insert_size.metrics.txt \
+       H=${sampleName}_insert_size.distribution.pdf
+    else
+       echo "Skipping sample ${sampleName} - no usable paired reads"
+       touch ${sampleName}_insert_size.metrics.txt
+    fi
     """
 }
 
-process QCStatsAlignment {
+process statsAlignment {
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
+    publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
 
     input:
     tuple sampleName, path(bam), path(ref)
@@ -109,7 +115,7 @@ process multiqc {
     
     label 'largemem'
     
-    publishDir "${params.outdir}/multiqc", mode: 'copy'
+    publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy'
     
     input:
     path qcLogList
