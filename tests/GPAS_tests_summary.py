@@ -114,6 +114,7 @@ class runTests(unittest.TestCase):
         # Check mutations and lineage
         tech=os.listdir('{0}/analysis/nextclade/'.format(path))[0]
         seqs=os.listdir('{0}/analysis/nextclade/{1}/'.format(path,tech))
+        seqs=[s for s in seqs if s.endswith('.tsv')]
         self.pango_reports=[s.replace('.tsv','') for s in seqs]
         dfs=[]
         for s in seqs:
@@ -158,6 +159,7 @@ class runTests(unittest.TestCase):
         al=self.checkAln2type(self.opts.outpath)
         df=df.merge(al,on='sample',how='left')
         
+        df.to_csv(self.opts.outputtsv, sep='\t', index=False)
         if self.opts.expectedtsv != None:
             ex=self.readExpected(self.opts.expectedtsv)
             dfc=ex.compare(df)
@@ -166,7 +168,6 @@ class runTests(unittest.TestCase):
                 print('Workflow finished with no discrepencies')
             else:
                 print('Workflow finished with some discrepencies, see {}'.format(self.opts.expectcomparisonedtsv))
-        df.to_csv(self.opts.outputtsv, sep='\t', index=False)
 
 if __name__ == "__main__":
         # args
