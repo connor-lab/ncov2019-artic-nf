@@ -87,7 +87,8 @@ if ( ! params.prefix ) {
      }
 } 
 
-
+println "Manifest's pipeline version: $workflow.manifest.version"
+println "Project : $workflow.projectDir"
 
 // main workflow
 workflow {

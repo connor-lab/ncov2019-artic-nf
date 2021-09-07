@@ -24,11 +24,13 @@ process download_nextclade_files {
 
     script:
     """
+    home=PWD
     nextclade_ver=`(nextclade -v)`
     wget -P nextclade_files https://raw.githubusercontent.com/nextstrain/nextclade/\${nextclade_ver}/data/sars-cov-2/tree.json
     wget -P nextclade_files https://raw.githubusercontent.com/nextstrain/nextclade/\${nextclade_ver}/data/sars-cov-2/genemap.gff
     wget -P nextclade_files https://raw.githubusercontent.com/nextstrain/nextclade/\${nextclade_ver}/data/sars-cov-2/qc.json 
     echo \$nextclade_ver > nextclade_files/version.txt
+
     """
 
 }
@@ -61,8 +63,9 @@ process nextclade {
 }
 
 process getVariantDefinitions {
+
     output:
-    path('variant_definitions') 
+    path "variant_definitions", emit: defs
 
     script:
     """

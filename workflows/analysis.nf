@@ -30,6 +30,8 @@ workflow downstreamAnalysis {
       ch_bedFile
 
     main:
+    println "Git info: $workflow.repository - $workflow.revision [$workflow.commitId]"
+
     pango(consensus)
 
     download_nextclade_files()
@@ -38,7 +40,7 @@ workflow downstreamAnalysis {
 
     getVariantDefinitions()
 
-    aln2type(consensus.combine(getVariantDefinitions.out).combine(ch_preparedRef).combine(ch_bedFile))
+    aln2type(consensus.combine(getVariantDefinitions.out.defs).combine(ch_preparedRef).combine(ch_bedFile))
 
     makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out.tsv,by:0))
 
