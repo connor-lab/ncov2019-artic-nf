@@ -19,7 +19,7 @@ $ nextflow run main.nf -profile singularity,sge \
 ```
 
 ###### 3. Run Nanopore Pipeline
-####### Deafult is "midnight" protocol
+###### **Deafult is "midnight" protocol**
 ```
 $ nextflow run main.nf -profile singularity \
     --nanopolish --prefix "midnight" \
@@ -29,7 +29,7 @@ $ nextflow run main.nf -profile singularity \
     --scheme-directory primer_schemes/midnight/nCoV-2019/V1/ \
     --outdir /home/test/midnight_test -with-report midnight
 ```
-####### To run the artic pipeline, please change the [nanopore.config](https://github.com/JD2112/gms-artic/blob/master/conf/nanopore.config) 'min_length' (default = 400) and 'max_length' (default = 700)
+###### **To run the artic pipeline, please change the [nanopore.config](https://github.com/JD2112/gms-artic/blob/master/conf/nanopore.config) 'min_length' (default = 400) and 'max_length' (default = 700)**
 
 ```
 $ nextflow run main.nf -profile singularity,sge \
