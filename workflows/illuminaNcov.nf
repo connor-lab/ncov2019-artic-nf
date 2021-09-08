@@ -95,6 +95,7 @@ workflow sequenceAnalysis {
       ch_filePairs
       ch_preparedRef
       ch_bedFile
+      ch_refFasta
 
     main:
 
@@ -127,7 +128,7 @@ workflow sequenceAnalysis {
                            .join(trimPrimerSequences.out.mapped))
       
 
-      downstreamAnalysis(makeConsensus.out, ch_preparedRef, ch_bedFile)
+      downstreamAnalysis(makeConsensus.out, ch_refFasta, ch_bedFile)
       
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
@@ -145,11 +146,12 @@ workflow sequenceAnalysisViridian {
       ch_filePairs
       ch_preparedRef
       ch_bedFile
+      ch_refFasta
 
     main:
       viridian(ch_filePairs.combine(ch_bedFile).combine(ch_preparedRef))
      
-      downstreamAnalysis(viridian.out.consensus, ch_preparedRef, ch_bedFile)
+      downstreamAnalysis(viridian.out.consensus, ch_refFasta, ch_bedFile)
   
 }
 
@@ -163,10 +165,10 @@ workflow ncovIllumina {
       
       // Actually do analysis
       if (params.varCaller=='iVar') {
-      sequenceAnalysis(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
+      sequenceAnalysis(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile, prepareReferenceFiles.out.reffasta)
       }
       else if (params.varCaller=='viridian') {
-      sequenceAnalysisViridian(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
+      sequenceAnalysisViridian(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile, prepareReferenceFiles.out.reffasta)
       }
       // Do some typing if we have the correct files
       if ( params.gff ) {
