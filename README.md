@@ -28,10 +28,11 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
          |___ meta_data.csv
 ```
 ***for illumina analysis***
+```
     sample_name     
          |___ fastq/
          |___ meta_data.csv
-
+```
 #### Manual running of analysis pipeline
 ###### 2. Run Illumina pipeline
 ```
