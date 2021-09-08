@@ -87,6 +87,11 @@ if ( ! params.prefix ) {
      }
 } 
 
+
+Channel.from("$workflow.manifest.version")
+	.view()
+	.collectFile(name: "${params.outdir}/workflow_manifest_version.txt")
+
 println "Manifest's pipeline version: $workflow.manifest.version"
 println "Project : $workflow.projectDir"
 
