@@ -24,7 +24,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           file: environments/illumina/Dockerfile
-          tags: oxfordmmm/artic-ncov2019-illumina:latest, oxfordmmm/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
+          tags: jezsw/artic-ncov2019-illumina:latest, jezsw/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
           push: true
           no-cache: true
       -
@@ -48,7 +48,7 @@ jobs:
       - 
         name: build singularity
         run: |
-          singularity build artic-ncov2019-illumina_${{env.RELEASE_VERSION}}.sif docker://oxfordmmm/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
+          singularity build artic-ncov2019-illumina_${{env.RELEASE_VERSION}}.sif docker://jezsw/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
@@ -74,7 +74,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           file: environments/nanopore/Dockerfile
-          tags: oxfordmmm/artic-ncov2019-nanopore:latest, oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
+          tags: jezsw/artic-ncov2019-nanopore:latest, jezsw/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
           push: true
           no-cache: true
       -
@@ -98,7 +98,7 @@ jobs:
       - 
         name: build singularity
         run: |
-          singularity build artic-ncov2019-nanopore_${{env.RELEASE_VERSION}}.sif docker://oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
+          singularity build artic-ncov2019-nanopore_${{env.RELEASE_VERSION}}.sif docker://jezsw/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
