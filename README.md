@@ -8,18 +8,18 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 * The illumina and nanopore tracks automatically run pangolin and nextclade.
 * Generates report for base changes.
 
-##### gms-artic in ngp-gms
+###### 1. gms-artic in ngp-gms
 
 ##### Running autoloader to check new incoming data and metadata file
 ```
 ./runner.sh
 ```
-***The program will continuously check the folder /gms-storage-aws/TEST/ for addition/deletion of data inside the folder***
+*The program will continuously check the folder /gms-storage-aws/TEST/ for addition/deletion of data inside the folder*
 
 ##### Data upload structure
-***sftp to /gms-storage-aws/TEST/nanopore/<sample_name> or /gms-storage-aws/TEST/illumina/<sample_name> will automatically detect data and run the analysis pipeline***
+*sftp to /gms-storage-aws/TEST/nanopore/<sample_name> or /gms-storage-aws/TEST/illumina/<sample_name> will automatically detect data and run the analysis pipeline*
 
-***for nanopore analysis (default is "midnight")***
+*for nanopore analysis (default is "midnight")*
 ```
     sample_name
          |___ fast5_pass/
@@ -27,7 +27,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
          |___ sequencing_summary.txt
          |___ meta_data.csv
 ```
-***for illumina analysis***
+*for illumina analysis*
 ```
     sample_name     
          |___ fastq/
