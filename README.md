@@ -13,7 +13,7 @@ PLEASE FIND THE DETAILS HERE: [Wiki page](https://github.com/JD2112/gms-artic/wi
 
 ##### Running autoloader to check new incoming data and metadata file
 ```
-./runner.sh
+./autoloader.py
 ```
 *The program will continuously check the folder /gms-storage-aws/TEST/ for addition/deletion of data inside the folder*
 
