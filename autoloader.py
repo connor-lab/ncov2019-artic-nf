@@ -27,7 +27,7 @@ if __name__ == "__main__":
                 if os.path.getmtime(f) != before.get(f):
                     modified.append(f)
 
-        if added: os.system('./runner.sh')
+        if added: os.system('bin/runScript.sh')
         if removed: print('Removed: {}'.format(', '.join(removed)))
         if modified: print('Modified: {}'.format(', '.join(modified)))
             #os.system('./runner.sh')
