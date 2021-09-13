@@ -8,7 +8,6 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 * The illumina and nanopore tracks automatically run pangolin and nextclade.
 * Generates report for base changes.
 
-PLEASE FIND THE DETAILS HERE: [Wiki page](https://github.com/JD2112/gms-artic/wiki/User-information)
 ###### 1. gms-artic in ngp-gms
 
 ##### Data upload structure
