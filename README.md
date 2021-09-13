@@ -20,13 +20,11 @@ PLEASE FIND THE DETAILS HERE: [Wiki page](https://github.com/JD2112/gms-artic/wi
          |___ fast5_pass/
          |___ fastq_pass/
          |___ sequencing_summary.txt
-         |___ meta_data.csv
 ```
 *for illumina analysis*
 ```
     sample_name     
          |___ fastq/
-         |___ meta_data.csv
 ```
 #### Manual running of analysis pipeline
 ###### 2. Run Illumina pipeline
