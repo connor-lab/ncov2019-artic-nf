@@ -11,12 +11,6 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 PLEASE FIND THE DETAILS HERE: [Wiki page](https://github.com/JD2112/gms-artic/wiki/User-information)
 ###### 1. gms-artic in ngp-gms
 
-##### Running autoloader to check new incoming data and metadata file
-```
-./autoloader.py
-```
-*The program will continuously check the folder /gms-storage-aws/TEST/ for addition/deletion of data inside the folder*
-
 ##### Data upload structure
 *sftp to /gms-storage-aws/TEST/nanopore/<sample_name> or /gms-storage-aws/TEST/illumina/<sample_name> will automatically detect data and run the analysis pipeline*
 
