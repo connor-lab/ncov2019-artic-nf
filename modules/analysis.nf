@@ -73,7 +73,8 @@ process getVariantDefinitions {
     """
     git clone https://github.com/phe-genomics/variant_definitions
     cd variant_definitions
-    git log -1 --pretty=format:"%h" > ../aln2type_variant_git_version.txt
+    git log -1 --pretty=format:"%h" > aln2type_variant_git_version.txt
+    git -C /aln2type log -1 --pretty=format:"%h" > aln2type_commit.txt
     """
 }
 
@@ -125,7 +126,8 @@ process makeReport {
 
     input:
     tuple(sampleName, path('pango.csv'), path('aln2type.csv'), path('nextclade.tsv'),
-	path('workflow_commit.txt'), val(manifest_ver), path(nextclade_files))
+	path('workflow_commit.txt'), val(manifest_ver), path(nextclade_files),
+	path(variant_definitions))
 
     output:
     path("${sampleName}_report.tsv"), emit: tsv
