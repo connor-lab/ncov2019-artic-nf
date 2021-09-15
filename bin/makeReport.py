@@ -16,6 +16,13 @@ aln2type['sample name']=sample_name
 df=pango.merge(nextclade, on='sample name', how='left', suffixes=("_pango","_nextclade"))
 df=df.merge(aln2type, on='sample name', how='left', suffixes=(None,"_aln2type"))
 
+# versions
+wf=open('workflow_commit.txt').read()
+df['workflow commit']=str(wf).strip()
+df['manifest verison']=sys.argv[2]
+nextclade_version=open('nextclade_files/version.txt').read()
+df['nextclade version']=str(nextclade_version).strip()
+
 df.to_csv('{0}_report.tsv'.format(sys.argv[1]), sep='\t', index=False)
 
 ### convert to json
