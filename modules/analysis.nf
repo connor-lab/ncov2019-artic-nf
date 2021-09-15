@@ -63,16 +63,33 @@ process nextclade {
 }
 
 process getVariantDefinitions {
+    publishDir "${params.outdir}/analysis/aln2type/${params.prefix}", mode: 'copy'
 
     output:
     path "variant_definitions", emit: defs
+//    path("aln2type_variant_git_version.txt"), emit: vers
 
     script:
     """
     git clone https://github.com/phe-genomics/variant_definitions
+    cd variant_definitions
+    git log -1 --pretty=format:"%h" > aln2type_variant_git_version.txt
+    git -C /aln2type log -1 --pretty=format:"%h" > aln2type_commit.txt
     """
 }
 
+process getWorkflowCommit {
+
+    output:
+    path "workflowcommit.txt", emit: commit
+
+    script:
+    """
+    home=`(pwd)`
+    cd /data/pipelines/ncov2019-artic-nf
+    git log -1 --pretty=format:"%h" > \${home}/workflowcommit.txt
+    """
+}
 
 
 process aln2type {
@@ -108,7 +125,9 @@ process makeReport {
     publishDir "${params.outdir}/analysis/report/${params.prefix}", mode: 'copy'
 
     input:
-    tuple(sampleName, path('pango.csv'), path('aln2type.csv'), path('nextclade.tsv'))
+    tuple(sampleName, path('pango.csv'), path('aln2type.csv'), path('nextclade.tsv'),
+	path('workflow_commit.txt'), val(manifest_ver), path(nextclade_files),
+	path(variant_definitions))
 
     output:
     path("${sampleName}_report.tsv"), emit: tsv
@@ -116,7 +135,7 @@ process makeReport {
 
     script:
     """
-    makeReport.py ${sampleName}
+    makeReport.py ${sampleName} ${manifest_ver}
     """
 }
 

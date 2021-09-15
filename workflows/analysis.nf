@@ -12,6 +12,7 @@ include {aln2type} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
 include {articDownloadScheme} from '../modules/artic.nf'
 include {FN4_upload} from '../modules/analysis.nf'
+include {getWorkflowCommit} from '../modules/analysis.nf'
 
 workflow ncovAnalysis {
     take:
@@ -30,7 +31,8 @@ workflow downstreamAnalysis {
       ch_bedFile
 
     main:
-    println "Git info: $workflow.repository - $workflow.revision [$workflow.commitId]"
+    Channel.from("$workflow.manifest.version")
+       .set{ch_manifest_ver}
 
     pango(consensus)
 
@@ -40,9 +42,17 @@ workflow downstreamAnalysis {
 
     getVariantDefinitions()
 
+    getWorkflowCommit()
+
     aln2type(consensus.combine(getVariantDefinitions.out.defs).combine(ch_preparedRef).combine(ch_bedFile))
 
-    makeReport(pango.out.combine(aln2type.out, by:0).combine(nextclade.out.tsv,by:0))
+    makeReport(pango.out.combine(aln2type.out, by:0)
+		.combine(nextclade.out.tsv,by:0)
+		.combine(getWorkflowCommit.out.commit)
+		.combine(ch_manifest_ver)
+		.combine(download_nextclade_files.out)
+		.combine(getVariantDefinitions.out.defs)
+	)
 
     makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
               storeDir:"${params.outdir}/analysis/report/${params.prefix}" ,
