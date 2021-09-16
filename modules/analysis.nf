@@ -73,7 +73,8 @@ process getVariantDefinitions {
     """
     git clone https://github.com/phe-genomics/variant_definitions
     cd variant_definitions
-    git log -1 --pretty=format:"%h" > aln2type_variant_git_version.txt
+    git log -1 --pretty=format:"%h" > aln2type_variant_git_commit.txt
+    git describe --tags > aln2type_variant_version.txt
     git -C /aln2type log -1 --pretty=format:"%h" > aln2type_commit.txt
     """
 }
