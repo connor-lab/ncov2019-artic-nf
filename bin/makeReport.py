@@ -22,9 +22,11 @@ df['workflow commit']=str(wf).strip()
 df['manifest verison']=sys.argv[2]
 nextclade_version=open('nextclade_files/version.txt').read()
 df['nextclade version']=str(nextclade_version).strip()
-aln2type_variant_commit=open('variant_definitions/aln2type_variant_git_version.txt').read()
+aln2type_variant_commit=open('variant_definitions/aln2type_variant_git_commit.txt').read()
+aln2type_variant_version=open('variant_definitions/aln2type_variant_version.txt').read()
 aln2type_source_commit=open('variant_definitions/aln2type_commit.txt').read()
 df['aln2type_variant_commit']=str(aln2type_variant_commit).strip()
+df['aln2type_variant_version']=str(aln2type_variant_version).strip()
 df['aln2type_source_commit']=str(aln2type_source_commit).strip()
 
 df.to_csv('{0}_report.tsv'.format(sys.argv[1]), sep='\t', index=False)
