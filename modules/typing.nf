@@ -110,7 +110,7 @@ process nextclade {
 
     label 'nextclade'
     
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}_clade.tsv"
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}.tsv"
     
     input:
         tuple val(sampleName), path(consensus_fasta)
