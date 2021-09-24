@@ -130,6 +130,7 @@ class runTests(unittest.TestCase):
         # check VOCs correct
         tech=os.listdir('{0}/analysis/aln2type/'.format(path))[0]
         seqs=os.listdir('{0}/analysis/aln2type/{1}/'.format(path,tech))
+        seqs=[s for s in seqs if s.endswith('.csv')]
         self.pango_reports=[s.replace('.csv','') for s in seqs]
         dfs=[]
         for s in seqs:
