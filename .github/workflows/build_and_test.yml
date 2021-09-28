@@ -1,0 +1,151 @@
+# Pipeline to build an SP3 stack, conduct a test run and then teardown
+
+name: oci-sp3-tests
+on:
+  push:
+    tags:
+      - sp3env-v*
+
+jobs:
+  build-and-test:
+    name: Test SP3 Stack
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_NAME: "GPAS"
+      DEPLOY_REPO_URL: "https://github.com/GPAS/sp3-oci-rm"
+      TF_VERSION: "0.14.x"
+      REGION: "uk-london-1"
+      IMAGE: "ocid1.image.oc1.uk-london-1.aaaaaaaaegasetypwp4mr44kphst3r6irxtbsdmwucwc5tnsbpngqorewepq"
+    steps:
+      - uses: actions/checkout@v2
+        with: 
+          fetch-depth: 0
+      - name: Set release version
+        run: echo "GIT_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - uses: hashicorp/setup-terraform@v1
+      - name: "Write Config & Key Files"
+        run: |
+          mkdir ~/.oci
+          echo "[DEFAULT]" >> ~/.oci/config
+          echo "user=${{secrets.OCI_USER_OCID}}" >> ~/.oci/config
+          echo "fingerprint=${{secrets.OCI_FINGERPRINT}}" >> ~/.oci/config
+          echo "region=${{secrets.OCI_REGION}}" >> ~/.oci/config
+          echo "tenancy=${{secrets.OCI_TENANCY_OCID}}" >> ~/.oci/config
+          echo "key_file=~/.oci/key.pem" >> ~/.oci/config
+          echo "${{secrets.OCI_KEY_FILE}}" >> ~/.oci/key.pem
+          echo "DEPLOY_STACK_NAME=SP3_CI_test-$RANDOM" >> $GITHUB_ENV
+
+      - name: "Install OCI CLI"
+        run: |
+          curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
+          chmod +x install.sh
+          ./install.sh --accept-all-defaults
+          echo "~/bin" >> $GITHUB_PATH
+          source ~/.bashrc
+
+      - name: "Fix OCI Config File Permissions"
+        run: |
+          oci setup repair-file-permissions --file ~/.oci/config
+          oci setup repair-file-permissions --file ~/.oci/key.pem
+
+      - name: "Check Provider"
+        run: |
+          echo "SOURCE_PROVIDER_ID=$(oci resource-manager configuration-source-provider list \
+            --compartment-id ${{secrets.OCI_COMPARTMENT_PROVIDER_OCID}}| jq '.data.items[] | select(."display-name"==env.PROVIDER_NAME).id' -r)" >> $GITHUB_ENV
+
+      - name: "Create Provider"
+        if: ${{env.SOURCE_PROVIDER_ID == ''}}
+        run: |
+          echo "SOURCE_PROVIDER_ID=$(oci resource-manager configuration-source-provider create-github-access-token-provider \
+          --access-token ${{secrets.ACCESS_TOKEN_GITHUB}} \
+          --api-endpoint https://github.com/ \
+          --display-name $PROVIDER_NAME \
+          --compartment-id ${{secrets.OCI_COMPARTMENT_PROVIDER_OCID}} | jq '.data.id' -r)" >> $GITHUB_ENV
+
+      # Having to sleep rather than --wait-for-state SUCCEEDED due to know bug
+      # https://oracle-cloud-infrastructure-python-sdk.readthedocs.io/en/latest/known-issues.html#create-job-and-wait-for-state-fails-with-keyerror-for-resourcemanagerclientcompositeoperations-versions-2-20-0-and-above
+      - name: "Create Stack"
+        run: |
+          echo "STACK_ID=$(oci resource-manager stack create-from-git-provider \
+          --compartment-id ${{secrets.OCI_COMPARTMENT_OCID}} \
+          --config-source-configuration-source-provider-id $SOURCE_PROVIDER_ID \
+          --config-source-repository-url $DEPLOY_REPO_URL \
+          --display-name ${{env.DEPLOY_STACK_NAME}} \
+          --terraform-version $TF_VERSION \
+          --variables '{"compartment_ocid": "${{secrets.OCI_COMPARTMENT_OCID}}",  "region":"${{env.REGION}}", "tenancy_ocid":"${{secrets.OCI_TENANCY_OCID}}", "randomise_ad":"true", "env_name":"sp3", "worker_min":"2", "worker_max":"6", "worker_max_create":"2", "bastion_image":"${{env.IMAGE}}", "bastion_shape":"VM.Standard2.1", "headnode_image":"${{env.IMAGE}}", "headnode_shape":"VM.Standard2.2", "worker_image":"${{env.IMAGE}}", "worker_shape":"VM.Standard2.4", "ssh_pub_key": "${{secrets.SSH_PUBLIC_KEY}}" }' \
+          | jq '.data.id' -r)" >> $GITHUB_ENV
+
+      - name: "Execute Apply Job"
+        run: |
+          sleep 10
+          echo "APPLY_JOB_ID=$(oci resource-manager job create-apply-job \
+            --execution-plan-strategy AUTO_APPROVED \
+            --stack-id $STACK_ID \
+            --wait-for-state SUCCEEDED  --wait-for-state FAILED | jq '.data.id' -r)" >> $GITHUB_ENV
+
+      - name: "Get Bastion Name"
+        run: |
+          echo "BASTION_NAME=$(oci resource-manager job get-job-tf-state \
+          --file - --job-id ${APPLY_JOB_ID} \
+          | jq '.outputs.sp3_bastion.value' | tr -d '\"') " >> $GITHUB_ENV
+
+      - name: Install SSH key of bastion
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          name: id_rsa
+          known_hosts: "placeholder"
+          config: |
+            ServerAliveInterval 120
+            StrictHostKeyChecking=no
+
+      - name: "Get Bastion Host"
+        run: |
+          ssh-keyscan $BASTION_NAME >> ~/.ssh/known_hosts
+
+      - name: "Wait for SP3 deploy"
+        run: |
+          ssh -J ubuntu@${BASTION_NAME} ubuntu@10.0.1.2 "while [ ! -f /tmp/sp3_up ]; do sleep 2; done; echo 'SP3 deployed';"
+
+      - name: "Get version info"
+        run: |
+          ssh -J ubuntu@${BASTION_NAME} ubuntu@10.0.1.2 "bash /home/ubuntu/sp3/sp3doc/get_oci_versions.sh"
+          mkdir -p release_notes
+          scp -o "ProxyCommand = ssh -W %h:%p ubuntu@${BASTION_NAME}" "ubuntu@10.0.1.2:/home/ubuntu/release_notes/*.txt" release_notes/versions.txt
+          echo "VERSION_FILE=$(ls release_notes/versions.txt)" >> $GITHUB_ENV
+
+      - name: Upload version file
+        uses: actions/upload-artifact@v2
+        with:
+          name: version_file
+          path: release_notes/versions.txt
+
+      - name: "Start SP3 tests"
+        id: tests
+        run: |
+          ssh -J ubuntu@${BASTION_NAME} ubuntu@10.0.1.2  "source ~/env/bin/activate; cd /data/pipelines/ncov2019-artic-nf; bash tests/GPAS_tests_short.bash"
+
+      - name: "Change tag if tests don't complete succesfully"
+        if: ${{ steps.tests.outcome == 'failure' }}
+        run: |
+          ENV_VERSION=$(echo $GIT_VERSION | cut -f 2 -d -)
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag sp3env-beta-v${ENV_VERSION}
+          git push
+          git checkout master
+          git tag -d ${env.GIT_VERSION}
+          git push origin --delete ${env.GIT_VERSION}
+
+      - name: 'Execute Destroy Job'
+        if: always()
+        run: |
+          ssh -J ubuntu@${BASTION_NAME} ubuntu@10.0.1.2  "bash /home/ubuntu/sp3/catcloud/scripts/kill_all_nodes.sh"
+          echo "DESTROY_JOB_ID=$(oci resource-manager job create-destroy-job \
+            --execution-plan-strategy AUTO_APPROVED \
+            --stack-id $STACK_ID \
+            --wait-for-state SUCCEEDED  --wait-for-state FAILED | jq '.data.id' -r)" >> $GITHUB_ENV
+      
+      - name: 'Delete Stack'
+        run: |
+          oci resource-manager stack delete --stack-id $STACK_ID --force
