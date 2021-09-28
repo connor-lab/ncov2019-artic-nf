@@ -130,6 +130,7 @@ class runTests(unittest.TestCase):
         # check VOCs correct
         tech=os.listdir('{0}/analysis/aln2type/'.format(path))[0]
         seqs=os.listdir('{0}/analysis/aln2type/{1}/'.format(path,tech))
+        seqs=[s for s in seqs if s.endswith('.csv')]
         self.pango_reports=[s.replace('.csv','') for s in seqs]
         dfs=[]
         for s in seqs:
@@ -144,6 +145,47 @@ class runTests(unittest.TestCase):
     def readExpected(self, f):
         df=pd.read_csv(f,sep='\t')
         return df
+
+    def compareDFs(self,df):
+        ex=self.readExpected(self.opts.expectedtsv)
+
+        exCols=ex.columns
+        dfCols=df.columns
+
+        if len(exCols)==len(dfCols):
+            dfc=ex.compare(df)
+            dfc.to_csv(self.opts.expectcomparisonedtsv, sep='\t', index=False)
+            if len(dfc) == 0:
+                print('Workflow finished with no discrepencies')
+            else:
+                print('Workflow finished with some discrepencies, see {}'.format(self.opts.expectcomparisonedtsv))
+        else:
+            print('Different number of columns between summary and expected')
+            print('Expected has {} columns'.format(len(exCols)))
+            print('Summary has {} columns'.format(len(dfCols)))
+
+            e1=set(exCols)-set(dfCols)
+            e2=set(dfCols)-set(exCols)
+            e=set.union(e1,e2)
+            print('Columns in Expected not in Summary')
+            print(e1)
+            print('Columns in Summary not in Expected')
+            print(e2)
+
+            exColsRed = [i for i in exCols if i not in e]
+            dfColsRed = [i for i in dfCols if i not in e]
+
+            ex2=ex[exColsRed]
+            df2=df[exColsRed]
+
+            dfc=ex2.compare(df2)
+            dfc.to_csv(self.opts.expectcomparisonedtsv, sep='\t', index=False)
+            if len(dfc) == 0:
+                print('Workflow finished with no discrepencies')
+            else:
+                print('Workflow finished with some discrepencies, see {}'.format(self.opts.expectcomparisonedtsv))
+            
+
 
     
     def run(self):
@@ -161,13 +203,7 @@ class runTests(unittest.TestCase):
         
         df.to_csv(self.opts.outputtsv, sep='\t', index=False)
         if self.opts.expectedtsv != None:
-            ex=self.readExpected(self.opts.expectedtsv)
-            dfc=ex.compare(df)
-            dfc.to_csv(self.opts.expectcomparisonedtsv, sep='\t', index=False)
-            if len(dfc) == 0:
-                print('Workflow finished with no discrepencies')
-            else:
-                print('Workflow finished with some discrepencies, see {}'.format(self.opts.expectcomparisonedtsv))
+            self.compareDFs(df)
 
 if __name__ == "__main__":
         # args

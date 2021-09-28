@@ -1,39 +1,22 @@
 #!/bin/bash
 
-rm -rf /work/runs/*_test /work/output/*_test
 
 echo \
 "SARS-CoV-2_reference_ox,mmm-artic-ill-s11511-1
 SARS-CoV-2_reference_ox,mmm-artic-ill-s12220-1
 SARS-CoV-2_reference_ox,mmm-artic-ill-s12368-1
-SARS-CoV-2_reference_ox,mmm-artic-ill-s16621-1
-SARS-CoV-2_reference_ox,mmm-artic-ill-s24350-3
-SARS-CoV-2_reference_ox,mmm-artic-ill-s32219-2
-SARS-CoV-2_reference_ox,mmm-artic-ill-s53667-1
-SARS-CoV-2_reference_ox,mmm-artic-ill-s59130-3
-SARS-CoV-2_reference_ox,mmm-artic-ill-s64379-3
-SARS-CoV-2_reference_ox,mmm-artic-ill-s71898-2
-SARS-CoV-2_reference_ox,mmm-artic-ill-s82718-1
-SARS-CoV-2_reference_ox,mmm-artic-ill-s98244-3" \
-	> /tmp/illumina_data.csv
+SARS-CoV-2_reference_ox,mmm-artic-ill-s16621-1" \
+	> /tmp/illumina_data_short.csv
 
 echo \
 "SARS-CoV-2_reference_ox,mmm-artic-ont-s11511-1
 SARS-CoV-2_reference_ox,mmm-artic-ont-s12220-4
 SARS-CoV-2_reference_ox,mmm-artic-ont-s12368-1
-SARS-CoV-2_reference_ox,mmm-artic-ont-s16621-3
-SARS-CoV-2_reference_ox,mmm-artic-ont-s24350-1
-SARS-CoV-2_reference_ox,mmm-artic-ont-s32219-1
-SARS-CoV-2_reference_ox,mmm-artic-ont-s53667-1
-SARS-CoV-2_reference_ox,mmm-artic-ont-s59130-1
-SARS-CoV-2_reference_ox,mmm-artic-ont-s64379-1
-SARS-CoV-2_reference_ox,mmm-artic-ont-s71898-1
-SARS-CoV-2_reference_ox,mmm-artic-ont-s82718-2
-SARS-CoV-2_reference_ox,mmm-artic-ont-s98244-1" \
-	> /tmp/ONT_data.csv
+SARS-CoV-2_reference_ox,mmm-artic-ont-s16621-3" \
+	> /tmp/ONT_data_short.csv
 
 # ont_artic_test
-test_name=ont_artic
+test_name=ont_artic_short
 echo Running ${test_name} test workflow
 mkdir -p /work/runs/${test_name}_test
 cd /work/runs/${test_name}_test
@@ -43,7 +26,7 @@ nextflow run \
         --prefix nanopore \
         -profile singularity \
         -process.executor slurm \
-        --objstore /tmp/ONT_data.csv \
+        --objstore /tmp/ONT_data_short.csv \
         --varCaller medaka \
         --refmap '"{}"' \
         --pipeline_name oxforduni-ncov2019-artic-nf-nanopore \
@@ -61,7 +44,7 @@ python3 /data/pipelines/ncov2019-artic-nf/tests/GPAS_tests_summary.py \
 	-c /work/output/${test_name}_test/${test_name}_comparison.tsv
 
 # ont_viridian_test
-test_name=ont_viridian
+test_name=ont_viridian_short
 echo Running ${test_name} test workflow
 mkdir -p /work/runs/${test_name}_test
 cd /work/runs/${test_name}_test
@@ -72,7 +55,7 @@ nextflow  run \
         --prefix nanopore \
         -profile singularity \
         -process.executor slurm \
-        --objstore /tmp/ONT_data.csv \
+        --objstore /tmp/ONT_data_short.csv \
         --varCaller viridian \
         --refmap '"{}"' \
         --pipeline_name oxforduni-ncov2019-artic-nf-nanopore \
@@ -90,7 +73,7 @@ python3 /data/pipelines/ncov2019-artic-nf/tests/GPAS_tests_summary.py \
 	-c /work/output/${test_name}_test/${test_name}_comparison.tsv
 
 # illumina_artic_test
-test_name=illumina_artic
+test_name=illumina_artic_short
 echo Running ${test_name} test workflow
 mkdir -p /work/runs/${test_name}_test
 cd /work/runs/${test_name}_test
@@ -101,7 +84,7 @@ nextflow run /data/pipelines/ncov2019-artic-nf/main.nf \
         --illumina --prefix illumina \
         -profile singularity \
         -process.executor slurm \
-        --objstore /tmp/illumina_data.csv \
+        --objstore /tmp/illumina_data_short.csv \
         --varCaller iVar \
         --refmap '"{}"' \
         --pipeline_name oxforduni-ncov2019-artic-nf-illumina \
@@ -120,7 +103,7 @@ python3 /data/pipelines/ncov2019-artic-nf/tests/GPAS_tests_summary.py \
 	-c /work/output/${test_name}_test/${test_name}_comparison.tsv
 
 # illumina_Viridian_test
-test_name=illumina_viridian
+test_name=illumina_viridian_short
 echo Running ${test_name} test workflow
 mkdir -p /work/runs/${test_name}_test
 cd /work/runs/${test_name}_test
@@ -132,7 +115,7 @@ nextflow run /data/pipelines/ncov2019-artic-nf/main.nf \
         --illumina --prefix illumina \
         -profile singularity \
         -process.executor slurm \
-        --objstore /tmp/illumina_data.csv \
+        --objstore /tmp/illumina_data_short.csv \
         --varCaller viridian \
         --refmap '"{}"' \
         --pipeline_name oxforduni-ncov2019-artic-nf-illumina \
