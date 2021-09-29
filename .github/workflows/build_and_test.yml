@@ -70,6 +70,7 @@ jobs:
           --compartment-id ${{secrets.OCI_COMPARTMENT_OCID}} \
           --config-source-configuration-source-provider-id $SOURCE_PROVIDER_ID \
           --config-source-repository-url $DEPLOY_REPO_URL \
+          --config-source-branch-name "main" \
           --display-name ${{env.DEPLOY_STACK_NAME}} \
           --terraform-version $TF_VERSION \
           --variables '{"compartment_ocid": "${{secrets.OCI_COMPARTMENT_OCID}}",  "region":"${{env.REGION}}", "tenancy_ocid":"${{secrets.OCI_TENANCY_OCID}}", "randomise_ad":"true", "env_name":"sp3", "worker_min":"2", "worker_max":"6", "worker_max_create":"2", "bastion_image":"${{env.IMAGE}}", "bastion_shape":"VM.Standard2.1", "headnode_image":"${{env.IMAGE}}", "headnode_shape":"VM.Standard2.2", "worker_image":"${{env.IMAGE}}", "worker_shape":"VM.Standard2.4", "ssh_pub_key": "${{secrets.SSH_PUBLIC_KEY}}" }' \
