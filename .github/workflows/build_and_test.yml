@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PROVIDER_NAME: "GPAS"
-      DEPLOY_REPO_URL: "https://github.com/GPAS/sp3-oci-rm"
+      DEPLOY_REPO_URL: "https://github.com/GenomePathogenAnalysisService/sp3-oci-rm"
       TF_VERSION: "0.14.x"
       REGION: "uk-london-1"
       IMAGE: "ocid1.image.oc1.uk-london-1.aaaaaaaaegasetypwp4mr44kphst3r6irxtbsdmwucwc5tnsbpngqorewepq"
