@@ -10,9 +10,6 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 
 ###### 1. gms-artic in ngp-gms
 
-##### Data upload structure
-*sftp to /gms-storage-aws/TEST/nanopore/<sample_name> or /gms-storage-aws/TEST/illumina/<sample_name> will automatically detect data and run the analysis pipeline*
-
 *for nanopore analysis (default is "midnight")*
 ```
     sample_name
