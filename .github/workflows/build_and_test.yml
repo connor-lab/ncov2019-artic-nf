@@ -127,7 +127,7 @@ jobs:
           ssh -J ubuntu@${BASTION_NAME} ubuntu@10.0.1.2  "source ~/env/bin/activate; cd /data/pipelines/ncov2019-artic-nf; bash tests/GPAS_tests_short.bash"
 
       - name: "Change tag if tests don't complete succesfully"
-        if: ${{ steps.tests.outcome == 'failure' }}
+        if: ${{ failure() }}
         run: |
           ENV_VERSION=$(echo $GIT_VERSION | cut -f 2 -d -)
           git config user.name github-actions
