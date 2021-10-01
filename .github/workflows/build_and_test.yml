@@ -132,11 +132,11 @@ jobs:
           ENV_VERSION=$(echo $GIT_VERSION | cut -f 2 -d -)
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git tag sp3env-beta-v${ENV_VERSION}
+          git tag sp3env-beta-${ENV_VERSION}
           git push --tags
           git checkout master
-          git tag -d ${env.GIT_VERSION}
-          git push origin --delete ${env.GIT_VERSION}
+          git tag -d ${GIT_VERSION}
+          git push origin --delete ${GIT_VERSION}
 
       - name: 'Execute Destroy Job'
         if: always()
