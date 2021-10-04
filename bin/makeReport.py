@@ -35,17 +35,25 @@ pango.set_index('program',inplace=True)
 p=pango.to_dict(orient='index')
 
 nextclade['program']='nextclade'
+nextclade['nextclade version']=str(nextclade_version).strip()
 nextclade.set_index('program',inplace=True)
 n=nextclade.to_dict(orient='index')
 
 aln2type['program']='aln2type'
+aln2type['aln2type_variant_commit']=str(aln2type_variant_commit).strip()
+aln2type['aln2type_source_commit']=str(aln2type_source_commit).strip()
 aln2type.set_index(['program','phe-label'],inplace=True)
 a={level: aln2type.xs(level).to_dict('index') for level in aln2type.index.levels[0]}
+
+w={'Workflow information':{}}
+w['Workflow information']['workflow commit']=str(wf).strip()
+w['Workflow information']['manifest verison']=sys.argv[2]
 
 d={sample_name:{}}
 d[sample_name].update(p)
 d[sample_name].update(n)
 d[sample_name].update(a)
+d[sample_name].update(w)
 
 with open('{0}_report.json'.format(sample_name), 'w' ) as f:
     json.dump(d, f, indent=4, sort_keys=True)
