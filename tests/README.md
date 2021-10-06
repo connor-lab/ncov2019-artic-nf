@@ -12,6 +12,7 @@ This folder contains scripts and expected results for testing the four potential
 Run the `GPAS_tests.bash` script from the headnode after SSH login.
 
 ```bash
+source ~/env/bin/activate
 bash /data/pipelines/ncov2019-artic-nf/tests/GPAS_tests.bash
 ```
 
