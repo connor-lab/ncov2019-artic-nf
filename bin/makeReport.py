@@ -42,6 +42,7 @@ nextclade.set_index('program',inplace=True)
 n=nextclade.to_dict(orient='index')
 
 aln2type['program']='aln2type'
+aln2type['label']=aln2type['phe-label']
 aln2type['aln2type_variant_commit']=str(aln2type_variant_commit).strip()
 aln2type['aln2type_source_commit']=str(aln2type_source_commit).strip()
 aln2type.set_index(['program','phe-label'],inplace=True)
@@ -50,6 +51,7 @@ a={level: aln2type.xs(level).to_dict('index') for level in aln2type.index.levels
 w={'Workflow information':{}}
 w['Workflow information']['workflow commit']=str(wf).strip()
 w['Workflow information']['manifest verison']=sys.argv[2]
+w['Workflow information']['Sample identifier']=sample_name
 
 d={sample_name:{}}
 d[sample_name].update(p)
