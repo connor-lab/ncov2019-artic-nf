@@ -2,6 +2,7 @@
 import pandas as pd
 import sys
 import json
+from Bio import SeqIO
 
 sample_name=sys.argv[1]
 
@@ -53,11 +54,20 @@ w['Workflow information']['workflow commit']=str(wf).strip()
 w['Workflow information']['manifest verison']=sys.argv[2]
 w['Workflow information']['Sample identifier']=sample_name
 
+# add fasta to json
+record = SeqIO.read('consensus.fasta', "fasta")
+f={'Fasta record':{'Seq id':record.id,
+    'Seq description': record.description,
+    'Sequence':str(record.seq),
+    'Sample identifier':sample_name}}
+
+
 d={sample_name:{}}
 d[sample_name].update(p)
 d[sample_name].update(n)
 d[sample_name].update(a)
 d[sample_name].update(w)
+d[sample_name].update(f)
 
 with open('{0}_report.json'.format(sample_name), 'w' ) as f:
     json.dump(d, f, indent=4, sort_keys=True)
