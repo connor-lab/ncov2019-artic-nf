@@ -10,25 +10,25 @@ pango=pd.read_csv('pango.csv')
 nextclade=pd.read_csv('nextclade.tsv', sep='\t')
 aln2type=pd.read_csv('aln2type.csv')
 
-pango['sample name']=sample_name
-nextclade['sample name']=sample_name
-aln2type['sample name']=sample_name
+pango['sampleName']=sample_name
+nextclade['sampleName']=sample_name
+aln2type['sampleName']=sample_name
 
-df=pango.merge(nextclade, on='sample name', how='left', suffixes=("_pango","_nextclade"))
-df=df.merge(aln2type, on='sample name', how='left', suffixes=(None,"_aln2type"))
+df=pango.merge(nextclade, on='sampleName', how='left', suffixes=("_pango","_nextclade"))
+df=df.merge(aln2type, on='sampleName', how='left', suffixes=(None,"_aln2type"))
 
 # versions
 wf=open('workflow_commit.txt').read()
-df['workflow commit']=str(wf).strip()
-df['manifest verison']=sys.argv[2]
+df['workflowCommit']=str(wf).strip()
+df['manifestVerison']=sys.argv[2]
 nextclade_version=open('nextclade_files/version.txt').read()
-df['nextclade version']=str(nextclade_version).strip()
+df['nextcladeVersion']=str(nextclade_version).strip()
 aln2type_variant_commit=open('variant_definitions/aln2type_variant_git_commit.txt').read()
 aln2type_variant_version=open('variant_definitions/aln2type_variant_version.txt').read()
 aln2type_source_commit=open('variant_definitions/aln2type_commit.txt').read()
-df['aln2type_variant_commit']=str(aln2type_variant_commit).strip()
-df['aln2type_variant_version']=str(aln2type_variant_version).strip()
-df['aln2type_source_commit']=str(aln2type_source_commit).strip()
+df['aln2typeVariantCommit']=str(aln2type_variant_commit).strip()
+df['aln2typeVariantVersion']=str(aln2type_variant_version).strip()
+df['aln2typeSourceVommit']=str(aln2type_source_commit).strip()
 
 df.to_csv('{0}_report.tsv'.format(sys.argv[1]), sep='\t', index=False)
 
@@ -38,28 +38,28 @@ pango.set_index('program',inplace=True)
 p=pango.to_dict(orient='index')
 
 nextclade['program']='nextclade'
-nextclade['nextclade version']=str(nextclade_version).strip()
+nextclade['nextcladeVersion']=str(nextclade_version).strip()
 nextclade.set_index('program',inplace=True)
 n=nextclade.to_dict(orient='index')
 
 aln2type['program']='aln2type'
 aln2type['label']=aln2type['phe-label']
-aln2type['aln2type_variant_commit']=str(aln2type_variant_commit).strip()
-aln2type['aln2type_source_commit']=str(aln2type_source_commit).strip()
+aln2type['aln2typeVariantCommit']=str(aln2type_variant_commit).strip()
+aln2type['aln2typeSourceCommit']=str(aln2type_source_commit).strip()
 aln2type.set_index(['program','phe-label'],inplace=True)
 a={level: aln2type.xs(level).to_dict('index') for level in aln2type.index.levels[0]}
 
-w={'Workflow information':{}}
-w['Workflow information']['workflow commit']=str(wf).strip()
-w['Workflow information']['manifest verison']=sys.argv[2]
-w['Workflow information']['Sample identifier']=sample_name
+w={'WorkflowInformation':{}}
+w['WorkflowInformation']['workflowCommit']=str(wf).strip()
+w['WorkflowInformation']['manifestVerison']=sys.argv[2]
+w['WorkflowInformation']['SampleIdentifier']=sample_name
 
 # add fasta to json
 record = SeqIO.read('consensus.fasta', "fasta")
-f={'Fasta record':{'Seq id':record.id,
-    'Seq description': record.description,
+f={'FastaRecord':{'SeqId':record.id,
+    'SeqDescription': record.description,
     'Sequence':str(record.seq),
-    'Sample identifier':sample_name}}
+    'SampleIdentifier':sample_name}}
 
 
 d={sample_name:{}}
