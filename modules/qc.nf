@@ -72,6 +72,9 @@ process statsCoverage {
 }
 
 process statsInsert {
+    tag { sampleName }
+
+    label 'largemem'
 
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.pdf", mode: 'copy'
@@ -96,6 +99,7 @@ process statsInsert {
 }
 
 process statsAlignment {
+    tag { sampleName }
 
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
 
