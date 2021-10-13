@@ -52,6 +52,7 @@ workflow downstreamAnalysis {
 		.combine(ch_manifest_ver)
 		.combine(download_nextclade_files.out)
 		.combine(getVariantDefinitions.out.defs)
+		.combine(consensus, by:0)
 	)
 
     makeReport.out.tsv.collectFile(name:'analysisReport.tsv',

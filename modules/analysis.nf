@@ -128,7 +128,7 @@ process makeReport {
     input:
     tuple(sampleName, path('pango.csv'), path('aln2type.csv'), path('nextclade.tsv'),
 	path('workflow_commit.txt'), val(manifest_ver), path(nextclade_files),
-	path(variant_definitions))
+	path(variant_definitions), path('consensus.fasta'))
 
     output:
     path("${sampleName}_report.tsv"), emit: tsv
