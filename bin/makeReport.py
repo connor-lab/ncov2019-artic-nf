@@ -2,7 +2,7 @@
 import pandas as pd
 import sys
 import json
-from Bio import SeqIO
+#from Bio import SeqIO
 
 sample_name=sys.argv[1]
 
@@ -52,14 +52,14 @@ a={level: aln2type.xs(level).to_dict('index') for level in aln2type.index.levels
 w={'WorkflowInformation':{}}
 w['WorkflowInformation']['workflowCommit']=str(wf).strip()
 w['WorkflowInformation']['manifestVerison']=sys.argv[2]
-w['WorkflowInformation']['SampleIdentifier']=sample_name
+w['WorkflowInformation']['sampleIdentifier']=sample_name
 
 # add fasta to json
-record = SeqIO.read('consensus.fasta', "fasta")
-f={'FastaRecord':{'SeqId':record.id,
-    'SeqDescription': record.description,
-    'Sequence':str(record.seq),
-    'SampleIdentifier':sample_name}}
+#record = SeqIO.read('consensus.fasta', "fasta")
+#f={'FastaRecord':{'SeqId':record.id,
+#    'SeqDescription': record.description,
+#    'Sequence':str(record.seq),
+#    'sampleName':sample_name}}
 
 
 d={sample_name:{}}
@@ -67,7 +67,7 @@ d[sample_name].update(p)
 d[sample_name].update(n)
 d[sample_name].update(a)
 d[sample_name].update(w)
-d[sample_name].update(f)
+#d[sample_name].update(f)
 
 with open('{0}_report.json'.format(sample_name), 'w' ) as f:
     json.dump(d, f, indent=4, sort_keys=True)
