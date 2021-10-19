@@ -239,30 +239,35 @@ process articMinIONViridian {
     tag { prefix }
 
     publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta"
+    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf"
     publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json"
     if (params.TESToutputMODE){
-        publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf"
+	publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam"
     }
 
     input:
-        tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo)
+        tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo),path('primers')
 
     output:
         tuple prefix, path("${prefix}.fasta"), emit: consensus
-        tuple prefix, path("${prefix}.viridian_cov.json"), emit: coverage
+        tuple prefix, path("${prefix}.viridian_log.json"), emit: coverage
         tuple prefix, path("${prefix}.vcf"), emit: vcfs
+	tuple prefix, path("${prefix}.bam"), emit: bam
 
     script:
         """
-        wget https://raw.githubusercontent.com/iqbal-lab-org/viridian_workflow/master/data/nCoV-artic-v3.bed
-        viridian_workflow run_one_sample_ont \
-		${schemeRepo}/nCoV-2019/V3/nCoV-2019.reference.fasta \
-		nCoV-artic-v3.bed \
-		${prefix}.fastq.gz \
-		${prefix}_outdir/
-        cp ${prefix}_outdir/viridian/consensus.final_assembly.fa ${prefix}.fasta
-        cp ${prefix}_outdir/sample.json ${prefix}.viridian_cov.json
-        cp ${prefix}_outdir/varifier/04.truth.vcf ${prefix}.vcf
+        viridian_workflow run_one_sample \
+		--tech ont \
+		--ref_fasta ${schemeRepo}/nCoV-2019/V3/nCoV-2019.reference.fasta \
+		--amplicon_json primers \
+		--reads ${prefix}.fastq.gz \
+		--outdir ${prefix}_outdir/ \
+		--sample_name ${prefix} \
+		--keep_bam
+        cp ${prefix}_outdir/consensus.fa ${prefix}.fasta
+        cp ${prefix}_outdir/log.json ${prefix}.viridian_log.json
+        cp ${prefix}_outdir/variants.vcf ${prefix}.vcf
+	cp ${prefix}_outdir/reference_mapped.bam ${prefix}.bam
         """
 }
 

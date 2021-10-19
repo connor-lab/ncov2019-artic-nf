@@ -13,6 +13,8 @@ include {makeReport} from '../modules/analysis.nf'
 include {articDownloadScheme} from '../modules/artic.nf'
 include {FN4_upload} from '../modules/analysis.nf'
 include {getWorkflowCommit} from '../modules/analysis.nf'
+include {getGFF3} from '../modules/analysis.nf'
+include {bcftools_csq} from '../modules/analysis.nf'
 
 workflow ncovAnalysis {
     take:
@@ -27,6 +29,7 @@ workflow ncovAnalysis {
 workflow downstreamAnalysis {
     take:
       consensus
+      vcf
       ch_preparedRef
       ch_bedFile
 
@@ -45,6 +48,10 @@ workflow downstreamAnalysis {
     getWorkflowCommit()
 
     aln2type(consensus.combine(getVariantDefinitions.out.defs).combine(ch_preparedRef).combine(ch_bedFile))
+
+    getGFF3()
+
+    bcftools_csq(vcf.combine(ch_preparedRef).combine(getGFF3.out))
 
     makeReport(pango.out.combine(aln2type.out, by:0)
 		.combine(nextclade.out.tsv,by:0)

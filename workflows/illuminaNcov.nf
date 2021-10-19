@@ -128,7 +128,7 @@ workflow sequenceAnalysis {
                            .join(trimPrimerSequences.out.mapped))
       
 
-      downstreamAnalysis(makeConsensus.out, ch_refFasta, ch_bedFile)
+      downstreamAnalysis(makeConsensus.out, callVariants.out.variants, ch_refFasta, ch_bedFile)
       
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
@@ -149,9 +149,11 @@ workflow sequenceAnalysisViridian {
       ch_refFasta
 
     main:
-      viridian(ch_filePairs.combine(ch_bedFile).combine(ch_preparedRef))
+      download_primers(params.primers)
+
+      viridian(ch_filePairs.combine(download_primers.out).combine(ch_preparedRef))
      
-      downstreamAnalysis(viridian.out.consensus, ch_refFasta, ch_bedFile)
+      downstreamAnalysis(viridian.out.consensus, viridian.out.vcfs, ch_refFasta, ch_bedFile)
   
 }
 
