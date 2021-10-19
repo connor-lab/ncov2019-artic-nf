@@ -247,7 +247,7 @@ process viridian {
     }
 
     input:
-        tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path(primers), path('ref.fa'),path("*")
+        tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path('primers'), path('ref.fa'),path("*")
 
     output:
         tuple prefix, path("${prefix}.fasta"), emit: consensus
@@ -260,7 +260,7 @@ process viridian {
         """
 	viridian_workflow run_one_sample \
                 --tech illumina \
-                --ref_fasta ${schemeRepo}/nCoV-2019/V3/nCoV-2019.reference.fasta \
+                --ref_fasta ref.fa \
                 --amplicon_json primers \
                 --reads1 ${prefix}_1.fastq.gz \
                 --reads2 ${prefix}_2.fastq.gz \
