@@ -16,5 +16,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: |
-      cd environments/illumina
-      docker build . --file Dockerfile --tag gms-artic-illumina:$(date +%s)
+      cd environments/illumina 
+      docker build . Dockerfile --tag gms-artic-illumina:$(date +%s)
