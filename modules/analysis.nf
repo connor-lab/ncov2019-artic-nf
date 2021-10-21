@@ -19,7 +19,7 @@ process makeReport {
 		path('nextclade.json'))
 
     output:
-    path("${sampleName}_report.tsv"), emit: tsv
+    path "${sampleName}_report.tsv", emit: tsv
 
     script:
     """
