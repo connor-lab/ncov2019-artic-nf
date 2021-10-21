@@ -85,7 +85,7 @@ jobs:
          scorpio_VER=$(cat versions/scorpio-latest-version.txt | sed 's|v||')
          constellations_VER=$(cat versions/constellations-latest-version.txt | sed 's|v||')
          pangodesign_VER=$(cat versions/pangodesignation-latest-version.txt | sed 's|v||' )  
-         docker build --no-cache -f environments/illumina/Dockerfile -t sofsta/artic-ncov2019-illumina:latest -t sofsta/artic-ncov2019-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .           
+         docker build --no-cache -f environments/illumina/Dockerfile -t genomicmedicinesweden/artic-ncov2019-illumina:latest -t genomicmedicinesweden/artic-ncov2019-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .           
      
      - name: Push Docker image to DockerHub
        shell: bash
@@ -95,6 +95,6 @@ jobs:
          scorpio_VER=$(cat versions/scorpio-latest-version.txt | sed 's|v||')
          constellations_VER=$(cat versions/constellations-latest-version.txt | sed 's|v||')
          pangodesign_VER=$(cat versions/pangodesignation-latest-version.txt | sed 's|v||' )
-         docker image push sofsta/artic-ncov2019-illumina:latest
-         docker image push sofsta/artic-ncov2019-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}
+         docker image push genomicmedicinesweden/artic-ncov2019-illumina:latest
+         docker image push genomicmedicinesweden/artic-ncov2019-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}
              
