@@ -11,6 +11,7 @@ include {articMinIONMedaka} from  '../modules/artic.nf'
 include {articRemoveUnmappedReads} from '../modules/artic.nf' 
 include {splitSeqSum} from '../modules/artic.nf' 
 include {getObjFilesONT} from '../modules/artic'
+include {download_primers} from '../modules/analysis.nf'
 include {articMinIONViridian} from '../modules/artic'
 
 include {makeQCCSV} from '../modules/qc.nf'
@@ -128,7 +129,7 @@ workflow sequenceAnalysisMedaka {
                            .join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
 
-     downstreamAnalysis(articMinIONMedaka.out.consensus_fasta, articDownloadScheme.out.reffasta, articDownloadScheme.out.bed)     
+     downstreamAnalysis(articMinIONMedaka.out.consensus_fasta, articMinIONMedaka.out.vcf, articDownloadScheme.out.reffasta, articDownloadScheme.out.bed)     
 
      if (params.outCram) {
         bamToCram(articMinIONMedaka.out.ptrim.map{ it[0] } 
@@ -148,15 +149,18 @@ workflow sequenceAnalysisViridian {
 
     main:
       articDownloadScheme()
+ 
+      download_primers(params.primers)
 
       getObjFilesONT(ch_runFastqDirs)
 
       articMinIONViridian(getObjFilesONT.out.fqs
-                                      .combine(articDownloadScheme.out.scheme))
+                                      .combine(articDownloadScheme.out.scheme)
+				      .combine(download_primers.out))
 
 
       // analysis
-      downstreamAnalysis(articMinIONViridian.out.consensus, articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
+      downstreamAnalysis(articMinIONViridian.out.consensus, articMinIONViridian.out.vcfs,articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
 
 }
 

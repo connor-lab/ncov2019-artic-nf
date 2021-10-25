@@ -16,6 +16,19 @@ process pango {
     """
 }
 
+process  download_primers {
+    input:
+        val(primers) 
+
+    output:
+        path('primers.txt')
+
+    script:
+        """
+        wget https://raw.githubusercontent.com/iqbal-lab-org/viridian_workflow/master/data/covid-artic-v3.json -O primers.txt
+        """
+}
+
 
 process download_nextclade_files {
     publishDir "${params.outdir}/analysis/nextclade/${params.prefix}", mode: 'copy'
@@ -163,5 +176,41 @@ process FN4_upload {
 	--file ${sampleName}.fasta \
 	--metadata "{\\"sampleID\\":\\"$sampleName\\"}"
 
+    """
+}
+
+
+process getGFF3 {
+
+    output:
+    path "MN908947.3.gff3"
+
+    script:
+    """
+    esearch -db nucleotide -query "MN908947.3" | efetch -format gb > MN908947.3.gb
+
+    cat MN908947.3.gb | gbk2gff3.py > MN908947.3.gff3
+    """
+}
+
+process bcftools_csq {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/analysis/bcftools/${params.prefix}", mode: 'copy'
+
+    input:
+    tuple(sampleName, path('vcf'), path('reffasta'), path('GFF3'))
+
+    output:
+    tuple(sampleName, path("${sampleName}.vcf")) optional true
+
+    script:
+    """
+    bcftools csq \
+	-f reffasta \
+	-g GFF3 \
+	vcf \
+	-Ot -o ${sampleName}.vcf \
+	--force
     """
 }
