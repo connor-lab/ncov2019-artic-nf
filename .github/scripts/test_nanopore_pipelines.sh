@@ -10,7 +10,7 @@ NXF_VER=20.03.0-edge nextflow run ./main.nf \
        -profile singularity \
        --nanopolish \
        --sequencing_summary .github/data/nanopore/20200311_1427_X4_FAK72834_a3787181/sequencing_summary_FAK72834_298b7829.txt 
-#       --basecalled_fastq .github/data/nanopore/20200311_1427_X4_FAK72834_a3787181/fastq_pass/ \
+       --basecalled_fastq .github/data/nanopore/20200311_1427_X4_FAK72834_a3787181/fastq_pass/ \
 #       --fast5_pass .github/data/nanopore/20200311_1427_X4_FAK72834_a3787181/fast5_pass/ \
 #       --prefix 20200311_1427_X4_FAK72834_a3787181 
 cp .nextflow.log artifacts/nanopolish.nextflow.log
