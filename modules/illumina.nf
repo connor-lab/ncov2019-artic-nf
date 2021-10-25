@@ -125,18 +125,19 @@ process callVariants {
 
     tag { sampleName }
 
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.variants.tsv", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.variants.vcf", mode: 'copy'
 
     input:
     tuple(sampleName, path(bam), path(ref))
 
     output:
-    tuple sampleName, path("${sampleName}.variants.tsv"), emit: variants
+    tuple sampleName, path("${sampleName}.variants.vcf"), emit: variants
 
     script:
         """
         samtools mpileup -A -d 0 --reference ${ref} -B -Q 0 ${bam} |\
         ivar variants -r ${ref} -m ${params.ivarMinDepth} -p ${sampleName}.variants -q ${params.ivarMinVariantQuality} -t ${params.ivarMinFreqThreshold}
+	ivar_variants_to_vcf.py ${sampleName}.variants.tsv ${sampleName}.variants.vcf
         """
 }
 
