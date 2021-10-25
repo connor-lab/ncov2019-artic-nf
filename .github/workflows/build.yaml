@@ -49,12 +49,11 @@ jobs:
         name: build singularity
         run: |
           singularity build artic-ncov2019-illumina_${{env.RELEASE_VERSION}}.sif docker://oxfordmmm/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: Upload image for release
+        uses: actions/upload-artifact@v2
         with:
-          files: artic-ncov2019-illumina_*.sif
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: artic-ncov2019-illumina
+          path: artic-ncov2019-illumina_*.sif
   
   build-nanopore-docker:
     runs-on: ubuntu-latest
@@ -99,9 +98,41 @@ jobs:
         name: build singularity
         run: |
           singularity build artic-ncov2019-nanopore_${{env.RELEASE_VERSION}}.sif docker://oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
+      - name: Upload image for release
+        uses: actions/upload-artifact@v2
+        with:
+          name: artic-ncov2019-nanopore
+          path: artic-ncov2019-nanopore_*.sif
+  
+
+  release_images:
+    runs-on: ubuntu-latest
+    needs: [build-illumina-sing, build-nanopore-sing]
+    steps:
+      - name: Gather illumina singularity image
+        uses: actions/download-artifact@v2
+        with:
+          path: sing_images
+          name: artic-ncov2019-illumina
+
+      - name: Gather nanopore singularity image
+        uses: actions/download-artifact@v2
+        with:
+          path: sing_images
+          name: artic-ncov2019-nanopore
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: artic-ncov2019-nanopore_*.sif
+          files: | 
+            sing_images/artic-ncov2019-illumina_*.sif
+            sing_images/artic-ncov2019-nanopore_*.sif
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: |
+            artic-ncov2019-illumina
+            artic-ncov2019-nanopore
+          failOnError: false
