@@ -8,11 +8,10 @@ singularity --version
 echo "Nextflow run current PR in --nanopolish mode (no barcodes).." >> artifacts/test_artifact.log
 NXF_VER=20.03.0-edge nextflow run ./main.nf \
        -profile singularity \
-       --nanopolish \
-       --sequencing_summary .github/data/nanopore/20200311_1427_X4_FAK72834_a3787181/sequencing_summary_FAK72834_298b7829.txt 
-       --basecalled_fastq .github/data/nanopore/20200311_1427_X4_FAK72834_a3787181/fastq_pass/ \
-       --fast5_pass .github/data/nanopore/20200311_1427_X4_FAK72834_a3787181/fast5_pass/ \
-#       --prefix 20200311_1427_X4_FAK72834_a3787181 
+       --nanopolish --prefix "test_nanopore" \
+       --basecalled_fastq .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fastq_pass/ \
+       --fast5_pass .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fast5_pass/ \
+       --sequencing_summary .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/sequencing_summary_FAK72834_298b7829.txt
 cp .nextflow.log artifacts/nanopolish.nextflow.log
 rm -rf results && rm -rf work && rm -rf .nextflow*
 
