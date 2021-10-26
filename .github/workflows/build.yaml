@@ -159,6 +159,6 @@ jobs:
       - name: 'Create new environment'
         uses: softprops/action-gh-release@v1
         with:
-          repository: SARS-COV-2_environments
+          repository: GenomePathogenAnalysisService/SARS-COV-2_environments
           tag_name: ${{ env.NEW_VERSION }}
           token: ${{ secrets.ACCESS_TOKEN_GITHUB }}
