@@ -22,25 +22,25 @@ NXF_VER=20.03.0-edge nextflow run main.nf \
        --basecalled_fastq .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fastq_pass/ \
        --fast5_pass .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fast5_pass/ \
        --sequencing_summary .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/sequencing_summary_FAK72834_298b7829.txt 
-       --prefix 20200311_1427_X1_FAK72834_a3787181 
+       #--prefix 20200311_1427_X1_FAK72834_a3787181 
 cp .nextflow.log artifacts/nanopolish_barcodes.nextflow.log
 rm -rf results && rm -rf work && rm -rf .nextflow*
 
 echo "Nextflow run current PR in --medaka mode (no barcodes).." >> artifacts/test_artifact.log
 NXF_VER=20.03.0-edge nextflow run main.nf \
        -profile singularity \
-       --medaka \
+       --medaka --prefix "test_nanopore" \
        --basecalled_fastq .github/data/nanopore/20200311_1427_X4_FAK72834_a3787181/fastq_pass/ \
-       --prefix 20200311_1427_X4_FAK72834_a3787181
+      # --prefix 20200311_1427_X4_FAK72834_a3787181
 cp .nextflow.log artifacts/medaka.nextflow.log
 rm -rf results && rm -rf work && rm -rf .nextflow*
 
 echo "Nextflow run current PR in --medaka mode (barcodes).." >> artifacts/test_artifact.log
 NXF_VER=20.03.0-edge nextflow run main.nf \
        -profile singularity \
-       --medaka \
+       --medaka --prefix "test_nanopore"  \
        --basecalled_fastq .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fastq_pass/ \
-       --prefix 20200311_1427_X1_FAK72834_a3787181
+      ## --prefix 20200311_1427_X1_FAK72834_a3787181
 
 cp .nextflow.log artifacts/medaka_barcodes.nextflow.log
 rm -rf results && rm -rf work && rm -rf .nextflow*
