@@ -136,3 +136,29 @@ jobs:
             artic-ncov2019-illumina
             artic-ncov2019-nanopore
           failOnError: false
+
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ACCESS_TOKEN_GITHUB }}
+          repository: GenomePathogenAnalysisService/SARS-COV-2_environments
+          path: SARS-COV-2_environments
+          fetch-depth: 0
+      
+      - name: 'Define new version'
+        working-directory: SARS-COV-2_environments
+        run: |
+          CURRENT_VERSION=$(git tag -l --sort=-version:refname | head -n 1)
+          echo "Current Version = $CURRENT_VERSION"
+          readarray -d . -t strarr <<< "$CURRENT_VERSION"
+          ((strarr[-1]+=1))
+          NEW_VERSION="${strarr[0]}"
+          for elem in "${strarr[@]:1}";do NEW_VERSION="$NEW_VERSION.$elem"; done
+          echo "New Version = $NEW_VERSION"
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+
+      - name: 'Create new environment'
+        uses: softprops/action-gh-release@v1
+        with:
+          repository: SARS-COV-2_environments
+          tag_name: ${{ env.NEW_VERSION }}
+          token: ${{ secrets.ACCESS_TOKEN_GITHUB }}
