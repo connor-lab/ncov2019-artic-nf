@@ -41,6 +41,9 @@ nextclade['program']='nextclade'
 nextclade['nextcladeVersion']=str(nextclade_version).strip()
 nextclade.set_index('program',inplace=True)
 n=nextclade.to_dict(orient='index')
+with open('nextclade.json','r') as inf:
+    nj=json.load(inf)
+n['nextcladeOutputJson']=nj
 
 aln2type['program']='aln2type'
 aln2type['label']=aln2type['phe-label']

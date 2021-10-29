@@ -55,6 +55,7 @@ workflow downstreamAnalysis {
 
     makeReport(pango.out.combine(aln2type.out, by:0)
 		.combine(nextclade.out.tsv,by:0)
+		.combine(nextclade.out.json,by:0)
 		.combine(getWorkflowCommit.out.commit)
 		.combine(ch_manifest_ver)
 		.combine(download_nextclade_files.out)
