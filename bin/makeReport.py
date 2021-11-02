@@ -2,7 +2,7 @@
 import pandas as pd
 import sys
 import json
-#from Bio import SeqIO
+from Bio import SeqIO
 
 sample_name=sys.argv[1]
 
@@ -41,6 +41,9 @@ nextclade['program']='nextclade'
 nextclade['nextcladeVersion']=str(nextclade_version).strip()
 nextclade.set_index('program',inplace=True)
 n=nextclade.to_dict(orient='index')
+with open('nextclade.json','r') as inf:
+    nj=json.load(inf)
+n['nextcladeOutputJson']=nj
 
 aln2type['program']='aln2type'
 aln2type['label']=aln2type['phe-label']
@@ -55,7 +58,8 @@ w['WorkflowInformation']['manifestVerison']=sys.argv[2]
 w['WorkflowInformation']['sampleIdentifier']=sample_name
 
 # add fasta to json
-#record = SeqIO.read('consensus.fasta', "fasta")
+record = SeqIO.read('ref.fasta', "fasta")
+w['WorkflowInformation']['referenceIdentifier']=record.id
 #f={'FastaRecord':{'SeqId':record.id,
 #    'SeqDescription': record.description,
 #    'Sequence':str(record.seq),

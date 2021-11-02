@@ -139,9 +139,9 @@ process makeReport {
     publishDir "${params.outdir}/analysis/report/${params.prefix}", mode: 'copy'
 
     input:
-    tuple(sampleName, path('pango.csv'), path('aln2type.csv'), path('nextclade.tsv'),
+    tuple(sampleName, path('pango.csv'), path('aln2type.csv'), path('nextclade.tsv'), path('nextclade.json'),
 	path('workflow_commit.txt'), val(manifest_ver), path(nextclade_files),
-	path(variant_definitions), path('consensus.fasta'))
+	path(variant_definitions), path('consensus.fasta'),path('ref.fasta'))
 
     output:
     path("${sampleName}_report.tsv"), emit: tsv
