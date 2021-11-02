@@ -2,7 +2,7 @@
 import pandas as pd
 import sys
 import json
-#from Bio import SeqIO
+from Bio import SeqIO
 
 sample_name=sys.argv[1]
 
@@ -58,7 +58,8 @@ w['WorkflowInformation']['manifestVerison']=sys.argv[2]
 w['WorkflowInformation']['sampleIdentifier']=sample_name
 
 # add fasta to json
-#record = SeqIO.read('consensus.fasta', "fasta")
+record = SeqIO.read('ref.fasta', "fasta")
+w['WorkflowInformation']['referenceIdentifier']=record.id
 #f={'FastaRecord':{'SeqId':record.id,
 #    'SeqDescription': record.description,
 #    'Sequence':str(record.seq),
