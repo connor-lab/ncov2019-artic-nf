@@ -34,8 +34,12 @@ if (params.profile){
 }
 
 if ( params.illumina ) {
-   if ( !params.directory && !params.objstore && !params.catsup) {
-       println("Please supply a directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
+   if ( !params.directory && !params.objstore && !params.catsup && !params.ena_csv) {
+       println("Please supply a valid input (directory, objstroe, catsup or ena_csv").
+       println("    --directory = A directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
+       println("    --objstore  = a csv (bucket,sample_prefix) for running from OCI S3 bucket")
+       println("    --catsup    = a directory that has been uploaded by catsup or electron client with a sp3data.csv (submission_uuid4,sample_uuid4)")
+       println("    --ena_csv   = a csv (bucket,sample_prefix,sample_accession) for running ENA batches")
        println("Use --help to print help")
        System.exit(1)
    }
@@ -60,11 +64,23 @@ if ( params.illumina ) {
    }
 } else if ( params.medaka ) {
    if (! params.basecalled_fastq && !params.objstore && !params.catsup ) {
-       println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
+       println("Please supply a valid input (basecalled_fastq, objstroe, catsup or ena_csv").
+       println("    --basecalled_fastq  = A directory of basecalled fastqs, (I.E the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass).") 
+       println("                          This can optionally contain barcodeXX directories, which are auto-detected.")
+       println("    --objstore          = a csv (bucket,sample_prefix) for running from OCI S3 bucket")
+       println("    --catsup            = a directory that has been uploaded by catsup or electron client with a sp3data.csv (submission_uuid4,sample_uuid4)")
+       println("    --ena_csv           = a csv (bucket,sample_prefix,sample_accession) for running ENA batches")
+       println("Use --help to print help")
    }
 } else if ( params.viridian ) {
-   if (! params.basecalled_fastq && !params.objstore && !params.catsup ) {
-       println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
+   if (! params.basecalled_fastq && !params.objstore && !params.catsup && !params.ena_csv) {
+       println("Please supply a valid input (basecalled_fastq, objstroe, catsup or ena_csv").
+       println("    --basecalled_fastq  = A directory of basecalled fastqs, (I.E the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass).") 
+       println("                          This can optionally contain barcodeXX directories, which are auto-detected.")
+       println("    --objstore          = a csv (bucket,sample_prefix) for running from OCI S3 bucket")
+       println("    --catsup            = a directory that has been uploaded by catsup or electron client with a sp3data.csv (submission_uuid4,sample_uuid4)")
+       println("    --ena_csv           = a csv (bucket,sample_prefix,sample_accession) for running ENA batches")
+       println("Use --help to print help")
    }
 } else if ( params.analysis ) {
    if ( params.consensus_seqs ) {
@@ -191,7 +207,7 @@ workflow {
 
    main:
      if ( params.nanopolish || params.medaka || (params.viridian && !params.illumina )) {
-	if ( params.objstore || params.catsup ) {
+	if ( params.objstore || params.catsup || params.ena_csv ) {
 	     articNcovNanopore(ch_objFiles)
 	}
 	else {
@@ -201,7 +217,7 @@ workflow {
          if ( params.cram ) {
             ncovIlluminaCram(ch_cramFiles)
          }
-         else if ( params.objstore || params.catsup ) {
+         else if ( params.objstore || params.catsup || params.ena_csv ) {
             ncovIlluminaObj(ch_objFiles)
          }
          else {
