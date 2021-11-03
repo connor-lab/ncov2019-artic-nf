@@ -26,7 +26,7 @@ jobs:
       run: |
        export PATH=/opt/conda/bin:$PATH
        conda install -c bioconda nextflow
-       NXF_VER=20.03.0-edge nextflow -version
+       NXF_VER=21.04.0 nextflow -version
     - name: test nanopore pipelines
       run: bash .github/scripts/test_nanopore_pipelines.sh
     - name: test typing functionality
