@@ -14,13 +14,13 @@ echo bed file: $BED_FILE >> artifacts/test_artifact.log
 # run current pull request code
 singularity --version
 echo Nextflow run --illumina mode with --ref, --bed .. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.0 nextflow run main.nf \
        -profile singularity \
        --ref $REF_FILE \
        --bed $BED_FILE \
-       --directory $PWD/.github/data/fastqs/ \
+       --directory .github/data/fastqs/ \
        --illumina \
-       --prefix test
+       --prefix "test"
 cp .nextflow.log artifacts/ref_bed.nextflow.log
 
 # check that git clone did not ran:
@@ -58,13 +58,13 @@ rm $REF_FILE
 ln -s $REAL_REF $REF_FILE
 
 echo Nextflow run --illumina mode with symlinked --ref, --bed .. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.0 nextflow run main.nf \
        -profile singularity \
        --ref $REF_FILE \
        --bed $BED_FILE \
-       --directory $PWD/.github/data/fastqs/ \
+       --directory .github/data/fastqs/ \
        --illumina \
-       --prefix test
+       --prefix "test"
 cp .nextflow.log artifacts/symref_bed.nextflow.log
 
 # check that bwa index did not ran:
