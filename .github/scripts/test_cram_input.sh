@@ -14,14 +14,14 @@ echo bed file: $BED_FILE
 sed -i s'/cpus = 4/cpus = 2/'g conf/coguk/sanger.config
 singularity --version
 echo Nextflow run --illumina mode with --ref, --bed and --cram.. >> artifacts/test_artifact.log
-NXF_VER=20.03.0-edge nextflow run ./main.nf \
+NXF_VER=21.04.0 nextflow run main.nf \
        -profile sanger,singularity \
        --ref $REF_FILE \
        --bed $BED_FILE \
        --cram \
-       --directory $PWD/.github/data/crams/ \
+       --directory .github/data/crams/ \
        --illumina \
-       --prefix test
+       --prefix "test"
 cp .nextflow.log artifacts/cram_ref_bed.nextflow.log
 
 # check that git clone did not ran:
