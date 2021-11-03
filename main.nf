@@ -122,6 +122,13 @@ workflow {
                   .unique()
                   .set{ ch_objFiles }
        }
+        else if (params.ena_csv != false) {
+           Channel.fromPath( "${params.ena_csv}" )
+                  .splitCsv(header: true)
+                  .map { row -> tuple("${params.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
+                  .unique()
+                  .set{ ch_objFiles }
+       }
        else {
            fastqSearchPath = makeFastqSearchPath( params.illuminaPrefixes, params.illuminaSuffixes, params.fastq_exts )
 
@@ -145,6 +152,14 @@ workflow {
            Channel.fromPath( "${params.catsup}/sp3data.csv" )
                   .splitCsv(header: true)
                   .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
+                  .view()
+                  .unique()
+                  .set{ ch_objFiles }
+       }
+       else if (params.ena_csv != false) {
+           Channel.fromPath( "${params.ena_csv}" )
+                  .splitCsv(header: true)
+                  .map { row -> tuple("${params.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
                   .view()
                   .unique()
                   .set{ ch_objFiles }
