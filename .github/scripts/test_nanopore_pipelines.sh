@@ -2,6 +2,7 @@
 set -eo pipefail
 export PATH=/opt/conda/bin:$PATH
 
+#test
 # run current pull request code
 singularity --version
 # write test log as github Action artifact
