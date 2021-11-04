@@ -19,7 +19,8 @@ cp -r work work_singularity_profile
 # run tests against previous previous_release to compare outputs 
 git clone https://github.com/genomic-medicine-sweden/gms-artic.git previous_release 
 cd previous_release
-git checkout tags/v1.4.0
+#git checkout tags/v1.4.0
+git checkout 8dfe83765ef0d2c98347d32ed1f1d57a5d213108
 
 # the github runner only has 2 cpus available, so replace for that commit required:
 sed -i s'/cpus = 4/cpus = 2/'g conf/resources.config
