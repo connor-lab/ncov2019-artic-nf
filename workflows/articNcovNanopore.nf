@@ -125,7 +125,8 @@ workflow sequenceAnalysisMedaka {
      collateSamples(qc.pass.map{ it[0] }
                            .join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
-                                              
+
+     pangolinTyping(articMinIONMedaka.out.consensus_fasta)
 
      if (params.outCram) {
         bamToCram(articMinIONMedaka.out.ptrim.map{ it[0] } 
