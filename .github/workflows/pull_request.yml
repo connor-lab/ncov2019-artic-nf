@@ -2,6 +2,9 @@ on:
   pull_request:
     branches:
     - master
+  push:
+    branches:
+    - GHactions_37d2b7a
 name: master Pull Request
 jobs:
   test:
