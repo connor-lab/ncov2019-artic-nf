@@ -176,7 +176,7 @@ workflow {
        else if (params.ena_csv && params.ena_csv != false) {
            Channel.fromPath( "${params.ena_csv}" )
                   .splitCsv(header: true)
-                  .map { row -> tuple("${params.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
+                  .map { row -> tuple("${row.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
                   .view()
                   .unique()
                   .set{ ch_objFiles }
