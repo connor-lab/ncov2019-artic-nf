@@ -34,8 +34,12 @@ if (params.profile){
 }
 
 if ( params.illumina ) {
-   if ( !params.directory && !params.objstore && !params.catsup) {
-       println("Please supply a directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
+   if ( !params.directory && !params.objstore && !params.catsup && !params.ena_csv) {
+       println("Please supply a valid input (directory, objstroe, catsup or ena_csv").
+       println("    --directory = A directory containing fastqs or CRAMs with --directory. Specify --cram if supplying a CRAMs directory")
+       println("    --objstore  = a csv (bucket,sample_prefix) for running from OCI S3 bucket")
+       println("    --catsup    = a directory that has been uploaded by catsup or electron client with a sp3data.csv (submission_uuid4,sample_uuid4)")
+       println("    --ena_csv   = a csv (bucket,sample_prefix,sample_accession) for running ENA batches")
        println("Use --help to print help")
        System.exit(1)
    }
@@ -60,11 +64,23 @@ if ( params.illumina ) {
    }
 } else if ( params.medaka ) {
    if (! params.basecalled_fastq && !params.objstore && !params.catsup ) {
-       println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
+       println("Please supply a valid input (basecalled_fastq, objstroe, catsup or ena_csv").
+       println("    --basecalled_fastq  = A directory of basecalled fastqs, (I.E the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass).") 
+       println("                          This can optionally contain barcodeXX directories, which are auto-detected.")
+       println("    --objstore          = a csv (bucket,sample_prefix) for running from OCI S3 bucket")
+       println("    --catsup            = a directory that has been uploaded by catsup or electron client with a sp3data.csv (submission_uuid4,sample_uuid4)")
+       println("    --ena_csv           = a csv (bucket,sample_prefix,sample_accession) for running ENA batches")
+       println("Use --help to print help")
    }
 } else if ( params.viridian ) {
-   if (! params.basecalled_fastq && !params.objstore && !params.catsup ) {
-       println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
+   if (! params.basecalled_fastq && !params.objstore && !params.catsup && !params.ena_csv) {
+       println("Please supply a valid input (basecalled_fastq, objstroe, catsup or ena_csv").
+       println("    --basecalled_fastq  = A directory of basecalled fastqs, (I.E the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass).") 
+       println("                          This can optionally contain barcodeXX directories, which are auto-detected.")
+       println("    --objstore          = a csv (bucket,sample_prefix) for running from OCI S3 bucket")
+       println("    --catsup            = a directory that has been uploaded by catsup or electron client with a sp3data.csv (submission_uuid4,sample_uuid4)")
+       println("    --ena_csv           = a csv (bucket,sample_prefix,sample_accession) for running ENA batches")
+       println("Use --help to print help")
    }
 } else if ( params.analysis ) {
    if ( params.consensus_seqs ) {
@@ -102,24 +118,32 @@ workflow {
                   .map { file -> tuple(file.simpleName, file) }
                   .view()
                   .set{ ch_consensusFiles }
-       }
+   }
    else if ( params.illumina ) {
        if (params.cram) {
            Channel.fromPath( "${params.directory}/**.cram" )
                   .map { file -> tuple(file.baseName, file) }
                   .set{ ch_cramFiles }
        }
-       else if (params.objstore != false) {
+       else if (params.objstore && params.objstore != false) {
            Channel.fromPath( "${params.objstore}" )
                   .splitCsv()
                   .map { row -> tuple(row[0], row[1], row[1]) }
                   .set{ ch_objFiles }
        }
-       else if (params.catsup != false) {
+       else if (params.catsup && params.catsup != false) {
            Channel.fromPath( "${params.catsup}/sp3data.csv" )
                   .splitCsv(header: true)
                   .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
                   .unique()
+                  .set{ ch_objFiles }
+       }
+       else if (params.ena_csv && params.ena_csv != false) {
+           Channel.fromPath( "${params.ena_csv}" )
+                  .splitCsv(header: true)
+                  .map { row -> tuple("${row.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
+                  .unique()
+                  .view()
                   .set{ ch_objFiles }
        }
        else {
@@ -135,13 +159,13 @@ workflow {
        nanoporeBarcodeDirs = file("${params.basecalled_fastq}/barcode*", type: 'dir', maxdepth: 1 )
        nanoporeNoBarcode = file("${params.basecalled_fastq}/*.fastq", type: 'file', maxdepth: 1)
 
-       if (params.objstore) {
+       if (params.objstore && params.objstore) {
            Channel.fromPath( "${params.objstore}" )
                   .splitCsv()
                   .map { row -> tuple(row[0], row[1], row[1]) }
                   .set{ ch_objFiles }
        }
-       else if (params.catsup != false) {
+       else if (params.catsup && params.catsup != false) {
            Channel.fromPath( "${params.catsup}/sp3data.csv" )
                   .splitCsv(header: true)
                   .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
@@ -149,54 +173,61 @@ workflow {
                   .unique()
                   .set{ ch_objFiles }
        }
+       else if (params.ena_csv && params.ena_csv != false) {
+           Channel.fromPath( "${params.ena_csv}" )
+                  .splitCsv(header: true)
+                  .map { row -> tuple("${row.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
+                  .view()
+                  .unique()
+                  .set{ ch_objFiles }
+       }
        else{
-       if( nanoporeBarcodeDirs ) {
-            // Yes, barcodes!
-            Channel.fromPath( nanoporeBarcodeDirs )
-                   .filter( ~/.*barcode[0-9]{1,4}$/ )
-                   .filter{ d ->
-                            def count = 0
-                            for (x in d.listFiles()) {
-                                if (x.isFile()) {
-                                    count += x.countFastq()
-                                }
-                            }
-                            count > params.minReadsPerBarcode
-                   }.set{ ch_fastqDirs }
-       } else if ( nanoporeNoBarcode ){
-            // No, no barcodes
-            Channel.fromPath( "${params.basecalled_fastq}", type: 'dir', maxDepth: 1 )
-                    .set{ ch_fastqDirs }
-      } else {
-            println("Couldn't detect whether your Nanopore run was barcoded or not. Use --basecalled_fastq to point to the unmodified guppy output directory.")
-            System.exit(1)
-      }
-   }
+           if( nanoporeBarcodeDirs ) {
+               // Yes, barcodes!
+               Channel.fromPath( nanoporeBarcodeDirs )
+                 .filter( ~/.*barcode[0-9]{1,4}$/ )
+                 .filter{ d ->
+		    def count = 0
+		    for (x in d.listFiles()) {
+			if (x.isFile()) {
+			    count += x.countFastq()
+			}
+		    }
+		    count > params.minReadsPerBarcode
+               }.set{ ch_fastqDirs }
+           } else if ( nanoporeNoBarcode ){
+               // No, no barcodes
+               Channel.fromPath( "${params.basecalled_fastq}", type: 'dir', maxDepth: 1 )
+                 .set{ ch_fastqDirs }
+           } else {
+               println("Couldn't detect whether your Nanopore run was barcoded or not. Use --basecalled_fastq to point to the unmodified guppy output directory.")
+               System.exit(1)
+           }
+       }
    }
 
    main:
-     if ( params.nanopolish || params.medaka || (params.viridian && !params.illumina )) {
-	if ( params.objstore || params.catsup ) {
-	     articNcovNanopore(ch_objFiles)
-	}
-	else {
-         articNcovNanopore(ch_fastqDirs)
-	}
-     } else if ( params.illumina ) {
-         if ( params.cram ) {
-            ncovIlluminaCram(ch_cramFiles)
-         }
-         else if ( params.objstore || params.catsup ) {
-            ncovIlluminaObj(ch_objFiles)
-         }
-         else {
-            ncovIllumina(ch_filePairs)
-         }
-      } else if (params.analysis) {
+       if ( params.nanopolish || params.medaka || (params.viridian && !params.illumina )) {
+           if ( params.objstore || params.catsup || params.ena_csv ) {
+	       articNcovNanopore(ch_objFiles)
+	   }
+	   else {
+               articNcovNanopore(ch_fastqDirs)
+	   }
+       } else if ( params.illumina ) {
+           if ( params.cram ) {
+               ncovIlluminaCram(ch_cramFiles)
+           }
+           else if ( params.objstore || params.catsup || params.ena_csv ) {
+               ncovIlluminaObj(ch_objFiles)
+           }
+           else {
+               ncovIllumina(ch_filePairs)
+           }
+       } else if (params.analysis) {
             ncovAnalysis(ch_consensusFiles)
-      } else {
-         println("Please select a workflow with --nanopolish, --illumina or --medaka")
-     }
-     
+   } else {
+       println("Please select a workflow with --nanopolish, --illumina or --medaka")
+   }
 }
 
