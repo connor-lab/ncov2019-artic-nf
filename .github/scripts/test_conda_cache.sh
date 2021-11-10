@@ -13,9 +13,10 @@ echo PWD=$PWD >> $REPO/artifacts/test_artifact.log
 NXF_VER=21.04.0 nextflow run $REPO \
        -profile conda \
        --cache $REPO/conda_cache_dir \
-       --directory $REPO/.github/data/fastqs/ \
+       #--directory $REPO/.github/data/fastqs/ \
+       --directory .github/data/fastqs/ \
        --illumina \
-       --prefix test
+       --prefix "test"
 cp .nextflow.log $REPO/artifacts/cache_creation.conda.profile.nextflow.log
 
 cat .nextflow.log | grep 'Conda create complete env=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/environments/illumina/environment.yml path=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/conda_cache_dir/artic-ncov2019-illumina-' \
@@ -28,9 +29,10 @@ echo re-run pipeline with conda --cache.. >> $REPO/artifacts/test_artifact.log
 NXF_VER=21.04.0 nextflow run $REPO \
        -profile conda \
        --cache $REPO/conda_cache_dir \
-       --directory $REPO/.github/data/fastqs/ \
+       #--directory $REPO/.github/data/fastqs/ \
+       --directory .github/data/fastqs/ \
        --illumina \
-       --prefix test
+       --prefix "test"
 cp .nextflow.log $REPO/artifacts/cache_use.conda.profile.nextflow.log
 
 cat .nextflow.log | grep 'Conda found local env for environment=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/environments/illumina/environment.yml; path=/home/runner/work/ncov2019-artic-nf/ncov2019-artic-nf/conda_cache_dir/artic-ncov2019-illumina-' \
