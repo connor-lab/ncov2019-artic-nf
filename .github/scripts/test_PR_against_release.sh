@@ -36,20 +36,20 @@ cd ..
 
 ## exclude files from comparison
 ## and list differences
-echo Compare ouputs of current PR vs those of previous release.. >> artifacts/test_artifact.log
-find results ./previous_release/results \
-     -name "test.qc.csv" \
-     -o -name "*.fq.gz" \
-     -o -name "*.bam" \
-     -o -name "scheme" | xargs rm -rf
-if ! git diff --stat --no-index results ./previous_release/results > diffs.txt ; then
-  echo "test failed: differences found between PR and previous release" >> artifacts/test_artifact.log
-  echo see diffs.txt >> artifacts/test_artifact.log 
-  cp diffs.txt artifacts/
-  exit 1
-else
-  echo no differences found between PR and previous release >> artifacts/test_artifact.log
-fi
+#echo Compare ouputs of current PR vs those of previous release.. >> artifacts/test_artifact.log
+#find results ./previous_release/results \
+#     -name "test.qc.csv" \
+#     -o -name "*.fq.gz" \
+#     -o -name "*.bam" \
+#     -o -name "scheme" | xargs rm -rf
+#if ! git diff --stat --no-index results ./previous_release/results > diffs.txt ; then
+#  echo "test failed: differences found between PR and previous release" >> artifacts/test_artifact.log
+#  echo see diffs.txt >> artifacts/test_artifact.log 
+#  cp diffs.txt artifacts/
+#  exit 1
+#else
+#  echo no differences found between PR and previous release >> artifacts/test_artifact.log
+#fi
 
 ## clean-up for following tests
 rm -rf previous_release && rm -rf results && rm -rf work && rm -rf .nextflow*
