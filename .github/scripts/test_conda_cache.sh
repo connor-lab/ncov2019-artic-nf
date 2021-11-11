@@ -7,11 +7,11 @@ mkdir conda_cache_dir
 # first NF run will create the conda env in the cache dir
 echo run pipeline with conda --cache to create cache.. >> artifacts/test_artifact.log
 export REPO=$PWD
-#echo REPO=$REPO >> artifacts/test_artifact.log
-cd ..
+##echo REPO=$REPO >> artifacts/test_artifact.log
+#cd ..
 #echo PWD=$PWD >> $REPO/artifacts/test_artifact.log
-NXF_VER=21.04.0 nextflow run $REPO \
-#NXF_VER=21.04.0 nextflow run main.nf \
+#NXF_VER=21.04.0 nextflow run $REPO \
+NXF_VER=21.04.0 nextflow run main.nf \
        -profile conda \
        --cache $REPO/conda_cache_dir \
        #--directory $REPO/.github/data/fastqs/ \
