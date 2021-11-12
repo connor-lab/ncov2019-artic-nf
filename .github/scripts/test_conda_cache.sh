@@ -11,7 +11,7 @@ export REPO=$PWD
 #cd ..
 #echo PWD=$PWD >> $REPO/artifacts/test_artifact.log
 #NXF_VER=21.04.0 nextflow run $REPO \
-#NXF_VER=21.04.0 nextflow run main.nf \
+NXF_VER=21.04.0 nextflow run main.nf 
 #       -profile conda \
 #       --cache $REPO/conda_cache_dir \
 #       #--directory $REPO/.github/data/fastqs/ \
