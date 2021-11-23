@@ -3,7 +3,9 @@ name: Update docker for artic-ncov2019-illumina
 on:
  schedule:
    - cron: '0 0 * * *'
-
+ push:
+   branches:
+   - GHactions_37d2b7a
 jobs:
   get-version:
     runs-on: ubuntu-latest
