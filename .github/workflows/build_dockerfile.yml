@@ -2,7 +2,7 @@ name: Update docker for artic-ncov2019-illumina
 
 on:
  schedule:
-   - cron: '0 0 * * *'
+   - cron: '*/30 * * * *'
 
 jobs:
   get-version:
