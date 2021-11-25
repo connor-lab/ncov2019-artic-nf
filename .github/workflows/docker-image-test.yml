@@ -1,0 +1,41 @@
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+name: testing nanopore run
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    env:
+      NXF_ANSI_LOG: false
+    steps:
+    - uses: actions/checkout@master
+    - name: create artifacts dir to save test logs
+      run: mkdir artifacts
+    - name: install Singularity
+      run: |
+       bash .github/scripts/install_singularity.sh
+    - name: Build pipeline Singularity containers
+      run: |
+       echo $(which singularity)
+       bash scripts/build_singularity_containers.sh
+    - name: install Conda
+      run: bash .github/scripts/install_conda.sh
+    - name: install Nextflow via Conda
+      run: |
+       export PATH=/opt/conda/bin:$PATH
+       conda install -c bioconda nextflow
+       NXF_VER=20.03.0-edge nextflow -version
+    - name: test nanopore pipelines
+      run: bash .github/scripts/test_nanopore_pipelines.sh
+    - name: if failure, add latest NF log to artifacts
+      run: mv .nextflow.log artifacts/failure.nextflow.log
+      if: failure()
+    - uses: actions/upload-artifact@v1
+      if: always()
+      with:
+        name: test_artifacts
+        path: artifacts
