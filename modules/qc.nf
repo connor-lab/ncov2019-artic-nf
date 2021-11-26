@@ -87,7 +87,8 @@ process statsInsert {
     path "${sampleName}_insert_size.distribution.pdf", optional: true
 
     """
-    if [[ \$( samtools view -F 12 ${bam} | cut -f1 | sort | uniq -c | awk '\$1 > 1 { count++ } END { print count }' ) > 0 ]]
+    mkdir ./tmp
+    if [[ \$( samtools view -F 12 ${bam} | cut -f1 | sort -T ./tmp | uniq -c | awk '\$1 > 1 { count++ } END { print count }' ) > 0 ]]
     then
        picard CollectInsertSizeMetrics I=${bam} O=${sampleName}_insert_size.metrics.txt \
        H=${sampleName}_insert_size.distribution.pdf

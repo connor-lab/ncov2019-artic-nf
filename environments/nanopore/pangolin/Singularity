@@ -3,8 +3,8 @@ From: continuumio/miniconda3:latest
 Stage: condabuild
 
 %labels
-authors="Jyotirmoy Das"
-description="Docker image containing all requirements for the ARTIC project's ncov2019 pipeline"
+authors= "Jyotirmoy Das"
+description= "Docker image containing all requirements for the ARTIC project's ncov2019 pipeline"
 
 %post
         rm -rf /var/lib/apt/lists/*
