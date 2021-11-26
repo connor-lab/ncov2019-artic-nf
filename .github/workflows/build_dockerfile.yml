@@ -1,0 +1,101 @@
+name: Update docker for artic-ncov2019-illumina
+
+on:
+ schedule:
+   - cron: '0 0 * * *'
+ push:
+   branches:
+   - GHactions_37d2b7a
+jobs:
+  get-version:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v2 
+     - name: Get current date
+       id: date
+       run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+     - name: Test with environment variables
+       run: echo $RELEASE_DATE
+       env:
+         RELEASE_DATE: ${{ steps.date.outputs.date }}     
+     - name: Fetch pangolin version
+       shell: bash
+       run: |
+         ##Get pangoLEARN version
+         curl -sL https://api.github.com/repos/cov-lineages/pangoLEARN/releases/latest | \
+         jq -r ".tag_name" > versions/pangoLEARN-latest-version.txt
+         pangoLEARN_VER=$(cat versions/pangoLEARN-latest-version.txt)
+         echo $pangoLEARN_VER
+
+         ##Get pango-designation version
+         curl -sL https://api.github.com/repos/cov-lineages/pango-designation/releases/latest | \
+         jq -r ".tag_name" > versions/pangodesignation-latest-version.txt
+         pangodesign_VER=$(cat versions/pangodesignation-latest-version.txt)
+         echo $pangodesign_VER         
+
+         ##Get constellations version
+         curl -sL https://api.github.com/repos/cov-lineages/constellations/releases/latest | \
+         jq -r ".tag_name" > versions/constellations-latest-version.txt
+         constellations_VER=$(cat versions/constellations-latest-version.txt) 
+         echo $constellations_VER
+         
+         ##Get pangolin version
+         curl -sL https://api.github.com/repos/cov-lineages/pangolin/releases/latest | \
+         jq -r ".tag_name" > versions/pangolin-latest-version.txt
+         PANGOLIN_VER=$(cat versions/pangolin-latest-version.txt)
+         echo $PANGOLIN_VER
+
+         ##Get scorpio version 
+         curl -sL https://api.github.com/repos/cov-lineages/scorpio/releases/latest | \
+         jq -r ".tag_name" > versions/scorpio-latest-version.txt
+         scorpio_VER=$(cat versions/scorpio-latest-version.txt)
+         echo $scorpio_VER
+ 
+
+     - name: Check for modified files
+       id: git-check
+       run: echo ::set-output name=modified::$([ -z "`git status --porcelain`" ] && echo "false" || echo "true")
+     #- name: Make new Dockerfile for latest release; commit
+     #  if: steps.git-check.outputs.modified == 'true'
+     #  run: |
+     #    REPO_VER=$(cat versions/pangolin-latest-version.txt | sed 's|v||') 
+     #    echo $REPO_VER
+   
+     - name: Login to Docker Hub
+       uses: docker/login-action@v1
+       with:
+         username: ${{ secrets.DOCKER_USER }}
+         password: ${{ secrets.DOCKER_PASSWORD }}
+     
+     - name: Set up Docker Buildx
+       id: buildx
+       uses: docker/setup-buildx-action@v1
+
+     - name: Check out pipeline code 
+       uses: docker/build-push-action@v2
+       with:
+         context: ./
+         file: environments/illumina/Dockerfile
+   
+     - name: Build new docker image
+       shell: bash 
+       run: |
+         echo  ${{ steps.date.outputs.date }}
+         REPO_VER=$(cat versions/pangolin-latest-version.txt | sed 's|v||')
+         pangoLEARN_VER=$(cat versions/pangoLEARN-latest-version.txt)
+         scorpio_VER=$(cat versions/scorpio-latest-version.txt | sed 's|v||')
+         constellations_VER=$(cat versions/constellations-latest-version.txt | sed 's|v||')
+         pangodesign_VER=$(cat versions/pangodesignation-latest-version.txt | sed 's|v||' )  
+         docker build --no-cache -f environments/illumina/Dockerfile -t genomicmedicinesweden/gms-artic-illumina:latest -t genomicmedicinesweden/gms-artic-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .           
+     
+     - name: Push Docker image to DockerHub
+       shell: bash
+       run: |
+         REPO_VER=$(cat versions/pangolin-latest-version.txt | sed 's|v||')
+         pangoLEARN_VER=$(cat versions/pangoLEARN-latest-version.txt)
+         scorpio_VER=$(cat versions/scorpio-latest-version.txt | sed 's|v||')
+         constellations_VER=$(cat versions/constellations-latest-version.txt | sed 's|v||')
+         pangodesign_VER=$(cat versions/pangodesignation-latest-version.txt | sed 's|v||' )
+         docker image push genomicmedicinesweden/gms-artic-illumina:latest
+         docker image push genomicmedicinesweden/gms-artic-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}
+             
