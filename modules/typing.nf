@@ -87,3 +87,43 @@ process mergeTypingCSVs {
     """
 }
 
+process pangolinTyping {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}.pangolin.csv"
+
+
+    input:
+    tuple val(sampleName), path(consensus_fasta)
+
+    output:
+    tuple val(sampleName), path("${sampleName}.pangolin.csv"), emit: pangolin
+
+    script:
+    """
+    pangolin ${consensus_fasta} --max-ambig 0.2 --outfile ${sampleName}.pangolin.csv 
+    """
+}
+
+process nextclade {
+    tag { sampleName }
+
+    label 'nextclade'
+    
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}.tsv"
+    
+    input:
+        tuple val(sampleName), path(consensus_fasta)
+    
+    output:
+        tuple(sampleName, path("${sampleName}_tree.json"),
+	    path("${sampleName}.tsv"),path("${sampleName}.json"))
+    
+    script:
+    """
+    nextclade --input-fasta ${consensus_fasta} \
+        --output-tree ${sampleName}_tree.json \
+        --output-tsv ${sampleName}.tsv \
+        --output-json ${sampleName}.json
+    """
+}

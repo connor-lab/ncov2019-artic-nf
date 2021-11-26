@@ -11,10 +11,22 @@ include {readMapping} from '../modules/illumina.nf'
 include {trimPrimerSequences} from '../modules/illumina.nf' 
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
+include {callConsensusFreebayes} from '../modules/illumina.nf'
+
+include {pangolinTyping} from '../modules/typing.nf' 
+include {nextclade} from '../modules/typing.nf'
+include {getVariantDefinitions} from '../modules/analysis.nf'
+include {makeReport} from '../modules/analysis.nf'
 include {cramToFastq} from '../modules/illumina.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
+include {fastqc} from '../modules/qc.nf'
+include {statsCoverage} from '../modules/qc.nf'
+include {statsInsert} from '../modules/qc.nf'
+include {statsAlignment} from '../modules/qc.nf'
+include {multiqc} from '../modules/qc.nf'
+
 
 include {bamToCram} from '../modules/out.nf'
 
@@ -87,17 +99,22 @@ workflow sequenceAnalysis {
       ch_bedFile
 
     main:
+      fastqc(ch_filePairs)
+
       readTrimming(ch_filePairs)
 
-      readMapping(readTrimming.out.combine(ch_preparedRef))
+      readMapping(readTrimming.out.trim.combine(ch_preparedRef))
 
       trimPrimerSequences(readMapping.out.combine(ch_bedFile))
+
+      freebayes_out = callConsensusFreebayes(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))     
+      freebayes_consensus_out = freebayes_out[0]
 
       callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) 
 
       makeConsensus(trimPrimerSequences.out.ptrim)
 
-      makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out, by: 0)
+      makeQCCSV(trimPrimerSequences.out.ptrim.join(makeConsensus.out.consensus_fasta, by: 0)
                                    .combine(ch_preparedRef.map{ it[0] }))
 
       makeQCCSV.out.csv.splitCsv()
@@ -111,9 +128,32 @@ workflow sequenceAnalysis {
 
       writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
 
+      statsCoverage(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
+
+      statsInsert(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
+
+      statsAlignment(readMapping.out.combine(ch_preparedRef.map{ it[0] }))
+
+      multiqc(fastqc.out.collect(), readTrimming.out.log.collect(), statsCoverage.out.collect(),
+              statsInsert.out.stats.collect(), statsAlignment.out.collect())
+      
       collateSamples(qc.pass.map{ it[0] }
                            .join(makeConsensus.out, by: 0)
                            .join(trimPrimerSequences.out.mapped))     
+      
+      pangolinTyping(makeConsensus.out.consensus_fasta)
+      
+      nextclade(makeConsensus.out.consensus_fasta)
+
+      getVariantDefinitions()
+
+      makeReport(pangolinTyping.out.combine(nextclade.out,by:0))
+
+      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
+		  storeDir:"${params.outdir}/AnalysisReport/${params.prefix}" , 
+		  keepHeader:true,
+		  skip:1)
+
 
       if (params.outCram) {
         bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
@@ -124,6 +164,7 @@ workflow sequenceAnalysis {
     emit:
       qc_pass = collateSamples.out
       variants = callVariants.out.variants
+
 }
 
 workflow ncovIllumina {

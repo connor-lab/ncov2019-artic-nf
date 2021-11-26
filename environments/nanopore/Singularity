@@ -6,13 +6,13 @@ environments/nanopore/environment.yml /environment.yml
 environments/extras.yml /extras.yml
 
 %labels
-authors="Matt Bull" 
+authors="Matt Bull"
 description="Docker image containing all requirements for the ARTIC project's ncov2019 pipeline"
 
 %post
 /opt/conda/bin/conda install mamba -c conda-forge && \
 /opt/conda/bin/mamba env create -f /environment.yml #&& \
-#/opt/conda/bin/mamba env update -f /extras.yml -n artic
+/opt/conda/bin/mamba env update -f /extras.yml -n artic
 
 Bootstrap: docker
 From: debian:buster-slim
@@ -28,7 +28,8 @@ apt-get clean -y
 
 %environment
 export PATH=/opt/conda/envs/artic/bin:$PATH
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
 
 %runscript
 exec "/opt/conda/envs/artic/bin/artic" "$@"
-

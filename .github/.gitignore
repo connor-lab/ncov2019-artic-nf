@@ -1,8 +1,0 @@
-.DS_Store
-.nextflow*
-nextflow
-results
-*.sif
-work
-environments/.DS_Store
-
