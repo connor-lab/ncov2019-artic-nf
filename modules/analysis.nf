@@ -39,9 +39,7 @@ process download_nextclade_files {
     """
     home=PWD
     nextclade_ver=`(nextclade -v)`
-    wget -P nextclade_files https://raw.githubusercontent.com/nextstrain/nextclade/\${nextclade_ver}/data/sars-cov-2/tree.json
-    wget -P nextclade_files https://raw.githubusercontent.com/nextstrain/nextclade/\${nextclade_ver}/data/sars-cov-2/genemap.gff
-    wget -P nextclade_files https://raw.githubusercontent.com/nextstrain/nextclade/\${nextclade_ver}/data/sars-cov-2/qc.json 
+    nextclade dataset get --name 'sars-cov-2' --output-dir nextclade_files
     echo \$nextclade_ver > nextclade_files/version.txt
 
     """
@@ -65,9 +63,7 @@ process nextclade {
     """
     nextclade --input-fasta ${fasta} \
 	--input-root-seq ${reffasta} \
-	--input-gene-map=nextclade_files/genemap.gff \
-	--input-tree=nextclade_files/tree.json \
-	--input-qc-config=nextclade_files/qc.json \
+	--input-dataset=nextclade_files \
 	--output-json=${sampleName}.json \
 	--output-tsv=${sampleName}.tsv \
 	--output-basename=${sampleName}

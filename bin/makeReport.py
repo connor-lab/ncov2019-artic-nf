@@ -41,7 +41,7 @@ nextclade['program']='nextclade'
 nextclade['nextcladeVersion']=str(nextclade_version).strip()
 nextclade.set_index('program',inplace=True)
 n=nextclade.to_dict(orient='index')
-with open('nextclade.json','r') as inf:
+with open('nextclade.json','rt', encoding= 'utf-8') as inf:
     nj=json.load(inf)
 n['nextcladeOutputJson']=nj
 
@@ -73,6 +73,6 @@ d[sample_name].update(a)
 d[sample_name].update(w)
 #d[sample_name].update(f)
 
-with open('{0}_report.json'.format(sample_name), 'w' ) as f:
-    json.dump(d, f, indent=4, sort_keys=True)
+with open('{0}_report.json'.format(sample_name), 'w', encoding='utf-8') as f:
+    json.dump(d, f, indent=4, sort_keys=True, ensure_ascii=False)
 
