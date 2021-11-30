@@ -248,7 +248,7 @@ process viridian {
     }
 
     input:
-        tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path('primers'), path('ref.fa'),path("*")
+        tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path('primers'), path('ref.fa'),path("*") 
 
     output:
         tuple prefix, path("${prefix}.fasta"), emit: consensus
@@ -258,11 +258,27 @@ process viridian {
 
 
     script:
+    if (params.primers != 'auto') 
         """
 	viridian_workflow run_one_sample \
                 --tech illumina \
                 --ref_fasta ref.fa \
                 --amplicon_json primers \
+                --reads1 ${prefix}_1.fastq.gz \
+                --reads2 ${prefix}_2.fastq.gz \
+                --outdir ${prefix}_outdir/ \
+                --sample_name ${prefix} \
+                --keep_bam
+        cp ${prefix}_outdir/consensus.fa ${prefix}.fasta
+        cp ${prefix}_outdir/log.json ${prefix}.viridian_log.json
+        cp ${prefix}_outdir/variants.vcf ${prefix}.vcf
+        cp ${prefix}_outdir/reference_mapped.bam ${prefix}.bam
+        """
+    else if (params.primers == 'auto') 
+        """
+	viridian_workflow run_one_sample \
+                --tech illumina \
+                --ref_fasta ref.fa \
                 --reads1 ${prefix}_1.fastq.gz \
                 --reads2 ${prefix}_2.fastq.gz \
                 --outdir ${prefix}_outdir/ \
