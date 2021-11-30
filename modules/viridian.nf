@@ -7,21 +7,21 @@ process viridianPrimers {
 
     tag { prefix }
 
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta"
-    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf"
-    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json"
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta", saveAs: { filename -> "${prefix}.fasta"}
+    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf", saveAs: { filename -> "${prefix}.vcf"}
+    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json", saveAs: { filename -> "${prefix}.viridian_log.json"}
     if (params.TESToutputMODE){
-        publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam"
+        publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam", saveAs: { filename -> "${prefix}.bam"}
     }
 
     input:
         tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path('primers'), path('ref.fa'),path("*")
 
     output:
-        tuple prefix, path("${prefix}.fasta"), emit: consensus
-        tuple prefix, path("${prefix}.viridian_log.json"), emit: coverage
-        tuple prefix, path("${prefix}.vcf"), emit: vcfs
-        tuple prefix, path("${prefix}.bam"), emit: bam
+        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus
+        tuple prefix, path("${prefix}_outdir/log.json"), emit: coverage
+        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs
+        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam
 
  
     script:
@@ -35,10 +35,6 @@ process viridianPrimers {
             --outdir ${prefix}_outdir/ \
             --sample_name ${prefix} \
             --keep_bam
-    cp ${prefix}_outdir/consensus.fa ${prefix}.fasta
-    cp ${prefix}_outdir/log.json ${prefix}.viridian_log.json
-    cp ${prefix}_outdir/variants.vcf ${prefix}.vcf
-    cp ${prefix}_outdir/reference_mapped.bam ${prefix}.bam
     """ 
 }
 
@@ -52,22 +48,22 @@ process viridianAuto {
 
     tag { prefix }
 
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta"
-    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf"
-    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json"
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta", saveAs: { filename -> "${prefix}.fasta"}
+    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf", saveAs: { filename -> "${prefix}.vcf"}
+    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json", saveAs: { filename -> "${prefix}.viridian_log.json"}
     if (params.TESToutputMODE){
-        publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam"
-    }   
+        publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam", saveAs: { filename -> "${prefix}.bam"}
+    }
 
     input:
         tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"), path('ref.fa'),path("*")
 
-    output:
-        tuple prefix, path("${prefix}.fasta"), emit: consensus
-        tuple prefix, path("${prefix}.viridian_log.json"), emit: coverage
-        tuple prefix, path("${prefix}.vcf"), emit: vcfs
-        tuple prefix, path("${prefix}.bam"), emit: bam
 
+    output:
+        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus
+        tuple prefix, path("${prefix}_outdir/log.json"), emit: coverage
+        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs
+        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam
 
     script:
     """
@@ -79,10 +75,6 @@ process viridianAuto {
             --outdir ${prefix}_outdir/ \
             --sample_name ${prefix} \
             --keep_bam
-    cp ${prefix}_outdir/consensus.fa ${prefix}.fasta
-    cp ${prefix}_outdir/log.json ${prefix}.viridian_log.json
-    cp ${prefix}_outdir/variants.vcf ${prefix}.vcf
-    cp ${prefix}_outdir/reference_mapped.bam ${prefix}.bam
     """ 
 }
 
@@ -95,22 +87,22 @@ process viridianONTPrimers {
     */
 
     tag { prefix }
-
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta"
-    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf"
-    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json"
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta", saveAs: { filename -> "${prefix}.fasta"}
+    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf", saveAs: { filename -> "${prefix}.vcf"}
+    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json", saveAs: { filename -> "${prefix}.viridian_log.json"}
     if (params.TESToutputMODE){
-	publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam"
+        publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam", saveAs: { filename -> "${prefix}.bam"}
     }
+
+    output:
+        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus
+        tuple prefix, path("${prefix}_outdir/log.json"), emit: coverage
+        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs
+        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam
 
     input:
         tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo),path('primers')
 
-    output:
-        tuple prefix, path("${prefix}.fasta"), emit: consensus
-        tuple prefix, path("${prefix}.viridian_log.json"), emit: coverage
-        tuple prefix, path("${prefix}.vcf"), emit: vcfs
-	tuple prefix, path("${prefix}.bam"), emit: bam
 
     script:
         """
@@ -122,10 +114,6 @@ process viridianONTPrimers {
 		--outdir ${prefix}_outdir/ \
 		--sample_name ${prefix} \
 		--keep_bam
-        cp ${prefix}_outdir/consensus.fa ${prefix}.fasta
-        cp ${prefix}_outdir/log.json ${prefix}.viridian_log.json
-        cp ${prefix}_outdir/variants.vcf ${prefix}.vcf
-	cp ${prefix}_outdir/reference_mapped.bam ${prefix}.bam
         """
 }
 
@@ -137,22 +125,22 @@ process viridianONTAuto {
     */
 
     tag { prefix }
-
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta"
-    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf"
-    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json"
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta", saveAs: { filename -> "${prefix}.fasta"}
+    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf", saveAs: { filename -> "${prefix}.vcf"}
+    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json", saveAs: { filename -> "${prefix}.viridian_log.json"}
     if (params.TESToutputMODE){
-	publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam"
+        publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam", saveAs: { filename -> "${prefix}.bam"}
     }
+
 
     input:
         tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo)
 
     output:
-        tuple prefix, path("${prefix}.fasta"), emit: consensus
-        tuple prefix, path("${prefix}.viridian_log.json"), emit: coverage
-        tuple prefix, path("${prefix}.vcf"), emit: vcfs
-	tuple prefix, path("${prefix}.bam"), emit: bam
+        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus
+        tuple prefix, path("${prefix}_outdir/log.json"), emit: coverage
+        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs
+        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam
 
     script:
         """
@@ -163,9 +151,5 @@ process viridianONTAuto {
 		--outdir ${prefix}_outdir/ \
 		--sample_name ${prefix} \
 		--keep_bam
-        cp ${prefix}_outdir/consensus.fa ${prefix}.fasta
-        cp ${prefix}_outdir/log.json ${prefix}.viridian_log.json
-        cp ${prefix}_outdir/variants.vcf ${prefix}.vcf
-	cp ${prefix}_outdir/reference_mapped.bam ${prefix}.bam
         """
 }
