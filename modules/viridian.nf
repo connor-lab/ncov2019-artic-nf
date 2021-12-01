@@ -6,12 +6,11 @@ process viridianPrimers {
     */
 
     tag { prefix }
-
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta", saveAs: { filename -> "${prefix}.fasta"}
-    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf", saveAs: { filename -> "${prefix}.vcf"}
-    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json", saveAs: { filename -> "${prefix}.viridian_log.json"}
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', saveAs: { filename -> filename.endsWith(".fa") ? "${prefix}.fasta":null}
+    publishDir "${params.outdir}/VCF/", mode: 'copy', saveAs: { filename -> filename.endsWith(".vcf") ? "${prefix}.vcf":null}
+    publishDir "${params.outdir}/qc/", mode: 'copy', saveAs: { filename -> filename.endsWith(".json") ? "${prefix}.json":null}
     if (params.TESToutputMODE){
-        publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam", saveAs: { filename -> "${prefix}.bam"}
+        publishDir "${params.outdir}/bam/", mode: 'copy', saveAs: { filename -> filename.endsWith(".bam") ? "${prefix}.bam":null}
     }
 
     input:
@@ -48,11 +47,12 @@ process viridianAuto {
 
     tag { prefix }
 
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta", saveAs: { filename -> "${prefix}.fasta"}
-    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf", saveAs: { filename -> "${prefix}.vcf"}
-    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json", saveAs: { filename -> "${prefix}.viridian_log.json"}
+    tag { prefix }
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', saveAs: { filename -> filename.endsWith(".fa") ? "${prefix}.fasta":null}
+    publishDir "${params.outdir}/VCF/", mode: 'copy', saveAs: { filename -> filename.endsWith(".vcf") ? "${prefix}.vcf":null}
+    publishDir "${params.outdir}/qc/", mode: 'copy', saveAs: { filename -> filename.endsWith(".json") ? "${prefix}.json":null}
     if (params.TESToutputMODE){
-        publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam", saveAs: { filename -> "${prefix}.bam"}
+        publishDir "${params.outdir}/bam/", mode: 'copy', saveAs: { filename -> filename.endsWith(".bam") ? "${prefix}.bam":null}
     }
 
     input:
@@ -87,22 +87,21 @@ process viridianONTPrimers {
     */
 
     tag { prefix }
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta", saveAs: { filename -> "${prefix}.fasta"}
-    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf", saveAs: { filename -> "${prefix}.vcf"}
-    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json", saveAs: { filename -> "${prefix}.viridian_log.json"}
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', saveAs: { filename -> filename.endsWith(".fa") ? "${prefix}.fasta":null}
+    publishDir "${params.outdir}/VCF/", mode: 'copy', saveAs: { filename -> filename.endsWith(".vcf") ? "${prefix}.vcf":null}
+    publishDir "${params.outdir}/qc/", mode: 'copy', saveAs: { filename -> filename.endsWith(".json") ? "${prefix}.json":null}
     if (params.TESToutputMODE){
-        publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam", saveAs: { filename -> "${prefix}.bam"}
+        publishDir "${params.outdir}/bam/", mode: 'copy', saveAs: { filename -> filename.endsWith(".bam") ? "${prefix}.bam":null}
     }
 
+    input:
+        tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo),path('primers')
+    
     output:
         tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus
         tuple prefix, path("${prefix}_outdir/log.json"), emit: coverage
         tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs
         tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam
-
-    input:
-        tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo),path('primers')
-
 
     script:
         """
@@ -125,11 +124,11 @@ process viridianONTAuto {
     */
 
     tag { prefix }
-    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', pattern: "*.fasta", saveAs: { filename -> "${prefix}.fasta"}
-    publishDir "${params.outdir}/VCF/", mode: 'copy', pattern: "*.vcf", saveAs: { filename -> "${prefix}.vcf"}
-    publishDir "${params.outdir}/qc/", mode: 'copy', pattern: "*.json", saveAs: { filename -> "${prefix}.viridian_log.json"}
+    publishDir "${params.outdir}/consensus_seqs/", mode: 'copy', saveAs: { filename -> filename.endsWith(".fa") ? "${prefix}.fasta":null}
+    publishDir "${params.outdir}/VCF/", mode: 'copy', saveAs: { filename -> filename.endsWith(".vcf") ? "${prefix}.vcf":null}
+    publishDir "${params.outdir}/qc/", mode: 'copy', saveAs: { filename -> filename.endsWith(".json") ? "${prefix}.json":null}
     if (params.TESToutputMODE){
-        publishDir "${params.outdir}/bam/", mode: 'copy', pattern: "*.bam", saveAs: { filename -> "${prefix}.bam"}
+        publishDir "${params.outdir}/bam/", mode: 'copy', saveAs: { filename -> filename.endsWith(".bam") ? "${prefix}.bam":null}
     }
 
 
