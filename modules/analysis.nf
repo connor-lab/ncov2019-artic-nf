@@ -24,9 +24,10 @@ process  download_primers {
         path('primers.txt')
 
     script:
-        """
-        wget https://raw.githubusercontent.com/iqbal-lab-org/viridian_workflow/master/data/covid-artic-v3.json -O primers.txt
-        """
+    primerURL=params.primers
+    """
+    wget $primerURL -O primers.txt
+    """
 }
 
 
