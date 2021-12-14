@@ -13,6 +13,9 @@ include {splitSeqSum} from '../modules/artic.nf'
 include {getObjFilesONT} from '../modules/artic'
 include {download_primers} from '../modules/analysis.nf'
 include {articMinIONViridian} from '../modules/artic'
+include {viridianONTPrimers} from '../modules/viridian.nf'
+include {viridianONTAuto} from '../modules/viridian.nf'
+
 
 include {makeQCCSV} from '../modules/qc.nf'
 include {writeQCSummaryCSV} from '../modules/qc.nf'
@@ -154,14 +157,20 @@ workflow sequenceAnalysisViridian {
 
       getObjFilesONT(ch_runFastqDirs)
 
-      articMinIONViridian(getObjFilesONT.out.fqs
-                                      .combine(articDownloadScheme.out.scheme)
-				      .combine(download_primers.out))
 
-
+      if (params.primers == 'auto') {
+      viridianONTAuto(getObjFilesONT.out.fqs
+                                      .combine(articDownloadScheme.out.scheme))
       // analysis
-      downstreamAnalysis(articMinIONViridian.out.consensus, articMinIONViridian.out.vcfs,articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
-
+      downstreamAnalysis(viridianONTAuto.out.consensus, viridianONTAuto.out.vcfs,articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
+      }
+      else if (params.primers != 'auto') {
+      viridianONTPrimers(getObjFilesONT.out.fqs
+                                      .combine(articDownloadScheme.out.scheme)
+                                      .combine(download_primers.out))
+      // analysis
+      downstreamAnalysis(viridianONTPrimers.out.consensus, viridianONTPrimers.out.vcfs,articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
+      }
 }
 
 workflow articNcovNanopore {

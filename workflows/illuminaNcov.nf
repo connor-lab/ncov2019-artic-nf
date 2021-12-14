@@ -13,7 +13,8 @@ include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 include {cramToFastq} from '../modules/illumina.nf'
 include {getObjFiles} from '../modules/illumina.nf'
-include {viridian} from '../modules/illumina.nf'
+include {viridianPrimers} from '../modules/viridian.nf'
+include {viridianAuto} from '../modules/viridian.nf'
 include {download_primers} from '../modules/analysis.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'
@@ -150,11 +151,18 @@ workflow sequenceAnalysisViridian {
       ch_refFasta
 
     main:
-      download_primers(params.primers)
 
-      viridian(ch_filePairs.combine(download_primers.out).combine(ch_preparedRef))
-     
-      downstreamAnalysis(viridian.out.consensus, viridian.out.vcfs, ch_refFasta, ch_bedFile)
+      if (params.primers != 'auto') {
+
+      download_primers(params.primers)
+      	viridianPrimers(ch_filePairs.combine(download_primers.out).combine(ch_preparedRef))
+        downstreamAnalysis(viridianPrimers.out.consensus, viridianPrimers.out.vcfs, ch_refFasta, ch_bedFile)
+      }
+      else if (params.primers == 'auto') {
+      	viridianAuto(ch_filePairs.combine(ch_preparedRef))
+        downstreamAnalysis(viridianAuto.out.consensus, viridianAuto.out.vcfs, ch_refFasta, ch_bedFile)
+      }
+
   
 }
 
