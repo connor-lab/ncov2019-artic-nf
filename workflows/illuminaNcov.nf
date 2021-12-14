@@ -17,6 +17,7 @@ include {pangolinTyping} from '../modules/typing.nf'
 include {nextclade} from '../modules/typing.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
+include {versions} from '../modules/analysis.nf'
 include {cramToFastq} from '../modules/illumina.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'
@@ -99,6 +100,8 @@ workflow sequenceAnalysis {
       ch_bedFile
 
     main:
+      versions()
+
       fastqc(ch_filePairs)
 
       readTrimming(ch_filePairs)

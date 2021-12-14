@@ -17,6 +17,7 @@ include {pangolinTyping} from '../modules/typing.nf'
 include {nextclade} from '../modules/typing.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
+include {versions} from '../modules/analysis.nf'
 
 include {bamToCram} from '../modules/out.nf'
 
@@ -33,8 +34,10 @@ workflow sequenceAnalysisNanopolish {
       ch_seqSummary
     
     main:
+      versions()
+
       articDownloadScheme()
-      
+
       articGuppyPlex(ch_runFastqDirs.flatten())
 
       articMinIONNanopolish(articGuppyPlex.out.fastq
