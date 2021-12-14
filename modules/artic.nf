@@ -259,7 +259,7 @@ process articMinIONViridian {
         viridian_workflow run_one_sample \
 		--tech ont \
 		--ref_fasta ${schemeRepo}/nCoV-2019/V3/nCoV-2019.reference.fasta \
-		--amplicon_json primers \
+		--amp_schemes_tsv primers \
 		--reads ${prefix}.fastq.gz \
 		--outdir ${prefix}_outdir/ \
 		--sample_name ${prefix} \

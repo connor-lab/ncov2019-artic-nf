@@ -263,7 +263,7 @@ process viridian {
 	viridian_workflow run_one_sample \
                 --tech illumina \
                 --ref_fasta ref.fa \
-                --amplicon_json primers \
+                --amp_schemes_tsv \
                 --reads1 ${prefix}_1.fastq.gz \
                 --reads2 ${prefix}_2.fastq.gz \
                 --outdir ${prefix}_outdir/ \

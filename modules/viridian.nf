@@ -28,7 +28,7 @@ process viridianPrimers {
     viridian_workflow run_one_sample \
             --tech illumina \
             --ref_fasta ref.fa \
-            --amplicon_json primers \
+            --amp_schemes_tsv primers \
             --reads1 ${prefix}_1.fastq.gz \
             --reads2 ${prefix}_2.fastq.gz \
             --outdir ${prefix}_outdir/ \
@@ -108,7 +108,7 @@ process viridianONTPrimers {
         viridian_workflow run_one_sample \
 		--tech ont \
 		--ref_fasta ${schemeRepo}/nCoV-2019/V3/nCoV-2019.reference.fasta \
-		--amplicon_json primers \
+		--amp_schemes_tsv primers \
 		--reads ${prefix}.fastq.gz \
 		--outdir ${prefix}_outdir/ \
 		--sample_name ${prefix} \

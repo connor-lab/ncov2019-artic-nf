@@ -152,7 +152,7 @@ class runTests(unittest.TestCase):
         exCols=ex.columns
         dfCols=df.columns
 
-        if len(exCols)==len(dfCols):
+        if set(exCols) == set(dfCols):
             dfc=ex.compare(df)
             dfc.to_csv(self.opts.expectcomparisonedtsv, sep='\t', index=False)
             if len(dfc) == 0:
