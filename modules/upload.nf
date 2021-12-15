@@ -46,3 +46,37 @@ process uploadToCLIMB {
     """
 }
 
+process uploadToBucket {
+    tag {prefix}
+
+    input:
+    tuple( val(prefix), path("${prefix}.fasta"), path("${prefix}.bam"),"${prefix}.vcf")
+
+    script:
+    bucketName=params.uploadBucket
+    """
+    mkdir ${prefix}
+    cp ${prefix}.fasta ${prefix}/
+    cp "${prefix}.bam" ${prefix}/
+    cp "${prefix}.vcf" ${prefix}/
+    gzip ${prefix}/${prefix}.fasta
+ 
+    oci os object put \
+	-bn $bucketName \
+	--force \
+        --auth instance_principal \
+	--file ${prefix}/${prefix}.fasta.gz
+
+    oci os object put \
+	-bn $bucketName \
+	--force \
+        --auth instance_principal \
+	--file ${prefix}/${prefix}.bam
+
+    oci os object put \
+	-bn $bucketName \
+	--force \
+        --auth instance_principal \
+	--file ${prefix}/${prefix}.bam
+    """ 
+}

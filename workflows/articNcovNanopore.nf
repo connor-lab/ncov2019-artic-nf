@@ -152,8 +152,7 @@ workflow sequenceAnalysisViridian {
 
     main:
       articDownloadScheme()
- 
-      download_primers(params.primers)
+      
 
       getObjFilesONT(ch_runFastqDirs)
 
@@ -161,16 +160,24 @@ workflow sequenceAnalysisViridian {
       if (params.primers == 'auto') {
       viridianONTAuto(getObjFilesONT.out.fqs
                                       .combine(articDownloadScheme.out.scheme))
-      // analysis
-      downstreamAnalysis(viridianONTAuto.out.consensus, viridianONTAuto.out.vcfs,articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
+      viridian=viridianONTAuto
       }
       else if (params.primers != 'auto') {
+      download_primers(params.primers)
       viridianONTPrimers(getObjFilesONT.out.fqs
                                       .combine(articDownloadScheme.out.scheme)
                                       .combine(download_primers.out))
-      // analysis
-      downstreamAnalysis(viridianONTPrimers.out.consensus, viridianONTPrimers.out.vcfs,articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
+      viridian=viridianONTPrimers
       }
+
+      // analysis
+      downstreamAnalysis(viridian.out.consensus, viridian.out.vcfs,articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
+      
+      if (params.uploadBucket != false) {
+         uploadToBucket(viridian.out.consensus.combine(viridian.out.bam, by:0).combine(viridian.out.vcfs, by:0))
+      } 
+
+
 }
 
 workflow articNcovNanopore {
