@@ -50,7 +50,7 @@ process uploadToBucket {
     tag {prefix}
 
     input:
-    tuple( val(prefix), path("${prefix}.fasta"), path("${prefix}.bam"),"${prefix}.vcf")
+    tuple(val(prefix), path("${prefix}.fasta"), path("${prefix}.bam"),path("${prefix}.vcf"))
 
     script:
     bucketName=params.uploadBucket

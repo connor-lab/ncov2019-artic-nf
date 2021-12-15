@@ -64,12 +64,14 @@ workflow downstreamAnalysis {
 		.combine(ch_preparedRef)
 	)
 
-    makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
-              storeDir:"${params.outdir}/analysis/report/${params.prefix}" ,
-              keepHeader:true,
-              skip:1)
+  //  makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
+  //            storeDir:"${params.outdir}/analysis/report/${params.prefix}" ,
+  //            keepHeader:true,
+  //            skip:1)
 
     FN4_upload(consensus.combine(getVariantDefinitions.out).combine(ch_preparedRef).combine(ch_bedFile))
 
+    emit:
+    report = makeReport.out.json
 }
     

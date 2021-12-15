@@ -30,6 +30,7 @@ include {nextclade} from '../modules/analysis.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {aln2type} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
+include {uploadToBucket} from '../modules/upload.nf'
 
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
@@ -174,10 +175,9 @@ workflow sequenceAnalysisViridian {
       downstreamAnalysis(viridian.out.consensus, viridian.out.vcfs,articDownloadScheme.out.reffasta,articDownloadScheme.out.bed)     
       
       if (params.uploadBucket != false) {
-         uploadToBucket(viridian.out.consensus.combine(viridian.out.bam, by:0).combine(viridian.out.vcfs, by:0))
+         uploadToBucket(viridian.out.consensus.combine(viridian.out.bam, by:0)
+				.combine(viridian.out.vcfs, by:0))
       } 
-
-
 }
 
 workflow articNcovNanopore {

@@ -168,7 +168,8 @@ workflow sequenceAnalysisViridian {
      downstreamAnalysis(viridian.out.consensus, viridian.out.vcfs, ch_refFasta, ch_bedFile)
 
      if (params.uploadBucket != false) {
-         uploadToBucket(viridian.out.consensus.combine(viridian.out.bam, by:0).combine(viridian.out.vcfs, by:0))
+         uploadToBucket(viridian.out.consensus.combine(viridian.out.bam, by:0)
+				.combine(viridian.out.vcfs, by:0))
      }
   
 }
