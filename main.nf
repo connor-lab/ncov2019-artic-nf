@@ -3,6 +3,7 @@
 // enable dsl2
 nextflow.preview.dsl = 2
 
+
 // include modules
 include {printHelp} from './modules/help.nf'
 include {makeFastqSearchPath} from './modules/util.nf'

@@ -30,6 +30,8 @@ include {getVariantDefinitions} from '../modules/analysis.nf'
 include {aln2type} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
 
+include {uploadToBucket} from '../modules/upload.nf'
+
 // import subworkflows
 include {CLIMBrsync} from './upload.nf'
 include {Genotyping} from './typing.nf'
@@ -154,15 +156,21 @@ workflow sequenceAnalysisViridian {
 
       if (params.primers != 'auto') {
 
-      download_primers(params.primers)
+        download_primers(params.primers)
       	viridianPrimers(ch_filePairs.combine(download_primers.out).combine(ch_preparedRef))
-        downstreamAnalysis(viridianPrimers.out.consensus, viridianPrimers.out.vcfs, ch_refFasta, ch_bedFile)
+        viridian=viridianPrimers
       }
       else if (params.primers == 'auto') {
       	viridianAuto(ch_filePairs.combine(ch_preparedRef))
-        downstreamAnalysis(viridianAuto.out.consensus, viridianAuto.out.vcfs, ch_refFasta, ch_bedFile)
+        viridian=viridianAuto
       }
 
+     downstreamAnalysis(viridian.out.consensus, viridian.out.vcfs, ch_refFasta, ch_bedFile)
+
+     if (params.uploadBucket != false) {
+         uploadToBucket(viridian.out.consensus.combine(viridian.out.bam, by:0)
+				.combine(viridian.out.vcfs, by:0))
+     }
   
 }
 
