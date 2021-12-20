@@ -1,6 +1,5 @@
 # GMS-artic (ncov2019-artic-nf)
 
-#Test
 A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinformatics tools (https://github.com/artic-network/fieldbioinformatics).
 
 ------------
@@ -53,3 +52,4 @@ $ nextflow run main.nf -profile singularity,sge \
     --sequencing_summary .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/sequencing_summary_FAK72834_298b7829.txt \
     --outdir nanopore_test
 ```
+#### To update your container image to the latest version from [dockerhub](https://hub.docker.com/orgs/genomicmedicinesweden/repositories), please delete your local image first before running the analysis pipeline. 
