@@ -17,10 +17,10 @@ process viridianPrimers {
         tuple prefix, path("${prefix}_1.fastq.gz"), path("${prefix}_2.fastq.gz"),path('primers'), path('ref.fa'),path("*")
 
     output:
-        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus
+        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus, optional: true
         tuple prefix, path("${prefix}_outdir/log.json"), emit: coverage
-        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs
-        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam
+        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs, optional: true
+        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam, optional: true
 
  
     script:
@@ -60,10 +60,10 @@ process viridianAuto {
 
 
     output:
-        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus
+        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus, optional: true
         tuple prefix, path("${prefix}_outdir/log.json"), emit: coverage
-        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs
-        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam
+        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs, optional: true
+        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam, optional: true
 
     script:
     """
@@ -98,10 +98,10 @@ process viridianONTPrimers {
         tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo),path('primers')
     
     output:
-        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus
+        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus, optional: true
         tuple prefix, path("${prefix}_outdir/log.json"), emit: coverage
-        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs
-        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam
+        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs, optional: true
+        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam, optional: true
 
     script:
         """
@@ -136,10 +136,10 @@ process viridianONTAuto {
         tuple prefix, path("${prefix}.fastq.gz"),path(schemeRepo)
 
     output:
-        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus
+        tuple prefix, path("${prefix}_outdir/consensus.fa"), emit: consensus, optional: true
         tuple prefix, path("${prefix}_outdir/log.json"), emit: coverage
-        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs
-        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam
+        tuple prefix, path("${prefix}_outdir/variants.vcf"), emit: vcfs, optional: true
+        tuple prefix, path("${prefix}_outdir/reference_mapped.bam"), emit: bam, optional: true
 
     script:
         """
