@@ -3,9 +3,9 @@ name: Update docker for artic-ncov2019-illumina, artic-ncov2019-nanopore
 on:
  schedule:
    - cron: '0 0 * * *'
- push:
-   branches:
-   - nextclade_latest
+#push:
+#   branches:
+#   - nextclade_latest
 jobs:
   get-version:
     runs-on: ubuntu-latest
@@ -86,14 +86,11 @@ jobs:
          scorpio_VER=$(cat versions/scorpio-latest-version.txt | sed 's|v||')
          constellations_VER=$(cat versions/constellations-latest-version.txt | sed 's|v||')
          pangodesign_VER=$(cat versions/pangodesignation-latest-version.txt | sed 's|v||' )  
-         #docker build --no-cache -f environments/illumina/Dockerfile -t genomicmedicinesweden/gms-artic-illumina:latest -t genomicmedicinesweden/gms-artic-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .           
-         docker build --no-cache -f environments/illumina/Dockerfile -t sofsta/gms-artic-illumina:latest -t sofsta/gms-artic-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .
+         docker build --no-cache -f environments/illumina/Dockerfile -t genomicmedicinesweden/gms-artic-illumina:latest -t genomicmedicinesweden/gms-artic-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .           
          #Build docker for nanopore
-         #docker build --no-cache -f environments/nanopore/Dockerfile -t genomicmedicinesweden/gms-artic-nanopore:latest -t genomicmedicinesweden/gms-artic-nanopore:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .
-         #docker build --no-cache -f environments/nanopore/Dockerfile -t sofsta/gms-artic-nanopore:latest -t sofsta/gms-artic-nanopore:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .
+         docker build --no-cache -f environments/nanopore/Dockerfile -t genomicmedicinesweden/gms-artic-nanopore:latest -t genomicmedicinesweden/gms-artic-nanopore:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .
          #Build docker for pangolin-check for specific requirements
-         #docker build --no-cache -f environments/nanopore/pangolin/Dockerfile -t genomicmedicinesweden/gms-artic-pangolin:latest -t genomicmedicinesweden/gms-artic-pangolin:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .
-         #docker build --no-cache -f environments/nanopore/pangolin/Dockerfile -t sofsta/gms-artic-pangolin:latest -t sofsta/gms-artic-pangolin:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .
+         docker build --no-cache -f environments/nanopore/pangolin/Dockerfile -t genomicmedicinesweden/gms-artic-pangolin:latest -t genomicmedicinesweden/gms-artic-pangolin:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER} .
 
 
      - name: Push Docker image to DockerHub
@@ -104,18 +101,11 @@ jobs:
          scorpio_VER=$(cat versions/scorpio-latest-version.txt | sed 's|v||')
          constellations_VER=$(cat versions/constellations-latest-version.txt | sed 's|v||')
          pangodesign_VER=$(cat versions/pangodesignation-latest-version.txt | sed 's|v||' )
-         #docker image push genomicmedicinesweden/gms-artic-illumina:latest
-         #docker image push genomicmedicinesweden/gms-artic-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}
-         sudo docker image push sofsta/gms-artic-illumina:latest
-         sudo docker image push sofsta/gms-artic-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}
+         docker image push genomicmedicinesweden/gms-artic-illumina:latest
+         docker image push genomicmedicinesweden/gms-artic-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}
          #Push to dockerhub for nanopore
-         #docker image push genomicmedicinesweden/gms-artic-nanopore:latest
-         #docker image push genomicmedicinesweden/gms-artic-nanopore:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}   
-         #docker image push sofsta/gms-artic-nanopore:latest
-         #docker image push sofsta/gms-artic-nanopore:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}   
+         docker image push genomicmedicinesweden/gms-artic-nanopore:latest
+         docker image push genomicmedicinesweden/gms-artic-nanopore:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}   
          #Push to dockerhub for pangolin with specific requirements
-         #docker image push genomicmedicinesweden/gms-artic-pangolin:latest
-         #docker image push genomicmedicinesweden/gms-artic-pangolin:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}
-         #docker image push sofsta/gms-artic-pangolin:latest
-         #docker image push sofsta/gms-artic-pangolin:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}   
-         
+         docker image push genomicmedicinesweden/gms-artic-pangolin:latest
+         docker image push genomicmedicinesweden/gms-artic-pangolin:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}
