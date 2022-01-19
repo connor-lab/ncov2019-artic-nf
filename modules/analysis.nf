@@ -167,11 +167,11 @@ process FN4_upload {
     FN4ormater.py -i ${sampleName}_wuhan.fa -r MN908947.3 -s ${sampleName} -o ${sampleName}.fasta
 
     oci os object put \
-	   -bn ${params.bucketNameFN4} \
-	   --force \
-       --auth instance_principal \
-	   --file ${sampleName}.fasta \
-	   --metadata "{\\"sampleID\\":\\"$sampleName\\"}"
+	-bn ${params.bucketNameFN4} \
+	--force \
+        --auth instance_principal \
+	--file ${sampleName}.fasta \
+	--metadata "{\\"sampleID\\":\\"$sampleName\\"}"
 
     """
 }
