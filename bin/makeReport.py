@@ -65,6 +65,16 @@ w['WorkflowInformation']['referenceIdentifier']=record.id
 #    'Sequence':str(record.seq),
 #    'sampleName':sample_name}}
 
+def completeness(nextcladeOutputJson):
+    ref_len = 29903
+    total_missing = nextcladeOutputJson['results'][0]['qc']['missingData']['totalMissing']
+    completeness_prop = (ref_len - total_missing) / ref_len
+    completeness_pc = round(completeness_prop * 100, 1)
+    return completeness_pc
+
+s={'summary':{}}
+s['summary']['completeness']=completeness(n['nextcladeOutputJson'])
+
 
 d={sample_name:{}}
 d[sample_name].update(p)
@@ -72,7 +82,7 @@ d[sample_name].update(n)
 d[sample_name].update(a)
 d[sample_name].update(w)
 #d[sample_name].update(f)
+d[sample_name].update(s)
 
 with open('{0}_report.json'.format(sample_name), 'w', encoding='utf-8') as f:
     json.dump(d, f, indent=4, sort_keys=True, ensure_ascii=False)
-
