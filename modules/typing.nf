@@ -120,7 +120,8 @@ process nextclade {
     path("${sampleName}.tsv"),path("${sampleName}.json"))
 
     script:
-    """ 
+    """
+    echo \$(nextclade --version 2>&1) > nextclade_version.txt 
     nextclade dataset get --name 'sars-cov-2' --output-dir 'data/sars-cov-2'
     nextclade --input-fasta ${consensus_fasta} \
         --input-dataset data/sars-cov-2 \
