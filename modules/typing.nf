@@ -108,8 +108,7 @@ process pangolinTyping {
 process nextclade {
     tag { sampleName }
 
-    label 'nextclade'
-    cpus 4    
+    label 'nextclade'  
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}.tsv"
 
