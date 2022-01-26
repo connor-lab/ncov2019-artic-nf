@@ -5,7 +5,7 @@ on:
    - cron: '0 0 * * *'
  push:
    branches:
-   - nanopore_docker
+   - nextclade_latest
 jobs:
   get-version:
     runs-on: ubuntu-latest
@@ -108,4 +108,4 @@ jobs:
          docker image push genomicmedicinesweden/gms-artic-nanopore:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}   
          #Push to dockerhub for pangolin with specific requirements
          docker image push genomicmedicinesweden/gms-artic-pangolin:latest
-         docker image push genomicmedicinesweden/gms-artic-pangolin:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}   
+         docker image push genomicmedicinesweden/gms-artic-pangolin:${{ steps.date.outputs.date }}-p-${REPO_VER}-L-${pangoLEARN_VER}-c-${constellations_VER}-d-${pangodesign_VER}-s-${scorpio_VER}
