@@ -127,6 +127,7 @@ workflow {
                   .set{ ch_cramFiles }
        }
        else if (params.objstore && params.objstore != false) {
+           println "Object Store Path: ${params.objstore}"
            Channel.fromPath( "${params.objstore}" )
                   .splitCsv()
                   .map { row -> tuple(row[0], row[1], row[1]) }
@@ -208,27 +209,27 @@ workflow {
    }
 
    main:
-       if ( params.nanopolish || params.medaka || (params.viridian && !params.illumina )) {
-           if ( params.objstore || params.catsup || params.ena_csv ) {
-	       articNcovNanopore(ch_objFiles)
-	   }
-	   else {
-               articNcovNanopore(ch_fastqDirs)
-	   }
-       } else if ( params.illumina ) {
-           if ( params.cram ) {
-               ncovIlluminaCram(ch_cramFiles)
-           }
-           else if ( params.objstore || params.catsup || params.ena_csv ) {
-               ncovIlluminaObj(ch_objFiles)
-           }
-           else {
-               ncovIllumina(ch_filePairs)
-           }
-       } else if (params.analysis) {
+        if ( params.nanopolish || params.medaka || (params.viridian && !params.illumina )) {
+            if ( params.objstore || params.catsup || params.ena_csv ) {
+                articNcovNanopore(ch_objFiles)
+            }
+            else {
+                    articNcovNanopore(ch_fastqDirs)
+            }
+        } else if ( params.illumina ) {
+            if ( params.cram ) {
+                ncovIlluminaCram(ch_cramFiles)
+            }
+            else if ( params.objstore || params.catsup || params.ena_csv ) {
+                ncovIlluminaObj(ch_objFiles)
+            }
+            else {
+                ncovIllumina(ch_filePairs)
+            }
+        } else if (params.analysis) {
             ncovAnalysis(ch_consensusFiles)
-   } else {
-       println("Please select a workflow with --nanopolish, --illumina or --medaka")
-   }
+        } else {
+            println("Please select a workflow with --nanopolish, --illumina or --medaka")
+        }
 }
 
