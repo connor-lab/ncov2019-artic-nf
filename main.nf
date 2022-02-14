@@ -7,6 +7,8 @@ nextflow.preview.dsl = 2
 // include modules
 include {printHelp} from './modules/help.nf'
 include {makeFastqSearchPath} from './modules/util.nf'
+include {getCsvBucketPath} from './modules/util.nf'
+include {getObjCsv} from './modules/k8.nf'
 
 // import subworkflows
 include {articNcovNanopore} from './workflows/articNcovNanopore.nf' 
@@ -167,12 +169,30 @@ workflow {
                   .set{ ch_objFiles }
        }
        else if (params.catsup && params.catsup != false) {
+            if ( java.nio.file.Paths.get(params.catsup).exists() ) {
+                Channel.fromPath( "${params.catsup}/sp3data.csv" )
+                        .splitCsv(header: true)
+                        .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
+                        .unique()
+                        .set{ ch_objFiles }
+            } else {
+                ch_objCSV = getCsvBucketPath(params.catsup)
+
+                getObjCsv( tuple( ch_objCSV[0], ch_objCSV[1] ))
+                    .splitCsv(header: true)
+                    .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
+                    .unique()
+                    .set{ ch_objFiles }
+            }
+
+/*
            Channel.fromPath( "${params.catsup}/sp3data.csv" )
                   .splitCsv(header: true)
                   .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
                   .view()
                   .unique()
                   .set{ ch_objFiles }
+*/
        }
        else if (params.ena_csv && params.ena_csv != false) {
            Channel.fromPath( "${params.ena_csv}" )
