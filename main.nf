@@ -17,7 +17,7 @@ include {ncovIlluminaCram} from './workflows/illuminaNcov.nf'
 include {ncovIlluminaObj} from './workflows/illuminaNcov.nf'
 include {ncovAnalysis} from './workflows/analysis'
 
-println("param illumina: " + params.illumina)
+println("[MAIN_START] nanopolish: " + params.nanopolish + " viridian: " + params.viridian + " illumina:" + params.illumina)
 
 if (params.varCaller == 'medaka'){
     params.medaka=true
@@ -107,6 +107,8 @@ if ( ! params.prefix ) {
          System.exit(1)
      }
 } 
+
+println("[MAIN_B4_WORKFLOW] nanopolish: " + params.nanopolish + " viridian: " + params.viridian + " illumina:" + params.illumina)
 
 
 Channel.from("$workflow.manifest.version")
@@ -266,6 +268,9 @@ workflow {
            }
        }
    }
+
+    println("[MAIN_AFTER_WORKFLOW] nanopolish: " + params.nanopolish + " viridian: " + params.viridian + " illumina:" + params.illumina)
+
 
    main:
         if ( params.nanopolish || params.medaka || (params.viridian && !params.illumina )) {
