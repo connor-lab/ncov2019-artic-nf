@@ -7,6 +7,8 @@ nextflow.preview.dsl = 2
 // include modules
 include {printHelp} from './modules/help.nf'
 include {makeFastqSearchPath} from './modules/util.nf'
+include {getCsvBucketPath} from './modules/util.nf'
+include {getObjCsv} from './modules/k8.nf'
 
 // import subworkflows
 include {articNcovNanopore} from './workflows/articNcovNanopore.nf' 
@@ -128,25 +130,53 @@ workflow {
        }
        else if (params.objstore && params.objstore != false) {
            println "Object Store Path: ${params.objstore}"
-           Channel.fromPath( "${params.objstore}" )
-                  .splitCsv()
-                  .map { row -> tuple(row[0], row[1], row[1]) }
-                  .set{ ch_objFiles }
+           if ( java.nio.file.Paths.get(params.objstore).exists() ) {
+               Channel.fromPath( "${params.objstore}" )
+                   .splitCsv()
+                   .map { row -> tuple(row[0], row[1], row[1]) }
+                   .set{ ch_objFiles }
+             } else {
+                ch_objCSV = getCsvBucketPath("${params.objstore}")
+
+                getObjCsv( tuple( ch_objCSV[0], ch_objCSV[1] ))
+                    .splitCsv()
+                    .map { row -> tuple(row[0], row[1], row[1]) }
+                    .set{ ch_objFiles }
+            }
        }
        else if (params.catsup && params.catsup != false) {
-           Channel.fromPath( "${params.catsup}/sp3data.csv" )
-                  .splitCsv(header: true)
-                  .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
-                  .unique()
-                  .set{ ch_objFiles }
+           if ( java.nio.file.Paths.get("${params.catsup}/sp3data.csv").exists() ) {
+               Channel.fromPath( "${params.catsup}/sp3data.csv" )
+                   .splitCsv(header: true)
+                   .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
+                   .unique()
+                   .set{ ch_objFiles }
+             } else {
+                ch_objCSV = getCsvBucketPath("${params.catsup}/sp3data.csv")
+
+                getObjCsv( tuple( ch_objCSV[0], ch_objCSV[1] ))
+                    .splitCsv(header: true)
+                    .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
+                    .unique()
+                    .set{ ch_objFiles }
+            }
        }
        else if (params.ena_csv && params.ena_csv != false) {
-           Channel.fromPath( "${params.ena_csv}" )
-                  .splitCsv(header: true)
-                  .map { row -> tuple("${row.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
-                  .unique()
-                  .view()
-                  .set{ ch_objFiles }
+           if ( java.nio.file.Paths.get(params.ena_csv).exists() ) {
+               Channel.fromPath( "${params.ena_csv}" )
+                   .splitCsv(header: true)
+                   .map { row -> tuple("${row.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
+                   .unique()
+                   .set{ ch_objFiles }
+             } else {
+                ch_objCSV = getCsvBucketPath(params.ena_csv)
+
+                getObjCsv( tuple( ch_objCSV[0], ch_objCSV[1] ))
+                    .splitCsv(header: true)
+                    .map { row -> tuple("${row.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
+                    .unique()
+                    .set{ ch_objFiles }
+            }
        }
        else {
            fastqSearchPath = makeFastqSearchPath( params.illuminaPrefixes, params.illuminaSuffixes, params.fastq_exts )
@@ -161,27 +191,54 @@ workflow {
        nanoporeBarcodeDirs = file("${params.basecalled_fastq}/barcode*", type: 'dir', maxdepth: 1 )
        nanoporeNoBarcode = file("${params.basecalled_fastq}/*.fastq", type: 'file', maxdepth: 1)
 
-       if (params.objstore && params.objstore) {
-           Channel.fromPath( "${params.objstore}" )
-                  .splitCsv()
-                  .map { row -> tuple(row[0], row[1], row[1]) }
-                  .set{ ch_objFiles }
+       if (params.objstore && params.objstore != false) {
+           if ( java.nio.file.Paths.get(params.objstore).exists() ) {
+                Channel.fromPath( "${params.objstore}" )
+                    .splitCsv()
+                    .map { row -> tuple(row[0], row[1], row[1]) }
+                    .set{ ch_objFiles }
+           } else {
+                ch_objCSV = getCsvBucketPath("${params.objstore}")
+
+                getObjCsv( tuple( ch_objCSV[0], ch_objCSV[1] ))
+                    .splitCsv()
+                    .map { row -> tuple(row[0], row[1], row[1]) }
+                    .set{ ch_objFiles }
+           }
        }
        else if (params.catsup && params.catsup != false) {
-           Channel.fromPath( "${params.catsup}/sp3data.csv" )
-                  .splitCsv(header: true)
-                  .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
-                  .view()
-                  .unique()
-                  .set{ ch_objFiles }
+            if ( java.nio.file.Paths.get(params.catsup).exists() ) {
+                Channel.fromPath( "${params.catsup}/sp3data.csv" )
+                        .splitCsv(header: true)
+                        .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
+                        .unique()
+                        .set{ ch_objFiles }
+            } else {
+                ch_objCSV = getCsvBucketPath("${params.catsup}/sp3data.csv")
+
+                getObjCsv( tuple( ch_objCSV[0], ch_objCSV[1] ))
+                    .splitCsv(header: true)
+                    .map { row -> tuple("${params.bucket}", "${row.submission_uuid4}/${row.sample_uuid4}", "${row.sample_uuid4}") }
+                    .unique()
+                    .set{ ch_objFiles }
+            }
        }
        else if (params.ena_csv && params.ena_csv != false) {
-           Channel.fromPath( "${params.ena_csv}" )
-                  .splitCsv(header: true)
-                  .map { row -> tuple("${row.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
-                  .view()
-                  .unique()
-                  .set{ ch_objFiles }
+            if ( java.nio.file.Paths.get(params.ena_csv).exists() ) {
+                Channel.fromPath( "${params.ena_csv}" )
+                    .splitCsv(header: true)
+                    .map { row -> tuple("${row.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
+                    .unique()
+                    .set{ ch_objFiles }
+            } else {
+                ch_objCSV = getCsvBucketPath("${params.ena_csv}")
+
+                getObjCsv( tuple( ch_objCSV[0], ch_objCSV[1] ))
+                    .splitCsv(header: true)
+                    .map { row -> tuple("${row.bucket}", "${row.sample_prefix}", "${row.sample_accession}") }
+                    .unique()
+                    .set{ ch_objFiles }
+            }
        }
        else{
            if( nanoporeBarcodeDirs ) {
