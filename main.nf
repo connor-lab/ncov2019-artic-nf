@@ -17,6 +17,8 @@ include {ncovIlluminaCram} from './workflows/illuminaNcov.nf'
 include {ncovIlluminaObj} from './workflows/illuminaNcov.nf'
 include {ncovAnalysis} from './workflows/analysis'
 
+println("param illumina: " + params.illumina)
+
 if (params.varCaller == 'medaka'){
     params.medaka=true
 }
