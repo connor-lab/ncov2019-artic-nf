@@ -39,7 +39,7 @@ $ nextflow run main.nf -profile singularity \
     --basecalled_fastq /home/test/fastq_pass/ \
     --fast5_pass /home/test/fast5_pass/ \
     --sequencing_summary /home/test/sequencing_summary_FAP82331_657703c9.txt \
-    --scheme-directory primer_schemes/midnight/nCoV-2019/V1/ \
+    --scheme-directory midnight-primer/V1/ \
     --outdir /home/test/midnight_test -with-report midnight
 ```
 
