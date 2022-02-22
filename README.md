@@ -42,6 +42,13 @@ $ nextflow run main.nf -profile singularity \
     --scheme-directory primer_schemes/midnight/nCoV-2019/V1/ \
     --outdir /home/test/midnight_test -with-report midnight
 ```
+
+###### --scheme-directory: by default will download the midnight primer scheme. To change the --scheme-directory use 'artic-primer/V3' or 'eden-primer/V1'
+
+```
+--scheme-directory artic-primer/V3/
+
+```
 ###### **To run the artic pipeline, please change the [nanopore.config](https://github.com/JD2112/gms-artic/blob/master/conf/nanopore.config) 'min_length' (default = 400) and 'max_length' (default = 700)**
 
 ```
