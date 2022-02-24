@@ -43,7 +43,7 @@ $ nextflow run main.nf -profile singularity \
     --outdir /home/test/midnight_test -with-report midnight
 ```
 
-###### --scheme-directory: by default will download the midnight primer scheme. To change the --scheme-directory use 'artic-primer/V3' or 'eden-primer/V1'
+###### --scheme: To use the primer list, add --scheme to the CLI, eg., use 'nCoV-2019/V3' for artic primers or 'midnight-primer/V1'
 
 ```
 --scheme-directory artic-primer/V3/

@@ -34,7 +34,7 @@ if ( params.illumina ) {
    }
 } else if ( params.nanopolish ) {
    if (! params.scheme ) {
-       println("Please supply the path to the primer directory containing required primers with --scheme-directory")
+       println("Please supply the path to the primer directory containing required primers with --scheme")
        System.exit(1)
    }  
    if (! params.basecalled_fastq ) {
