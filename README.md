@@ -46,7 +46,9 @@ $ nextflow run main.nf -profile singularity \
 ###### --scheme: To use the primer list, add --scheme to the CLI, eg., use 'nCoV-2019/V3' for artic primers or 'midnight-primer/V1'
 
 ```
---scheme-directory artic-primer/V3/
+--scheme nCoV-2019/V3/
+--scheme midnight-primers/V1/
+--scheme eden-primers/V1/
 
 ```
 ###### **To run the artic pipeline, please change the [nanopore.config](https://github.com/JD2112/gms-artic/blob/master/conf/nanopore.config) 'min_length' (default = 400) and 'max_length' (default = 700)**
