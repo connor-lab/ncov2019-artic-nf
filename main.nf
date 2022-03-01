@@ -33,6 +33,10 @@ if ( params.illumina ) {
        System.exit(1)
    }
 } else if ( params.nanopolish ) {
+   if (! params.scheme ) {
+       println("Please supply the path to the primer directory containing required primers with --scheme")
+       System.exit(1)
+   }  
    if (! params.basecalled_fastq ) {
        println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
    }

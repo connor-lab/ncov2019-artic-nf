@@ -39,8 +39,17 @@ $ nextflow run main.nf -profile singularity \
     --basecalled_fastq /home/test/fastq_pass/ \
     --fast5_pass /home/test/fast5_pass/ \
     --sequencing_summary /home/test/sequencing_summary_FAP82331_657703c9.txt \
-    --scheme-directory primer_schemes/midnight/nCoV-2019/V1/ \
+    --scheme-directory midnight-primer/V1/ \
     --outdir /home/test/midnight_test -with-report midnight
+```
+
+###### --scheme: To use the primer list, add --scheme to the CLI, eg., use 'nCoV-2019/V3' for artic primers or 'midnight-primer/V1'
+
+```
+--scheme nCoV-2019/V3/
+--scheme midnight-primers/V1/
+--scheme eden-primers/V1/
+
 ```
 ###### **To run the artic pipeline, please change the [nanopore.config](https://github.com/JD2112/gms-artic/blob/master/conf/nanopore.config) 'min_length' (default = 400) and 'max_length' (default = 700)**
 
