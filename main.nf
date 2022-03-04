@@ -4,6 +4,7 @@
 nextflow.preview.dsl = 2
 
 // include modules
+include {containerupdate} from './modules/containerupdate.nf'
 include {printHelp} from './modules/help.nf'
 include {makeFastqSearchPath} from './modules/util.nf'
 
@@ -76,6 +77,7 @@ if ( ! params.prefix ) {
 
 // main workflow
 workflow {
+   containerupdate()
    if ( params.illumina ) {
        if (params.cram) {
            Channel.fromPath( "${params.directory}/**.cram" )
