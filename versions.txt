@@ -4,3 +4,6 @@ pangolin 3.1.14
 viridian 0.3.0
 nextclade 1.7.0
 pangolin 3.1.17
+viridian 0.3.7
+nextclade 1.10.3
+pangolin 3.1.20
