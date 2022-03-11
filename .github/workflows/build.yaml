@@ -95,7 +95,7 @@ jobs:
             oxfordmmm/artic-ncov2019-nanopore:latest
             oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
             lhr.ocir.io/${{secrets.OCR_NAMESPACE}}/oxfordmmm/artic-ncov2019-nanopore:latest
-            lhr.ocir.io/${{secrets.OCR_NAMESPACE}}/oxfordmmm/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
+            lhr.ocir.io/${{secrets.OCR_NAMESPACE}}/oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
           push: true
           no-cache: true
       -
