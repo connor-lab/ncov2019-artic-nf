@@ -19,12 +19,23 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
+        name: Login to OCR
+        uses: docker/login-action@v1 
+        with:
+          registry: lhr.ocir.io
+          username: ${{ secrets.OCR_USERNAME }}
+          password: ${{ secrets.OCR_TOKEN }}
+      -
         name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           file: environments/illumina/Dockerfile
-          tags: oxfordmmm/artic-ncov2019-illumina:latest, oxfordmmm/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
+          tags: |
+            oxfordmmm/artic-ncov2019-illumina:latest
+            oxfordmmm/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
+            lhr.ocir.io/${{secrets.OCR_NAMESPACE}}/oxfordmmm/artic-ncov2019-illumina:latest
+            lhr.ocir.io/${{secrets.OCR_NAMESPACE}}/oxfordmmm/artic-ncov2019-illumina:${{env.RELEASE_VERSION}}
           push: true
           no-cache: true
       -
@@ -68,12 +79,23 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
+        name: Login to OCR
+        uses: docker/login-action@v1 
+        with:
+          registry: lhr.ocir.io
+          username: ${{ secrets.OCR_USERNAME }}
+          password: ${{ secrets.OCR_TOKEN }}
+      -
         name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           file: environments/nanopore/Dockerfile
-          tags: oxfordmmm/artic-ncov2019-nanopore:latest, oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
+          tags: |
+            oxfordmmm/artic-ncov2019-nanopore:latest
+            oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
+            lhr.ocir.io/${{secrets.OCR_NAMESPACE}}/oxfordmmm/artic-ncov2019-nanopore:latest
+            lhr.ocir.io/${{secrets.OCR_NAMESPACE}}/oxfordmmm/artic-ncov2019-nanopore:${{env.RELEASE_VERSION}}
           push: true
           no-cache: true
       -
