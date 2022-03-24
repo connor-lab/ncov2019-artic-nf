@@ -20,7 +20,7 @@ df=df.merge(aln2type, on='sampleName', how='left', suffixes=(None,"_aln2type"))
 # versions
 wf=open('workflow_commit.txt').read()
 df['workflowCommit']=str(wf).strip()
-df['manifestVerison']=sys.argv[2]
+df['manifestVersion']=sys.argv[2]
 nextclade_version=open('nextclade_files/version.txt').read()
 df['nextcladeVersion']=str(nextclade_version).strip()
 aln2type_variant_commit=open('variant_definitions/aln2type_variant_git_commit.txt').read()
@@ -54,7 +54,7 @@ a={level: aln2type.xs(level).to_dict('index') for level in aln2type.index.levels
 
 w={'WorkflowInformation':{}}
 w['WorkflowInformation']['workflowCommit']=str(wf).strip()
-w['WorkflowInformation']['manifestVerison']=sys.argv[2]
+w['WorkflowInformation']['manifestVersion']=sys.argv[2]
 w['WorkflowInformation']['sampleIdentifier']=sample_name
 
 # add fasta to json
