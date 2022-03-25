@@ -11,11 +11,11 @@ jobs:
     name: Test SP3 Stack
     runs-on: ubuntu-latest
     env:
-      PROVIDER_NAME: "GPAS"
+      PROVIDER_NAME: "oxfordmmm-GitHub"
       DEPLOY_REPO_URL: "https://github.com/GenomePathogenAnalysisService/sp3-oci-rm"
-      TF_VERSION: "0.14.x"
+      TF_VERSION: "1.0.x"
       REGION: "uk-london-1"
-      IMAGE: "ocid1.image.oc1.uk-london-1.aaaaaaaaegasetypwp4mr44kphst3r6irxtbsdmwucwc5tnsbpngqorewepq"
+      IMAGE: "ocid1.image.oc1.uk-london-1.aaaaaaaaoqrulg7gufk3dv2nqf27i3a6ezpgxbuyx3nwwqaxxbvdidtx4hoq"
     steps:
       - uses: actions/checkout@v2
         with: 
@@ -52,7 +52,7 @@ jobs:
       - name: "Check Provider"
         run: |
           echo "SOURCE_PROVIDER_ID=$(oci resource-manager configuration-source-provider list \
-            --compartment-id ${{secrets.OCI_COMPARTMENT_PROVIDER_OCID}}| jq '.data.items[] | select(."display-name"==env.PROVIDER_NAME).id' -r)" >> $GITHUB_ENV
+            --compartment-id ${{secrets.OCI_COMPARTMENT_PROVIDER_OCID}} | jq '.data.items[] | select(."display-name"=="${{env.PROVIDER_NAME}}").id' -r)" >> $GITHUB_ENV
 
       - name: "Create Provider"
         if: ${{env.SOURCE_PROVIDER_ID == ''}}
@@ -69,12 +69,12 @@ jobs:
         run: |
           echo "STACK_ID=$(oci resource-manager stack create-from-git-provider \
           --compartment-id ${{secrets.OCI_COMPARTMENT_OCID}} \
-          --config-source-configuration-source-provider-id $SOURCE_PROVIDER_ID \
-          --config-source-repository-url $DEPLOY_REPO_URL \
+          --config-source-configuration-source-provider-id ${{env.SOURCE_PROVIDER_ID}} \
+          --config-source-repository-url ${{env.DEPLOY_REPO_URL}} \
           --config-source-branch-name "main" \
           --display-name ${{env.DEPLOY_STACK_NAME}} \
           --terraform-version $TF_VERSION \
-          --variables '{"compartment_ocid": "${{secrets.OCI_COMPARTMENT_OCID}}",  "region":"${{env.REGION}}", "tenancy_ocid":"${{secrets.OCI_TENANCY_OCID}}", "randomise_ad":"true", "env_name":"sp3", "worker_min":"2", "worker_max":"6", "worker_max_create":"2", "bastion_image":"${{env.IMAGE}}", "bastion_shape":"VM.Standard2.1", "headnode_image":"${{env.IMAGE}}", "headnode_shape":"VM.Standard2.2", "worker_image":"${{env.IMAGE}}", "worker_shape":"VM.Standard2.4", "ssh_pub_key": "${{secrets.SSH_PUBLIC_KEY}}" }' \
+          --variables '{"compartment_ocid": "${{secrets.OCI_COMPARTMENT_OCID}}",  "region":"${{env.REGION}}", "tenancy_ocid":"${{secrets.OCI_TENANCY_OCID}}", "randomise_ad":"true", "env_name":"sp3", "worker_min":"2", "worker_max":"2", "worker_max_create":"1", "bastion_image":"${{env.IMAGE}}", "bastion_shape":"VM.Standard2.1", "headnode_image":"${{env.IMAGE}}", "headnode_shape":"VM.Standard2.2", "worker_image":"${{env.IMAGE}}", "worker_shape":"VM.Standard2.4", "ssh_pub_key": "${{secrets.SSH_PUBLIC_KEY}}" , "mount_ad": "lfHB:UK-LONDON-1-AD-1" }' \
           | jq '.data.id' -r)" >> $GITHUB_ENV
 
       - name: "Execute Apply Job"
