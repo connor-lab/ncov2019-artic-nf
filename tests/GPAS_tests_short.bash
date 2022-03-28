@@ -38,7 +38,7 @@ nextflow kuberun \
         --run_uuid ${test_name}_test \
         --TESToutputMODE true \
         --outdir /work/output/${test_name}_test \
-        > nextflow.txt
+        > ${test_name}_nextflow.txt
 
 sudo chown ubuntu:ubuntu /work/output/${test_name}_test
 
@@ -55,7 +55,6 @@ echo Running ${test_name} test workflow
 mkdir -p /work/runs/${test_name}_test
 cd /work/runs/${test_name}_test
 
-
 nextflow kuberun \
         oxfordmmm/ncov2019-artic-nf \
         -with-trace trace.txt -with-report report.html -with-dag dag.png \
@@ -69,7 +68,7 @@ nextflow kuberun \
         --run_uuid ${test_name}_test \
         --TESToutputMODE true \
         --outdir /work/output/${test_name}_test \
-        > nextflow.txt
+        > ${test_name}_nextflow.txt
 
 sudo chown ubuntu:ubuntu /work/output/${test_name}_test
 

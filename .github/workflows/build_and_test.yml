@@ -139,6 +139,12 @@ jobs:
           git tag -d ${GIT_VERSION}
           git push origin --delete ${GIT_VERSION}
 
+      - name: Upload nextflow logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: nextflow_logs
+          path: /work/output/*/*_nextflow.txt
+
       - name: 'Execute Destroy Job'
         if: always()
         run: |
