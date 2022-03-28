@@ -20,6 +20,8 @@ pushd /data/pipelines/ncov2019-artic-nf
 git_version=$(git describe --tags)
 popd
 
+nextflow pull oxfordmmm/ncov2019-artic-nf -r ${git_version}
+
 # ont_viridian_test
 test_name=ont_viridian_short
 echo Running ${test_name} test workflow
@@ -29,7 +31,7 @@ cd /work/runs/${test_name}_test
 nextflow kuberun \
         oxfordmmm/ncov2019-artic-nf \
         -with-trace trace.txt -with-report report.html -with-dag dag.png \
-        -r ${git_version} \
+        -r ${git_version} -latest \
         --prefix nanopore \
         -profile oke \
         --objstore /work/tmp/ONT_data_short.csv \
@@ -58,7 +60,7 @@ cd /work/runs/${test_name}_test
 nextflow kuberun \
         oxfordmmm/ncov2019-artic-nf \
         -with-trace trace.txt -with-report report.html -with-dag dag.png \
-        -r ${git_version} \
+        -r ${git_version}  -latest \
         --readpat '*{1,2}.fastq.gz' \
         --illumina --prefix illumina \
         -profile oke \
