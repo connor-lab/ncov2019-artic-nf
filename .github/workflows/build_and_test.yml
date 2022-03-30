@@ -4,7 +4,7 @@ name: oci-sp3-tests
 on:
   push:
     tags:
-      - sp3env-v*
+      - sp3env-beta-v*
 
 jobs:
   build-and-test:
@@ -138,6 +138,19 @@ jobs:
           git checkout master
           git tag -d ${GIT_VERSION}
           git push origin --delete ${GIT_VERSION}
+
+      - name: "Get nextflow logs"
+        run: |
+          mkdir -p release_notes
+          scp -o "ProxyCommand = ssh -W %h:%p ubuntu@${BASTION_NAME}" "ubuntu@10.0.1.2:/work/runs/*/*_nextflow.txt" nextflow_logs/
+          echo "NEXTFLOW_LOGS=$(ls nextflow_logs/*)" >> $GITHUB_ENV
+
+      - name: Upload nextflow logs
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: nextflow_logs
+          path: nextflow_logs/*_nextflow.txt
 
       - name: 'Execute Destroy Job'
         if: always()
