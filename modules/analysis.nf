@@ -45,8 +45,7 @@ process versions {
         ivar version > version_ivar.txt
         multiqc --version > version_multiqc.txt
         nextclade --version > version_nextclade.txt
-        pangolin -dv > version_pango_designation.txt
-        pangolin -pv > version_pangoLEARN.txt
+        pangolin -pv > version_pangolin-data.txt
         pangolin -v > version_pangolin.txt
         picard CollectWgsMetrics -version > version_picard.txt 2>&1 || true
         python --version > version_python.txt
@@ -69,8 +68,7 @@ process versions {
         muscle -version > version_muscle.txt
         nanopolish --version > version_nanopolish.txt
         nextclade --version > version_nextclade.txt
-        pangolin -dv > version_pango_designation.txt
-        pangolin -pv > version_pangoLEARN.txt
+        pangolin -pv > version_pangolin-data.txt
         pangolin -v > version_pangolin.txt
         porechop --version > version_porechop.txt
         python --version > version_python.txt
