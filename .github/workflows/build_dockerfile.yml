@@ -87,7 +87,7 @@ jobs:
        shell: bash
        run: |
          REPO_VER=$(cat versions/pangolin-latest-version.txt | sed 's|v||')
-         pangolin-data_VER=$(cat versions/pangolin-data-latest-version.txt)
+         pangolin-data_VER=$(cat versions/pangolin-data-latest-version.txt | sed 's|v||')
          scorpio_VER=$(cat versions/scorpio-latest-version.txt | sed 's|v||')
          constellations_VER=$(cat versions/constellations-latest-version.txt | sed 's|v||')
          #docker image push genomicmedicinesweden/gms-artic-illumina:latest
