@@ -16,6 +16,7 @@ jobs:
       TF_VERSION: "1.0.x"
       REGION: "uk-london-1"
       IMAGE: "ocid1.image.oc1.uk-london-1.aaaaaaaaoqrulg7gufk3dv2nqf27i3a6ezpgxbuyx3nwwqaxxbvdidtx4hoq"
+      AD: "lfHB:UK-LONDON-1-AD-1"
     steps:
       - uses: actions/checkout@v2
         with: 
@@ -74,7 +75,7 @@ jobs:
           --config-source-branch-name "main" \
           --display-name ${{env.DEPLOY_STACK_NAME}} \
           --terraform-version $TF_VERSION \
-          --variables '{"compartment_ocid": "${{secrets.OCI_COMPARTMENT_OCID}}",  "region":"${{env.REGION}}", "tenancy_ocid":"${{secrets.OCI_TENANCY_OCID}}", "randomise_ad":"true", "env_name":"sp3", "worker_min":"2", "worker_max":"2", "worker_max_create":"1", "bastion_image":"${{env.IMAGE}}", "bastion_shape":"VM.Standard2.1", "headnode_image":"${{env.IMAGE}}", "headnode_shape":"VM.Standard2.2", "worker_image":"${{env.IMAGE}}", "worker_shape":"VM.Standard2.4", "ssh_pub_key": "${{secrets.SSH_PUBLIC_KEY}}" , "mount_ad": "lfHB:UK-LONDON-1-AD-1" }' \
+          --variables '{"compartment_ocid": "${{secrets.OCI_COMPARTMENT_OCID}}",  "region":"${{env.REGION}}", "tenancy_ocid":"${{secrets.OCI_TENANCY_OCID}}", "randomise_ad":"false", "ad":"${{env.AD}}", "env_name":"sp3", "worker_min":"1", "worker_max":"1", "worker_max_create":"1", "bastion_image":"${{env.IMAGE}}", "bastion_shape":"VM.Standard2.1", "headnode_image":"${{env.IMAGE}}", "headnode_shape":"VM.Standard2.2", "worker_image":"${{env.IMAGE}}", "worker_shape":"VM.Standard2.4", "ssh_pub_key": "${{secrets.SSH_PUBLIC_KEY}}" , "mount_ad": "${{env.AD}}" }' \
           | jq '.data.id' -r)" >> $GITHUB_ENV
 
       - name: "Execute Apply Job"
@@ -125,7 +126,7 @@ jobs:
       - name: "Start SP3 tests"
         id: tests
         run: |
-          ssh -J ubuntu@${BASTION_NAME} ubuntu@10.0.1.2  "source ~/env/bin/activate; cd /data/pipelines/ncov2019-artic-nf; bash tests/GPAS_tests_short.bash"
+          ssh -J ubuntu@${BASTION_NAME} ubuntu@10.0.1.2 "cd /data/pipelines/ncov2019-artic-nf; export PATH=/home/ubuntu/bin:$PATH; export OCI_CLI_AUTH=instance_principal; source ~/env/bin/activate; bash tests/GPAS_tests_short.bash"
 
       - name: "Change tag if tests don't complete succesfully"
         if: ${{ failure() }}
