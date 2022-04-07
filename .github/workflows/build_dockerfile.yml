@@ -24,7 +24,7 @@ jobs:
          ##Get pangolin-data version
          curl -sL https://api.github.com/repos/cov-lineages/pangolin-data/releases/latest | \
          jq -r ".tag_name" > versions/pangolin-data-latest-version.txt
-         pangolin-data_VER=$(cat versions/pangolin-data-latest-version.txt)
+         pangolin-data_VER=$(cat versions/constellations-latest-version.txt)
          echo $pangolin-data_VER
 
          ##Get constellations version
