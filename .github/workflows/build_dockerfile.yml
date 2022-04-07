@@ -87,7 +87,6 @@ jobs:
          pangolin_data_VER=$(cat versions/pangolin-data-latest-version.txt | sed 's|v||')
          scorpio_VER=$(cat versions/scorpio-latest-version.txt | sed 's|v||')
          constellations_VER=$(cat versions/constellations-latest-version.txt | sed 's|v||')
-         #docker image push genomicmedicinesweden/gms-artic-illumina:latest
          docker image push genomicmedicinesweden/gms-artic-illumina:latest
          docker image push genomicmedicinesweden/gms-artic-illumina:${{ steps.date.outputs.date }}-p-${REPO_VER}-d-${pangolin_data_VER}-c-${constellations_VER}-s-${scorpio_VER}
          #Push to dockerhub for nanopore
