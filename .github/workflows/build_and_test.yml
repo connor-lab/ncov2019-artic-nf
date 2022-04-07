@@ -4,7 +4,7 @@ name: oci-sp3-tests
 on:
   push:
     tags:
-      - sp3env-beta-v*
+      - sp3env-v*
 
 jobs:
   build-and-test:
