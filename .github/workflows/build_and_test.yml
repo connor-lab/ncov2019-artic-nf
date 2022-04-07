@@ -126,7 +126,7 @@ jobs:
       - name: "Start SP3 tests"
         id: tests
         run: |
-          ssh -J ubuntu@${BASTION_NAME} ubuntu@10.0.1.2 "source ~/env/bin/activate; cd /data/pipelines/ncov2019-artic-nf; export PATH=/home/ubuntu/bin:$PATH; export OCI_CLI_AUTH=instance_principal; bash tests/GPAS_tests_short.bash"
+          ssh -J ubuntu@${BASTION_NAME} ubuntu@10.0.1.2 "cd /data/pipelines/ncov2019-artic-nf; export PATH=/home/ubuntu/bin:$PATH; export OCI_CLI_AUTH=instance_principal; source ~/env/bin/activate; bash tests/GPAS_tests_short.bash"
 
       - name: "Change tag if tests don't complete succesfully"
         if: ${{ failure() }}
