@@ -1,8 +1,6 @@
 name: Update docker for artic-ncov2019-illumina, artic-ncov2019-nanopore
 
 on:
- schedule:
-   - cron: '0 0 * * *'
  push:
    branches:
    - update_dockerfile
