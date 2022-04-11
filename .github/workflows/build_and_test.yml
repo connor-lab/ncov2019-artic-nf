@@ -143,7 +143,7 @@ jobs:
       - name: "Get nextflow logs"
         run: |
           mkdir -p release_notes
-          scp -o "ProxyCommand = ssh -W %h:%p ubuntu@${BASTION_NAME}" "ubuntu@10.0.1.2:/work/runs/*/*_nextflow.txt" nextflow_logs/
+          scp -r -o "ProxyCommand = ssh -W %h:%p ubuntu@${BASTION_NAME}" "ubuntu@10.0.1.2:/work/runs/*/*_nextflow.txt" nextflow_logs/
           echo "NEXTFLOW_LOGS=$(ls nextflow_logs/*)" >> $GITHUB_ENV
 
       - name: Upload nextflow logs
