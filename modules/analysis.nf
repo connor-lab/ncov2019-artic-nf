@@ -98,6 +98,7 @@ process getWorkflowCommit {
     """
     home=`(pwd)`
     cd /data/pipelines/ncov2019-artic-nf
+    git config --global --add safe.directory /data/pipelines/ncov2019-artic-nf
     git log -1 --pretty=format:"%h" > \${home}/workflowcommit.txt
     """
 }
