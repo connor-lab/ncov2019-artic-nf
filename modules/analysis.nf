@@ -85,6 +85,7 @@ process getVariantDefinitions {
     cd variant_definitions
     git log -1 --pretty=format:"%h" > aln2type_variant_git_commit.txt
     git describe --tags > aln2type_variant_version.txt
+    git config --global --add safe.directory /aln2type
     git -C /aln2type log -1 --pretty=format:"%h" > aln2type_commit.txt
     """
 }
