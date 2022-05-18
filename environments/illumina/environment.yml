@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - bioconda
   - defaults
+  - r
 dependencies:
   - biopython=1.74
   - libxcb
@@ -27,6 +28,7 @@ dependencies:
   - fastqc=0.11.9
   - multiqc=1.11
   - nextclade=1.10.2
+  - r
   - pip:
       - pandas >= 1.1
       - scikit-learn >= 0.23.1
