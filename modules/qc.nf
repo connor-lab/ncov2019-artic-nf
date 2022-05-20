@@ -50,7 +50,7 @@ process fastqc {
     def args = task.ext.args ?: ''
 
     """
-    fastqc ${forward} ${reverse} --format fastq --threads ${task.cpus} $args
+    fastqc ${forward} ${reverse} --format fastq --threads ${task.cpus} --dir ${params.tmpdir}
     """
 }
 
