@@ -75,6 +75,8 @@ process statsInsert {
     tag { sampleName }
 
     label 'largemem'
+    errorStrategy 'retry'
+    maxRetries 5
 
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.pdf", mode: 'copy'
@@ -92,8 +94,7 @@ process statsInsert {
     then
        picard CollectInsertSizeMetrics I=${bam} O=${sampleName}_insert_size.metrics.txt \
        H=${sampleName}_insert_size.distribution.pdf \
-       TMP_DIR=${params.tmpdir} \
-       M=0.5
+       TMP_DIR=${params.tmpdir}
     else
        echo "Skipping sample ${sampleName} - no usable paired reads"
        touch ${sampleName}_insert_size.metrics.txt
