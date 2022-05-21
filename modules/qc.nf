@@ -92,7 +92,8 @@ process statsInsert {
     then
        picard CollectInsertSizeMetrics I=${bam} O=${sampleName}_insert_size.metrics.txt \
        H=${sampleName}_insert_size.distribution.pdf \
-       TMP_DIR=${params.tmpdir}
+       TMP_DIR=${params.tmpdir} \
+       M=0.5
     else
        echo "Skipping sample ${sampleName} - no usable paired reads"
        touch ${sampleName}_insert_size.metrics.txt
