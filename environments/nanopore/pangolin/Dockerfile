@@ -1,5 +1,7 @@
 FROM ubuntu:xenial
 
+ARG PANGOLIN_VER
+
 # install needed software for conda install; cleanup apt garbage
 RUN apt-get update && apt-get install -y \
  wget \
