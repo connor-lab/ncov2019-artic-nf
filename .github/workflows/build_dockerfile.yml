@@ -5,7 +5,7 @@ on:
    - cron: '0 0 * * *'
  push:
     branches:
-      - fix_mamba 
+      - update_pangolin_container 
 jobs:
   get-version:
     runs-on: ubuntu-latest
