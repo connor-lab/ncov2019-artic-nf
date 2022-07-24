@@ -149,7 +149,8 @@ process fastqcNanopore {
     file "*fastqc*"
 
     """
-    fastqc ${params.fastqPath} --format fastq --threads ${task.cpus} --dir ${params.tmpdir}
+    mkdir ${params.fastqcOut}
+    fastqc ${params.fastqPath} --format fastq --threads ${task.cpus} --dir ${params.tmpdir} --outdir ${params.fastqcOut}
     """
 }
 
