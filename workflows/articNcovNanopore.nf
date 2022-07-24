@@ -19,7 +19,7 @@ include {getVariantDefinitions} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
 include {versions} from '../modules/analysis.nf'
 include {fastqc} from '../modules/qc.nf'
-include {multiqc} from '../modules/qc.nf'
+include {multiqc_nanopore} from '../modules/qc.nf'
 
 include {bamToCram} from '../modules/out.nf'
 
@@ -107,7 +107,7 @@ workflow sequenceAnalysisMedaka {
 
       fastqc("${params.outdir}/../fastq/*fastq.gz")
 
-      multiqc()
+      multiqc_nanopore(fastqc.out.collect())
 
       articDownloadScheme()
 
