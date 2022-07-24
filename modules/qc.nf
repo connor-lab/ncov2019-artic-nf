@@ -137,36 +137,26 @@ process multiqc {
     file '*multiqc_data/multiqc_data.json'
 
     """
-    multiqc ${params.outdir} --filename ${params.prefix}_multiqc.html --data-format json \
+    multiqc . --filename ${params.prefix}_multiqc.html --data-format json \
     ${params.multiqcOptions}
     """
 }
 
 process fastqcNanopore {
-    tag { sampleName }
-
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy', overwrite: true
-
-    input:
-    tuple sampleName, path(forward)
 
     output:
     file "*fastqc*"
 
     """
-    fastqc ${forward} --format fastq --threads ${task.cpus} --dir ${params.tmpdir}
+    fastqc ${params.fastqPath} --format fastq --threads ${task.cpus} --dir ${params.tmpdir}
     """
 }
 
 process multiqcNanopore {
-    tag { params.prefix }
-
     label 'largemem'
 
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy'
-
-    input:
-    path
 
     output:
     file '*multiqc.html'
