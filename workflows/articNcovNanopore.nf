@@ -105,7 +105,7 @@ workflow sequenceAnalysisMedaka {
     main:
       versions()
 
-      fastqc("${params.outdir}/../fastq/*fastq.gz")
+      fastqc(ch_runFastqDirs)
 
       multiqcNanopore(fastqc.out.collect())
 
