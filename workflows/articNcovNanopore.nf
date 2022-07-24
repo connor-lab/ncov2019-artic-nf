@@ -107,7 +107,7 @@ workflow sequenceAnalysisMedaka {
 
       fastqc("${params.outdir}/../fastq/*fastq.gz")
 
-      multiqc_nanopore(fastqc.out.collect())
+      multiqcNanopore(fastqc.out.collect())
 
       articDownloadScheme()
 
