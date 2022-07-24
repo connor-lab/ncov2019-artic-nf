@@ -142,6 +142,22 @@ process multiqc {
     """
 }
 
+process fastqcNanopore {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy', overwrite: true
+
+    input:
+    tuple sampleName, path(forward)
+
+    output:
+    file "*fastqc*"
+
+    """
+    fastqc ${forward} --format fastq --threads ${task.cpus} --dir ${params.tmpdir}
+    """
+}
+
 process multiqcNanopore {
     tag { params.prefix }
 
