@@ -164,7 +164,6 @@ process multiqcNanopore {
     file '*multiqc_data/multiqc_data.json'
 
     """
-    multiqc . --filename ${params.prefix}_multiqc.html --data-format json \
-    ${params.multiqcOptions}
+    multiqc . --filename ${params.prefix}_multiqc.html --data-format json
     """
 }

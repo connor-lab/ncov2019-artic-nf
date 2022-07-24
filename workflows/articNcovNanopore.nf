@@ -107,7 +107,7 @@ workflow sequenceAnalysisMedaka {
 
       fastqcNanopore()
 
-      multiqcNanopore()
+      multiqcNanopore(fastqc.out)
 
       articDownloadScheme()
 
