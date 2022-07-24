@@ -38,10 +38,6 @@ workflow sequenceAnalysisNanopolish {
     main:
       versions()
 
-      fastqc("${params.outdir}/../fastq/*fastq.gz")
-
-      multiqc()
-
       articDownloadScheme()
 
       articGuppyPlex(ch_runFastqDirs.flatten())
@@ -108,6 +104,10 @@ workflow sequenceAnalysisMedaka {
 
     main:
       versions()
+
+      fastqc("${params.outdir}/../fastq/*fastq.gz")
+
+      multiqc()
 
       articDownloadScheme()
 
