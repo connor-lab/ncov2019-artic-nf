@@ -18,6 +18,8 @@ include {nextclade} from '../modules/typing.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
 include {versions} from '../modules/analysis.nf'
+include {fastqc} from '../modules/qc.nf'
+include {multiqc} from '../modules/qc.nf'
 
 include {bamToCram} from '../modules/out.nf'
 
@@ -35,6 +37,10 @@ workflow sequenceAnalysisNanopolish {
     
     main:
       versions()
+
+      fastqc("${params.outdir}/../fastq/*fastq.gz")
+
+      multiqc()
 
       articDownloadScheme()
 

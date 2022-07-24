@@ -5,4 +5,4 @@ results
 *.sif
 work
 environments/.DS_Store
-
+.idea/
