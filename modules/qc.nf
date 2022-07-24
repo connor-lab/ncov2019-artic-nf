@@ -141,3 +141,23 @@ process multiqc {
     ${params.multiqcOptions}
     """
 }
+
+process multiqcNanopore {
+    tag { params.prefix }
+
+    label 'largemem'
+
+    publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy'
+
+    input:
+    path
+
+    output:
+    file '*multiqc.html'
+    file '*multiqc_data/multiqc_data.json'
+
+    """
+    multiqc ${params.outdir} --filename ${params.prefix}_multiqc.html --data-format json \
+    ${params.multiqcOptions}
+    """
+}

@@ -19,7 +19,7 @@ include {getVariantDefinitions} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
 include {versions} from '../modules/analysis.nf'
 include {fastqc} from '../modules/qc.nf'
-include {multiqc_nanopore} from '../modules/qc.nf'
+include {multiqcNanopore} from '../modules/qc.nf'
 
 include {bamToCram} from '../modules/out.nf'
 
