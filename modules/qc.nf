@@ -159,6 +159,9 @@ process multiqcNanopore {
 
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy'
 
+    input:
+    path fastqcMetrics
+
     output:
     file '*multiqc.html'
     file '*multiqc_data/multiqc_data.json'
