@@ -5,7 +5,7 @@ on:
    - cron: '0 0 * * *'
  push:
     branches:
-      - fix_mamba 
+      - update_pangolin_container 
 jobs:
   get-version:
     runs-on: ubuntu-latest
@@ -78,7 +78,7 @@ jobs:
          #Build docker for nanopore
          docker build --no-cache -f environments/nanopore/Dockerfile -t genomicmedicinesweden/gms-artic-nanopore:latest -t genomicmedicinesweden/gms-artic-nanopore:${{ steps.date.outputs.date }}-p-${REPO_VER}-d-${pangolin_data_VER}-c-${constellations_VER}-s-${scorpio_VER} .
          #Build docker for pangolin-check for specific requirements
-         docker build --no-cache -f environments/nanopore/pangolin/Dockerfile -t genomicmedicinesweden/gms-artic-pangolin:latest -t genomicmedicinesweden/gms-artic-pangolin:${{ steps.date.outputs.date }}-p-${REPO_VER}-d-${pangolin_data_VER}-c-${constellations_VER}-s-${scorpio_VER} .
+         docker build --no-cache -f environments/nanopore/pangolin/Dockerfile -t genomicmedicinesweden/gms-artic-pangolin:latest -t genomicmedicinesweden/gms-artic-pangolin:${{ steps.date.outputs.date }}-p-${REPO_VER}-d-${pangolin_data_VER}-c-${constellations_VER}-s-${scorpio_VER} --build-arg PANGOLIN_VER=v${REPO_VER} .
 
      - name: Push Docker image to DockerHub
        shell: bash

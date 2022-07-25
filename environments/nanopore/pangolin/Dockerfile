@@ -1,5 +1,7 @@
 FROM ubuntu:xenial
 
+ARG PANGOLIN_VER
+
 # install needed software for conda install; cleanup apt garbage
 RUN apt-get update && apt-get install -y \
  wget \
@@ -11,9 +13,9 @@ RUN apt-get update && apt-get install -y \
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
  bash ./Miniconda3-latest-Linux-x86_64.sh -p /miniconda -b  && \
  rm Miniconda3-latest-Linux-x86_64.sh && \
- wget "https://github.com/cov-lineages/pangolin/archive/refs/tags/v3.1.14.tar.gz" && \
- tar -xf v3.1.14.tar.gz && \
- rm v3.1.14.tar.gz && \
+ wget "https://github.com/cov-lineages/pangolin/archive/refs/tags/${PANGOLIN_VER}.tar.gz" && \
+ tar -xf "${PANGOLIN_VER}.tar.gz" && \
+ rm "${PANGOLIN_VER}.tar.gz" && \
  mv -v pangolin-* pangolin
 
 # set the environment
@@ -38,6 +40,6 @@ RUN cd pangolin && \
  pip install . && \
  conda clean -a -y && \
  mkdir /data && \
- pangolin -v && pangolin -pv && pangolin -dv
+ pangolin --all-versions
 
 WORKDIR /data
