@@ -146,12 +146,11 @@ process fastqcNanopore {
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy', overwrite: true
 
     output:
-    path("*/*.zip") , emit: zip
-    path("*/*.html") , emit: html
+    path("*.zip") , emit: zip
+    path("*.html") , emit: html
 
     """
-    mkdir -p ${params.fastqcOut}
-    fastqc ${params.fastqPath} --format fastq --threads ${task.cpus} --dir ${params.tmpdir} --outdir ${params.fastqcOut}
+    fastqc ${params.fastqPath} --format fastq --threads ${task.cpus} --dir ${params.tmpdir} --outdir .
     """
 }
 
