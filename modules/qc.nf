@@ -146,7 +146,7 @@ process fastqcNanopore {
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy', overwrite: true
 
     output:
-    file *fastqc*, emit: fastqc_out
+    path "*fastqc*", emit: fastqc_out
 
     """
     mkdir -p ${params.fastqcOut}
