@@ -101,6 +101,8 @@ workflow sequenceAnalysisMedaka {
       ch_runFastqDirs
 
     main:
+      versions()
+
       articDownloadScheme()
 
       articGuppyPlex(ch_runFastqDirs.flatten())
