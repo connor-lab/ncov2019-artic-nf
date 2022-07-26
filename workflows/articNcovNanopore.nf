@@ -105,7 +105,7 @@ workflow sequenceAnalysisMedaka {
     main:
       versions()
 
-      fastqcNanopore()
+      fastqcNanopore(ch_runFastqDirs)
 
       multiqcNanopore(fastqcNanopore.out.zip)
 
