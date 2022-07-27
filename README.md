@@ -7,9 +7,9 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 - [Version updates](#Version-updates)
 - [How to run in NGP server](#How-to-run-in-NGP-server)
   - [Datafile structure](#Datafile-structure)
-  - [From terminal](#Manual-running-of-analysis-pipeline)
-    - [Illumina pipeline](#Run-Illumina-pipeline)
-    - [Nanopore pipeline](#Run-Nanopore-Pipeline)
+  - [Pipeline run command](#Manual-running-of-analysis-pipeline)
+  - [Illumina pipeline](#Run-Illumina-pipeline)
+  - [Nanopore pipeline](#Run-Nanopore-Pipeline)
   - [Primer scheme parameters setup](#Primer-scheme-parameters-setup)
 - [Useful information](#Useful-information) 
 ------------
