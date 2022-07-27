@@ -32,6 +32,7 @@ dependencies:
   - pip:
       - pandas == 1.0.1
       - scikit-learn >= 0.23.1
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
 =======
   - nextclade=1.10.2
@@ -42,4 +43,6 @@ dependencies:
   - pip:
       - pandas == 1.0.1
       - scikit-learn >= 0.23.1
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes

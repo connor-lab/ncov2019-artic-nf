@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 name: gms-artic-pangolin
+=======
+name: pangolin
+>>>>>>> Stashed changes
 channels:
   - conda-forge
   - bioconda
@@ -14,7 +18,15 @@ dependencies:
   - usher>=0.3.2
   - pip:
     - pandas >= 1.0.1
+<<<<<<< Updated upstream
     - git+https://github.com/cov-lineages/pangoLEARN.git
     - git+https://github.com/cov-lineages/scorpio.git
     - git+https://github.com/cov-lineages/constellations.git
     - git+https://github.com/cov-lineages/pango-designation.git
+=======
+    - git+https://github.com/cov-lineages/pangolin.git
+    - git+https://github.com/cov-lineages/constellations.git 
+    - git+https://github.com/cov-lineages/scorpio.git
+    - git+https://github.com/cov-lineages/pangolin-data.git
+
+>>>>>>> Stashed changes

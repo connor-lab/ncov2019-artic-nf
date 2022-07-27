@@ -1,4 +1,4 @@
-name: artic-ncov2019-illumina
+name: gms-artic-illumina
 channels:
   - conda-forge
   - bioconda
@@ -28,11 +28,9 @@ dependencies:
   - fastqc=0.11.9
   - multiqc=1.11
   - nextclade=1.10.2
-  - r=3.6.0
+  - sambamba=0.8.0
+  - ensembl-vep>=102.0
+  - conda-forge::r-base
   - pip:
       - pandas >= 1.1
       - scikit-learn >= 0.23.1
-      - git+https://github.com/cov-lineages/pangolin.git
-      - git+https://github.com/cov-lineages/constellations.git 
-      - git+https://github.com/cov-lineages/scorpio.git
-      - git+https://github.com/cov-lineages/pangolin-data.git

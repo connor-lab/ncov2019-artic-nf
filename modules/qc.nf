@@ -193,6 +193,10 @@ process pycoqc {
         -f ${seqSummary} \\
         -o pycoqc.html \\
         -j pycoqc_data.json
+<<<<<<< Updated upstream
         
+=======
+
+>>>>>>> Stashed changes
     """
 }
