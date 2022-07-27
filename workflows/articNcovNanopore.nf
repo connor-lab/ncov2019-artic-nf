@@ -18,10 +18,8 @@ include {nextclade} from '../modules/typing.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
 include {versions} from '../modules/analysis.nf'
-include {pangoversions} from '../modules/analysis.nf'
 include {fastqcNanopore} from '../modules/qc.nf'
 include {multiqcNanopore} from '../modules/qc.nf'
-include {pycoqc} from '../modules/qc.nf'
 
 include {bamToCram} from '../modules/out.nf'
 
@@ -39,14 +37,6 @@ workflow sequenceAnalysisNanopolish {
     
     main:
       versions()
-
-      pangoversions()
-
-      fastqcNanopore(ch_runFastqDirs)
-
-      multiqcNanopore(fastqcNanopore.out.zip)
-
-      pycoqc(ch_seqSummary)
 
       articDownloadScheme()
 
@@ -115,13 +105,9 @@ workflow sequenceAnalysisMedaka {
     main:
       versions()
 
-      pangoversions()
-
       fastqcNanopore(ch_runFastqDirs)
 
       multiqcNanopore(fastqcNanopore.out.zip)
-
-      pycoqc(ch_seqSummary)
 
       articDownloadScheme()
 
@@ -150,8 +136,6 @@ workflow sequenceAnalysisMedaka {
      collateSamples(qc.pass.map{ it[0] }
                            .join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
-
-     nextclade(articMinIONNanopolish.out.consensus_fasta)
 
      pangolinTyping(articMinIONMedaka.out.consensus_fasta)
 
