@@ -1,4 +1,5 @@
-# GMS-Artic (ncov2019-artic-nf)
+
+![logo](workflow-image/logo.png)
 
 A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinformatics tools (https://github.com/artic-network/fieldbioinformatics).
 
