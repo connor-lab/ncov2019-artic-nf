@@ -266,7 +266,11 @@ process annotationVEP {
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.freebayes.vep.vcf", mode: 'copy'
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
 =======
 
 >>>>>>> Stashed changes
@@ -278,7 +282,11 @@ process annotationVEP {
 
     script:
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         """   
+=======
+        """
+>>>>>>> Stashed changes
 =======
         """
 >>>>>>> Stashed changes

@@ -141,7 +141,11 @@ process multiqc {
 
 process fastqcNanopore {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
 =======
 
 >>>>>>> Stashed changes
@@ -150,7 +154,11 @@ process fastqcNanopore {
     input:
     path fastq
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
 =======
 
 >>>>>>> Stashed changes
@@ -166,7 +174,11 @@ process fastqcNanopore {
 process multiqcNanopore {
     label 'largemem'
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
 =======
 
 >>>>>>> Stashed changes
@@ -188,7 +200,11 @@ process pycoqc {
 
     label 'largemem'
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
 =======
 
 >>>>>>> Stashed changes
@@ -207,9 +223,13 @@ process pycoqc {
         -o pycoqc.html \\
         -j pycoqc_data.json
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         
 =======
 
+>>>>>>> Stashed changes
+=======
+        
 >>>>>>> Stashed changes
     """
 }

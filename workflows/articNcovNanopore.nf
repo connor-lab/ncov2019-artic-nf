@@ -25,6 +25,9 @@ include {fastqcNanopore} from '../modules/qc.nf'
 include {multiqcNanopore} from '../modules/qc.nf'
 include {pycoqc} from '../modules/qc.nf'
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -57,12 +60,24 @@ workflow sequenceAnalysisNanopolish {
       
       pycoqc(ch_seqSummary)
 
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
 =======
 
       pangoversions()
 
       fastqcNanopore(ch_runFastqDirs)
+=======
+      pangoversions()
+
+      fastqcNanopore(ch_runFastqDirs)
+
+      multiqcNanopore(fastqcNanopore.out.zip)
+
+      pycoqc(ch_seqSummary)
+
+      articDownloadScheme()
+>>>>>>> Stashed changes
 
       multiqcNanopore(fastqcNanopore.out.zip)
 
@@ -158,6 +173,9 @@ workflow sequenceAnalysisMedaka {
 
       pycoqc(ch_seqSummary)
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       articDownloadScheme()
 
@@ -189,7 +207,11 @@ workflow sequenceAnalysisMedaka {
 
      nextclade(articMinIONNanopolish.out.consensus_fasta)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
      
+=======
+
+>>>>>>> Stashed changes
 =======
 
 >>>>>>> Stashed changes
