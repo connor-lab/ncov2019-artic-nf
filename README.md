@@ -8,8 +8,8 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 - [How to run in NGP server](#How-to-run-in-NGP-server)
   - [Datafile structure](#Datafile-structure)
   - [Pipeline run command](#Manual-running-of-analysis-pipeline)
-    - [Illumina pipeline](#2.-Run-Illumina-pipeline)
-    - [Nanopore pipeline](#3.-Run-Nanopore-Pipeline)
+    - [Illumina pipeline](#Run-Illumina-pipeline)
+    - [Nanopore pipeline](#Run-Nanopore-Pipeline)
   - [Primer scheme parameters setup](#Primer-scheme-parameters-setup)
 - [Useful information](#Useful-information) 
 ------------
@@ -55,7 +55,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 ## How to run in NGP server
 
 ### Datafile structure
-###### 1. gms-artic in ngp-gms
+#### gms-artic in ngp-gms
 
 *for nanopore analysis (default is "midnight")*
 ```
@@ -70,7 +70,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
          |___ fastq/
 ```
 ### Manual running of analysis pipeline
-###### 2. Run Illumina pipeline
+#### Run Illumina pipeline
 ```
 $ nextflow run main.nf -profile singularity,sge \
     --illumina --prefix "test_illumina"     \
@@ -78,7 +78,7 @@ $ nextflow run main.nf -profile singularity,sge \
     --outdir illumina_test
 ```
 
-###### 3. Run Nanopore Pipeline
+#### Run Nanopore Pipeline
 ###### **Deafult is "midnight" protocol**
 ```
 $ nextflow run main.nf -profile singularity \
