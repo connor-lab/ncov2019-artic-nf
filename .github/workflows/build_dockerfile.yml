@@ -5,7 +5,7 @@ on:
    - cron: '0 0 * * *'
  push:
     branches:
-      - update_pangolin_container 
+      - update_nanopore_container 
 jobs:
   get-version:
     runs-on: ubuntu-latest
