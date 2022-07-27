@@ -1,4 +1,4 @@
-name: pangolin
+name: gms-artic-pangolin
 channels:
   - conda-forge
   - bioconda

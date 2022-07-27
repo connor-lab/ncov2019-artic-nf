@@ -62,6 +62,39 @@ Date: 2020-09-15
 * Add new option to remove samples with low reads after guppyplex 
 
 ------------
+### v2.0.0
+#### Major updates
+- Docker container separated for Pangolin typing -
+    - Illumina container: gms-artic-illumina
+    - Nanopore container: gms-artic-illumina
+    - Pangolin container: gms-artic-pangolin
+    - pycoQC container  : pycoqc
+- Added separate package version files for each workflow -
+    - versions      : for Illumina and Nanopore
+    - pangoversion  : for pangolin typing
+- Illumina analysis additional features -
+    - flagstat
+    - depth
+    - VEP annotation
+- Illumina results works for sc2reporter visualization
+- Nanopore analysis additional features (artic & medaka)-
+    - fastqc
+    - multiqc
+    - pycoQC
+
+### v1.8.0
+#### Minor updates
+
+- Pangolin v4 support
+- Updated Picard arguments
+- FastQC commands can be added from config
+- Added version of pangolin to build_dockerfile
+
+#### Bug fixes
+- Fixed build_dockerfile
+- Fixed R issue
+- Fixed mamba issue
+
 #### Major changes
 
 * The illumina and nanopore tracks automatically run pangolin and nextclade.

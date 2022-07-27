@@ -14,7 +14,7 @@ process articDownloadScheme{
 
     script:
     """
-    git clone ${params.schemeRepoURL} ${params.schemeDir}
+    git clone ${params.schemeRepoURL}
     """
 }
 
