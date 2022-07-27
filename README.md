@@ -3,13 +3,23 @@
 
 A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinformatics tools (https://github.com/artic-network/fieldbioinformatics).
 
+### Table of contents - 
+- [Version updates](#Version-updates)
+- [How to run in NGP server](#How-to-run-in-NGP-server)
+  - [Datafile structure](#Datafile-structure)
+  - [From terminal](#Manual-running-of-analysis-pipeline)
+    - [Illumina pipeline](#Run-Illumina-pipeline)
+    - [Nanopore pipeline](#Run-Nanopore-Pipeline)
+  - [Primer scheme parameters setup](#Primer-scheme-parameters-setup)
+- [Useful information](#Useful-information) 
 ------------
+## Version updates
 ### v2.0.0
 #### Major updates
 - Docker container separated for Pangolin typing -
-    - Illumina container: gms-artic-illumina
-    - Nanopore container: gms-artic-illumina
-    - Pangolin container: gms-artic-pangolin
+    - Illumina container: [gms-artic-illumina](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-illumina)
+    - Nanopore container: [gms-artic-nanopore](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-nanopore)
+    - Pangolin container: [gms-artic-pangolin](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-pangolin)
     - pycoQC container  : pycoqc
 - Added separate package version files for each workflow -
     - versions      : for Illumina and Nanopore
@@ -20,9 +30,9 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
     - VEP annotation
 - Illumina results works for sc2reporter visualization
 - Nanopore analysis additional features (artic & medaka)-
-    - fastqc
-    - multiqc
-    - pycoQC
+    - [fastqc](https://github.com/s-andrews/FastQC)
+    - [multiqc](https://multiqc.info)
+    - [pycoQC](https://github.com/a-slide/pycoQC)
 
 ### v1.8.0
 #### Minor updates
@@ -42,6 +52,9 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 * The illumina and nanopore tracks automatically run pangolin and nextclade.
 * Generates report for base changes.
 
+## How to run in NGP server
+
+### Datafile structure
 ###### 1. gms-artic in ngp-gms
 
 *for nanopore analysis (default is "midnight")*
@@ -56,7 +69,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
     sample_name     
          |___ fastq/
 ```
-#### Manual running of analysis pipeline
+### Manual running of analysis pipeline
 ###### 2. Run Illumina pipeline
 ```
 $ nextflow run main.nf -profile singularity,sge \
@@ -77,6 +90,7 @@ $ nextflow run main.nf -profile singularity \
     --outdir /home/test/midnight_test -with-report midnight
 ```
 
+### Primer scheme parameters setup
 ###### --scheme: To use the primer list, add --scheme to the CLI, eg., use 'nCoV-2019/V3' for artic primers or 'midnight-primer/V1'
 
 ```
@@ -85,6 +99,8 @@ $ nextflow run main.nf -profile singularity \
 --scheme eden-primers/V1/
 
 ```
+
+## Useful information
 ###### **To run the artic pipeline, please change the [nanopore.config](https://github.com/JD2112/gms-artic/blob/master/conf/nanopore.config) 'min_length' (default = 400) and 'max_length' (default = 700)**
 
 ```
