@@ -59,6 +59,8 @@ process versions {
     else if ( params.medaka || params.nanopolish )
         """
         artic --version > version_artic.txt
+        fastqc -v > version_fastqc.txt
+        multiqc --version > version_multiqc.txt
         bwa > version_bwa.txt 2>&1 || true
         scorpio -cv > version_constellations.txt
         gofasta -v > version_gofasta.txt

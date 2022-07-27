@@ -141,3 +141,35 @@ process multiqc {
     ${params.multiqcOptions}
     """
 }
+
+process fastqcNanopore {
+    publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy', overwrite: true
+
+    input:
+    path fastq
+
+    output:
+    path("*.zip") , emit: zip
+    path("*.html") , emit: html
+
+    """
+    fastqc ${fastq}/*.fastq.gz --format fastq --threads ${task.cpus} --dir ${params.tmpdir} --outdir .
+    """
+}
+
+process multiqcNanopore {
+    label 'largemem'
+
+    publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy'
+
+    input:
+    path zip
+
+    output:
+    file '*multiqc.html'
+    file '*multiqc_data/multiqc_data.json'
+
+    """
+    multiqc . --filename ${params.prefix}_multiqc.html --data-format json
+    """
+}

@@ -18,6 +18,8 @@ include {nextclade} from '../modules/typing.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
 include {versions} from '../modules/analysis.nf'
+include {fastqcNanopore} from '../modules/qc.nf'
+include {multiqcNanopore} from '../modules/qc.nf'
 
 include {bamToCram} from '../modules/out.nf'
 
@@ -102,6 +104,10 @@ workflow sequenceAnalysisMedaka {
 
     main:
       versions()
+
+      fastqcNanopore(ch_runFastqDirs)
+
+      multiqcNanopore(fastqcNanopore.out.zip)
 
       articDownloadScheme()
 
