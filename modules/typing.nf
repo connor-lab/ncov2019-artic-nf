@@ -108,22 +108,27 @@ process pangolinTyping {
 process nextclade {
     tag { sampleName }
 
-    label 'nextclade'
-    
+    label 'nextclade'  
+
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}.tsv"
-    
+
     input:
-        tuple val(sampleName), path(consensus_fasta)
+    tuple val(sampleName), path(consensus_fasta)
     
     output:
-        tuple(sampleName, path("${sampleName}_tree.json"),
-	    path("${sampleName}.tsv"),path("${sampleName}.json"))
-    
+    tuple(sampleName, path("${sampleName}_tree.json"),
+    path("${sampleName}.tsv"),path("${sampleName}.json"))
+
     script:
     """
+    echo \$(nextclade --version 2>&1) > nextclade_version.txt 
+    nextclade dataset get --name 'sars-cov-2' --output-dir 'data/sars-cov-2'
     nextclade --input-fasta ${consensus_fasta} \
+        --input-dataset data/sars-cov-2 \
         --output-tree ${sampleName}_tree.json \
         --output-tsv ${sampleName}.tsv \
         --output-json ${sampleName}.json
-    """
+
+    """ 
+    
 }

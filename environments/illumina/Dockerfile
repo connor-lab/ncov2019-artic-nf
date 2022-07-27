@@ -6,6 +6,7 @@ COPY extras.yml /extras.yml
 COPY environment.yml /environment.yml
 RUN /opt/conda/bin/conda update conda && \
 /opt/conda/bin/conda install mamba -c conda-forge && \
+/opt/conda/bin/conda update mamba -c conda-forge && \
 /opt/conda/bin/mamba env create -f /environment.yml
 
 FROM debian:buster-slim
