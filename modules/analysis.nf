@@ -26,8 +26,6 @@ process makeReport {
     makeReport.py ${sampleName}
     """
 }
-<<<<<<< Updated upstream
-=======
 
 process versions {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*", mode: 'copy'
@@ -68,8 +66,6 @@ process versions {
         porechop --version > version_porechop.txt
         python --version > version_python.txt
         samtools --version > version_samtools.txt
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         snakemake -v > version_snakemake.txt
         get_versions.py ${params.prefix}_versions.csv
         """
@@ -103,84 +99,7 @@ process pangoversions {
         pangolin -v > version_pangolin.txt
         python --version > version_python.txt
         scorpio -v > version_scorpio.txt
-=======
->>>>>>> Stashed changes
         snakemake -v > version_snakemake.txt
         get_versions.py ${params.prefix}_versions.csv
         """
 }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
-
-
-process pangoversions {
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*", mode: 'copy'
-
-    output:
-    file "*versions.csv"
-
-    script:
-    if ( params.illumina )
-        """
-        scorpio -cv > version_constellations.txt
-        gofasta -v > version_gofasta.txt
-        pangolin -pv > version_pangolin-data.txt
-        pangolin -v > version_pangolin.txt
-        python --version > version_python.txt
-        scorpio -v > version_scorpio.txt
-        snakemake -v > version_snakemake.txt
-        usher --version > version_usher.txt
-        get_versions.py ${params.prefix}_versions.csv
-        """
-    else if ( params.medaka || params.nanopolish )
-        """
-        scorpio -cv > version_constellations.txt
-        gofasta -v > version_gofasta.txt
-        pangolin -pv > version_pangolin-data.txt
-        pangolin -v > version_pangolin.txt
-        python --version > version_python.txt
-        scorpio -v > version_scorpio.txt
-=======
->>>>>>> Stashed changes
-        snakemake -v > version_snakemake.txt
-        get_versions.py ${params.prefix}_versions.csv
-        """
-}
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
-
-
-process pangoversions {
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "*", mode: 'copy'
-
-    output:
-    file "*versions.csv"
-
-    script:
-    if ( params.illumina )
-        """
-        scorpio -cv > version_constellations.txt
-        gofasta -v > version_gofasta.txt
-        pangolin -pv > version_pangolin-data.txt
-        pangolin -v > version_pangolin.txt
-        python --version > version_python.txt
-        scorpio -v > version_scorpio.txt
-        snakemake -v > version_snakemake.txt
-        usher --version > version_usher.txt
-        get_versions.py ${params.prefix}_versions.csv
-        """
-    else if ( params.medaka || params.nanopolish )
-        """
-        scorpio -cv > version_constellations.txt
-        gofasta -v > version_gofasta.txt
-        pangolin -pv > version_pangolin-data.txt
-        pangolin -v > version_pangolin.txt
-        python --version > version_python.txt
-        scorpio -v > version_scorpio.txt
-        snakemake -v > version_snakemake.txt
-        get_versions.py ${params.prefix}_versions.csv
-        """
-}
->>>>>>> Stashed changes

@@ -17,20 +17,11 @@ include {pangolinTyping} from '../modules/typing.nf'
 include {nextclade} from '../modules/typing.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
-<<<<<<< Updated upstream
-=======
 include {versions} from '../modules/analysis.nf'
 include {pangoversions} from '../modules/analysis.nf'
 include {fastqcNanopore} from '../modules/qc.nf'
 include {multiqcNanopore} from '../modules/qc.nf'
 include {pycoqc} from '../modules/qc.nf'
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 include {bamToCram} from '../modules/out.nf'
 
@@ -47,27 +38,8 @@ workflow sequenceAnalysisNanopolish {
       ch_seqSummary
     
     main:
-<<<<<<< Updated upstream
-=======
       versions()
-<<<<<<< Updated upstream
-      
-      pangoversions()
-      
-      fastqcNanopore(ch_runFastqDirs)
-      
-      multiqcNanopore(fastqcNanopore.out.zip)
-      
-      pycoqc(ch_seqSummary)
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
-
-      pangoversions()
-
-      fastqcNanopore(ch_runFastqDirs)
-=======
       pangoversions()
 
       fastqcNanopore(ch_runFastqDirs)
@@ -77,15 +49,7 @@ workflow sequenceAnalysisNanopolish {
       pycoqc(ch_seqSummary)
 
       articDownloadScheme()
->>>>>>> Stashed changes
 
-      multiqcNanopore(fastqcNanopore.out.zip)
-
-      pycoqc(ch_seqSummary)
-
->>>>>>> Stashed changes
-      articDownloadScheme()
-      
       articGuppyPlex(ch_runFastqDirs.flatten())
 
       articMinIONNanopolish(articGuppyPlex.out.fastq
@@ -149,21 +113,7 @@ workflow sequenceAnalysisMedaka {
       ch_runFastqDirs
 
     main:
-<<<<<<< Updated upstream
-=======
       versions()
-<<<<<<< Updated upstream
-      
-      pangoversions()
-      
-      fastqcNanopore(ch_runFastqDirs)
-      
-      multiqcNanopore(fastqcNanopore.out.zip)
-      
-      pycoqc(ch_seqSummary)
-      
->>>>>>> Stashed changes
-=======
 
       pangoversions()
 
@@ -173,10 +123,6 @@ workflow sequenceAnalysisMedaka {
 
       pycoqc(ch_seqSummary)
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
       articDownloadScheme()
 
       articGuppyPlex(ch_runFastqDirs.flatten())
@@ -206,15 +152,7 @@ workflow sequenceAnalysisMedaka {
                            .join(articRemoveUnmappedReads.out))
 
      nextclade(articMinIONNanopolish.out.consensus_fasta)
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-     
-=======
 
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
      pangolinTyping(articMinIONMedaka.out.consensus_fasta)
 
      if (params.outCram) {

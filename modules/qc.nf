@@ -48,7 +48,7 @@ process fastqc {
     file "*fastqc*"
 
     """
-    fastqc ${forward} ${reverse} --format fastq --threads ${task.cpus}
+    fastqc ${forward} ${reverse} --format fastq --threads ${task.cpus} --dir ${params.tmpdir}
     """
 }
 
@@ -75,6 +75,8 @@ process statsInsert {
     tag { sampleName }
 
     label 'largemem'
+    errorStrategy 'retry'
+    maxRetries 5
 
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.pdf", mode: 'copy'
@@ -91,7 +93,8 @@ process statsInsert {
     if [[ \$( samtools view -F 12 ${bam} | cut -f1 | sort -T ./tmp | uniq -c | awk '\$1 > 1 { count++ } END { print count }' ) > 0 ]]
     then
        picard CollectInsertSizeMetrics I=${bam} O=${sampleName}_insert_size.metrics.txt \
-       H=${sampleName}_insert_size.distribution.pdf
+       H=${sampleName}_insert_size.distribution.pdf \
+       TMP_DIR=${params.tmpdir}
     else
        echo "Skipping sample ${sampleName} - no usable paired reads"
        touch ${sampleName}_insert_size.metrics.txt
@@ -140,28 +143,12 @@ process multiqc {
 }
 
 process fastqcNanopore {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    
-=======
 
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy', overwrite: true
 
     input:
     path fastq
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    
-=======
 
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
     output:
     path("*.zip") , emit: zip
     path("*.html") , emit: html
@@ -173,15 +160,7 @@ process fastqcNanopore {
 
 process multiqcNanopore {
     label 'largemem'
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    
-=======
 
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy'
 
     input:
@@ -199,15 +178,7 @@ process multiqcNanopore {
 process pycoqc {
 
     label 'largemem'
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    
-=======
 
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy'
 
     input:
@@ -222,14 +193,6 @@ process pycoqc {
         -f ${seqSummary} \\
         -o pycoqc.html \\
         -j pycoqc_data.json
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         
-=======
-
->>>>>>> Stashed changes
-=======
-        
->>>>>>> Stashed changes
     """
 }

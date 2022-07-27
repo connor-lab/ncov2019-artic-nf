@@ -105,7 +105,6 @@ process trimPrimerSequences {
     input:
     tuple sampleName, path(bam), path(bedfile)
 
-
     output:
     tuple sampleName, path("${sampleName}.mapped.bam"), emit: mapped
     tuple sampleName, path("${sampleName}.mapped.primertrimmed.sorted.bam" ), emit: ptrim
@@ -265,15 +264,7 @@ process annotationVEP {
     tag { sampleName }
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.freebayes.vep.vcf", mode: 'copy'
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    
-=======
 
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
     input:
         tuple sampleName, path(vcf),path(ref)
 
@@ -281,15 +272,7 @@ process annotationVEP {
         tuple sampleName, path("${sampleName}.freebayes.vep.vcf")
 
     script:
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        """   
-=======
         """
->>>>>>> Stashed changes
-=======
-        """
->>>>>>> Stashed changes
         bgzip -i -f -c ${baseDir}/typing/MN908947.3.gff >MN908947.3.gff.gz
         tabix -f MN908947.3.gff.gz
 
