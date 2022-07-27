@@ -265,7 +265,11 @@ process annotationVEP {
     tag { sampleName }
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.freebayes.vep.vcf", mode: 'copy'
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
     input:
         tuple sampleName, path(vcf),path(ref)
 
@@ -273,7 +277,11 @@ process annotationVEP {
         tuple sampleName, path("${sampleName}.freebayes.vep.vcf")
 
     script:
+<<<<<<< Updated upstream
         """   
+=======
+        """
+>>>>>>> Stashed changes
         bgzip -i -f -c ${baseDir}/typing/MN908947.3.gff >MN908947.3.gff.gz
         tabix -f MN908947.3.gff.gz
 

@@ -140,12 +140,20 @@ process multiqc {
 }
 
 process fastqcNanopore {
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy', overwrite: true
 
     input:
     path fastq
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
     output:
     path("*.zip") , emit: zip
     path("*.html") , emit: html
@@ -157,7 +165,11 @@ process fastqcNanopore {
 
 process multiqcNanopore {
     label 'largemem'
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy'
 
     input:
@@ -175,7 +187,11 @@ process multiqcNanopore {
 process pycoqc {
 
     label 'largemem'
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy'
 
     input:
@@ -190,6 +206,10 @@ process pycoqc {
         -f ${seqSummary} \\
         -o pycoqc.html \\
         -j pycoqc_data.json
+<<<<<<< Updated upstream
         
+=======
+
+>>>>>>> Stashed changes
     """
 }

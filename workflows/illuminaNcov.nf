@@ -10,7 +10,11 @@ include {indexReference} from '../modules/illumina.nf'
 include {readMapping} from '../modules/illumina.nf'
 include {flagStat} from '../modules/illumina.nf'
 include {trimPrimerSequences} from '../modules/illumina.nf'
+<<<<<<< Updated upstream
 include {depth} from '../modules/illumina.nf' 
+=======
+include {depth} from '../modules/illumina.nf'
+>>>>>>> Stashed changes
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 include {callConsensusFreebayes} from '../modules/illumina.nf'
@@ -24,6 +28,9 @@ include {makeReport} from '../modules/analysis.nf'
 =======
 include {versions} from '../modules/analysis.nf'
 include {pangoversions} from '../modules/analysis.nf'
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 include {cramToFastq} from '../modules/illumina.nf'
 
@@ -113,6 +120,9 @@ workflow sequenceAnalysis {
 
       pangoversions()
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       fastqc(ch_filePairs)
 
@@ -126,12 +136,20 @@ workflow sequenceAnalysis {
 
       depth(trimPrimerSequences.out.ptrim.combine(ch_bedFile))
 
+<<<<<<< Updated upstream
       freebayes_out = callConsensusFreebayes(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))     
+=======
+      freebayes_out = callConsensusFreebayes(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
+>>>>>>> Stashed changes
       freebayes_consensus_out = freebayes_out[0]
 
       annotationVEP(callConsensusFreebayes.out.vcf.combine(ch_preparedRef.map{ it[0] }))
 
+<<<<<<< Updated upstream
       callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) 
+=======
+      callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
+>>>>>>> Stashed changes
 
       makeConsensus(trimPrimerSequences.out.ptrim)
 
