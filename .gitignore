@@ -1,8 +1,7 @@
-.DS_Store
 .nextflow*
 nextflow
 results
 *.sif
 work
-environments/.DS_Store
 .idea/
+.DS_Store
