@@ -15,10 +15,9 @@ def intervals_extract(iterable):
         group = list(group)
         yield [group[0][1], group[-1][1]]
 
-
 # write the depth mask used with bcftools to turn consensus positions into Ns
 def write_depth_mask(out_filename, contig_depths, min_coverage):
-    maskfh = open(out_filename, "w")
+    maskfh = open(out_filename, 'w')
     for contig_name, depths in contig_depths.items():
         # from artic-mask, create list of positions that fail the depth check
         mask_vector = []
@@ -30,9 +29,8 @@ def write_depth_mask(out_filename, contig_depths, min_coverage):
         intervals = list(intervals_extract(mask_vector))
 
         for i in intervals:
-            maskfh.write("%s\t%s\t%s\n" % (contig_name, i[0] + 1, i[1] + 1))
+            maskfh.write("%s\t%s\t%s\n" % (contig_name, i[0]+1, i[1]+1))
     maskfh.close()
-
 
 # calculate the variant allele fraction for each alt allele using freebayes' read/alt observation tags
 def calculate_vafs(record):
@@ -44,18 +42,16 @@ def calculate_vafs(record):
         vafs.append(vaf)
     return vafs
 
-
 # make a simple VCF record with the minimal information needed to make the consensus sequence
 def make_simple_record(vcf_header, parent_record, position, ref, alt, vaf):
     r = vcf_header.new_record()
     r.chrom = parent_record.chrom
     r.pos = position
     r.ref = ref
-    r.alts = [alt]
+    r.alts = [ alt ]
     r.info["DP"] = parent_record.info["DP"]
     r.info["VAF"] = vaf
     return r
-
 
 # process indel variants found by freebayes into a variant that should be
 # applied to the consensus sequence
@@ -79,14 +75,11 @@ def handle_indel(vcf_header, record):
             max_vaf = value
             max_idx = idx
 
-    r = make_simple_record(
-        vcf_header, record, record.pos, record.ref, record.alts[max_idx], [max_vaf]
-    )
+    r = make_simple_record(vcf_header, record, record.pos, record.ref, record.alts[max_idx], [ max_vaf ])
     output.append(r)
     return output
 
-
-# return the base with the highest value in vaf_by_base,
+# return the base with the highest value in vaf_by_base, 
 # optionally skipping a character (eg. the reference base)
 def base_max(vaf_by_base, skip=None):
     max_vaf = 0.0
@@ -97,26 +90,25 @@ def base_max(vaf_by_base, skip=None):
             max_b = b
     return max_b
 
-
 def handle_sub(vcf_header, record):
     output = list()
 
     # this code is general enough to handle multi-allelic MNPs
     # and the typical case of a biallelic SNP
     sub_length = len(record.ref)
-
+    
     vafs = calculate_vafs(record)
 
     # calculate the VAF of each base at each position of the MNP
     base_frequency = list()
     for i in range(0, sub_length):
-        base_frequency.append({"A": 0.0, "C": 0.0, "G": 0.0, "T": 0.0})
-
+        base_frequency.append({ "A":0.0, "C":0.0, "G":0.0, "T":0.0 })
+    
     for alt, vaf in zip(record.alts, vafs):
-        assert len(alt) == sub_length
-        for i, b in enumerate(alt):
+        assert(len(alt) == sub_length)
+        for i,b in enumerate(alt):
             base_frequency[i][b] += vaf
-
+    
     # construct output records
     for i in range(0, sub_length):
 
@@ -124,102 +116,55 @@ def handle_sub(vcf_header, record):
         max_b = base_max(base_frequency[i], record.ref[i])
         if max_b is None:
             continue
-        r = make_simple_record(
-            vcf_header,
-            record,
-            record.pos + i,
-            record.ref[i],
-            max_b,
-            base_frequency[i][max_b],
-        )
+        r = make_simple_record(vcf_header, record, record.pos + i, record.ref[i], max_b, base_frequency[i][max_b])
         output.append(r)
     return output
 
-
 def main():
 
-    description = "Process a .gvcf file to create a file of consensus variants, low-frequency variants and a coverage mask"
+    description = 'Process a .gvcf file to create a file of consensus variants, low-frequency variants and a coverage mask'
     parser = argparse.ArgumentParser(description=description)
 
-    parser.add_argument(
-        "-m",
-        "--mask-output",
-        required=True,
-        help=f"The output file name for the coverage mask\n",
-    )
+    parser.add_argument('-m', '--mask-output', required=True,
+            help=f"The output file name for the coverage mask\n")
+    
+    parser.add_argument('-v', '--variants-output', required=True,
+            help=f"The output file name for variants (non-reference gVCF records)\n")
+    
+    parser.add_argument('-c', '--consensus-sites-output', required=True,
+            help=f"The output file name for variants that will be applied to generate the consensus sequence\n")
 
-    parser.add_argument(
-        "-v",
-        "--variants-output",
-        required=True,
-        help=f"The output file name for variants (non-reference gVCF records)\n",
-    )
-
-    parser.add_argument(
-        "-c",
-        "--consensus-sites-output",
-        required=True,
-        help=f"The output file name for variants that will be applied to generate the consensus sequence\n",
-    )
-
-    parser.add_argument(
-        "-d",
-        "--min-depth",
-        type=int,
-        default=10,
-        help=f"Mask reference positions with depth less than this threshold",
-    )
-
-    parser.add_argument(
-        "-l",
-        "--lower-ambiguity-frequency",
-        type=float,
-        default=0.25,
-        help=f"Variants with frequency less than -l will be discarded",
-    )
-
-    parser.add_argument(
-        "-u",
-        "--upper-ambiguity-frequency",
-        type=float,
-        default=0.75,
-        help=f"Substitution variants with frequency less than -u will be encoded with IUPAC ambiguity codes",
-    )
-
-    parser.add_argument("file", action="store", nargs=1)
-
+    parser.add_argument('-d', '--min-depth', type=int, default=10,
+            help=f"Mask reference positions with depth less than this threshold")
+    
+    parser.add_argument('-l', '--lower-ambiguity-frequency', type=float, default=0.25,
+            help=f"Variants with frequency less than -l will be discarded")
+    
+    parser.add_argument('-u', '--upper-ambiguity-frequency', type=float, default=0.75,
+            help=f"Substitution variants with frequency less than -u will be encoded with IUPAC ambiguity codes")
+    
+    parser.add_argument('file', action='store', nargs=1)
+    
     args = parser.parse_args()
-    vcf = pysam.VariantFile(open(args.file[0], "r"))
+    vcf = pysam.VariantFile(open(args.file[0],'r'))
 
     # Initalize depth mask to all zeros for all contigs
     contig_depth = defaultdict(list)
     for r in vcf.header.records:
         if r.type == "CONTIG":
-            contig_depth[r["ID"]] = [0] * int(r["length"])
+            contig_depth[r['ID']] = [0] * int(r['length'])
 
     out_header = vcf.header
-
+    
     # open the output file with the filtered variant sites
-    out_header.info.add(
-        "VAF",
-        number="A",
-        type="Float",
-        description="Variant allele fraction, called from observed reference/alt reads",
-    )
-    variants_out = pysam.VariantFile(args.variants_output, "w", header=out_header)
-
+    out_header.info.add("VAF", number="A", type='Float', description="Variant allele fraction, called from observed reference/alt reads")
+    variants_out = pysam.VariantFile(args.variants_output, 'w', header=out_header)
+    
     # open the output file with the changes to apply to the consensus fasta
     # this includes an additional tag in the VCF file
-    out_header.info.add(
-        "ConsensusTag",
-        number=1,
-        type="String",
-        description="The type of base to be included in the consensus sequence (IUPAC or Fixed)",
-    )
-    consensus_sites_out = pysam.VariantFile(
-        args.consensus_sites_output, "w", header=out_header
-    )
-
+    out_header.info.add("ConsensusTag", number=1, type='String', description="The type of base to be included in the consensus sequence (IUPAC or Fixed)")
+    consensus_sites_out = pysam.VariantFile(args.consensus_sites_output, 'w', header=out_header)
+    
     for record in vcf:
 
         is_gvcf_ref = record.alts[0] == "<*>"
@@ -232,11 +177,11 @@ def main():
         depth = record.info["DP"]
 
         # disallow gvcf records that are longer than a single base
-        assert not is_gvcf_ref or v_start == v_end
+        assert(not is_gvcf_ref or v_start == v_end)
 
         # update depth mask
         for i in range(v_start, v_end + 1):
-            assert i > 0
+            assert(i > 0)
             # VCF coordinates are 1-based, we record the depth vector as 0-based
             # to be consistent with artic-mask
             contig_depth[record.chrom][i - 1] = depth
@@ -263,7 +208,7 @@ def main():
         for out_r in out_records:
 
             # at this point we should have resolved multi-allelic variants
-            assert len(out_r.alts) == 1
+            assert(len(out_r.alts) == 1)
 
             vaf = out_r.info["VAF"][0]
             is_indel = len(out_r.ref) != len(out_r.alts[0])
@@ -292,7 +237,6 @@ def main():
             variants_out.write(record)
 
     write_depth_mask(args.mask_output, contig_depth, args.min_depth)
-
 
 if __name__ == "__main__":
     main()

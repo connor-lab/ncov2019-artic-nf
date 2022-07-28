@@ -3,13 +3,12 @@ channels:
   - conda-forge
   - bioconda
   - defaults
-  - r
 dependencies:
   - biopython=1.74
   - libxcb
   - matplotlib>=3.3.3
   - python>=3.7
-  - bwa=0.7.17=pl5.22.0_2
+  - bwa=0.7.17
   - samtools=1.10
   - bcftools=1.10
   - trim-galore=0.6.5
