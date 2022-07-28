@@ -3,7 +3,7 @@
 
 A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinformatics tools (https://github.com/artic-network/fieldbioinformatics).
 
-### Table of contents - 
+### Table of contents -
 - [Version updates](#Version-updates)
 - [How to run in NGP server](#How-to-run-in-NGP-server)
   - [Datafile structure](#Datafile-structure)
@@ -11,28 +11,28 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
     - [Illumina pipeline](#Run-Illumina-pipeline)
     - [Nanopore pipeline](#Run-Nanopore-Pipeline)
   - [Primer scheme parameters setup](#Primer-scheme-parameters-setup)
-- [Useful information](#Useful-information) 
+- [Useful information](#Useful-information)
 ------------
 ## Version updates
 ### v2.0.0
 #### Major updates
 - Docker container separated for Pangolin typing -
-    - Illumina container: [gms-artic-illumina](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-illumina)
-    - Nanopore container: [gms-artic-nanopore](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-nanopore)
-    - Pangolin container: [gms-artic-pangolin](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-pangolin)
-    - pycoQC container  : pycoqc
+  - Illumina container: [gms-artic-illumina](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-illumina)
+  - Nanopore container: [gms-artic-nanopore](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-nanopore)
+  - Pangolin container: [gms-artic-pangolin](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-pangolin)
+  - pycoQC container  : [pycoqc](https://hub.docker.com/repository/docker/jd21/pycoqc)
 - Added separate package version files for each workflow -
-    - versions      : for Illumina and Nanopore
-    - pangoversion  : for pangolin typing
+  - versions      : for Illumina and Nanopore
+  - pangoversion  : for pangolin typing
 - Illumina analysis additional features -
-    - flagstat
-    - depth
-    - VEP annotation
+  - flagstat
+  - depth
+  - VEP annotation
 - Illumina results works for sc2reporter visualization
 - Nanopore analysis additional features (artic & medaka)-
-    - [fastqc](https://github.com/s-andrews/FastQC)
-    - [multiqc](https://multiqc.info)
-    - [pycoQC](https://github.com/a-slide/pycoQC)
+  - [fastqc](https://github.com/s-andrews/FastQC)
+  - [multiqc](https://multiqc.info)
+  - [pycoQC](https://github.com/a-slide/pycoQC)
 
 ### v1.8.0
 #### Minor updates
