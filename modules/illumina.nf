@@ -282,6 +282,7 @@ process annotationVEP {
         vep -i ${sampleName}.variants.norm.vcf.gz --format vcf --gff MN908947.3.gff.gz --fasta ${ref} -o ${sampleName}.freebayes.vep.vcf --vcf --force_overwrite --no_stats --hgvs
         """
 }
+
 process cramToFastq {
     /**
     * Converts CRAM to fastq (http://bio-bwa.sourceforge.net/)
