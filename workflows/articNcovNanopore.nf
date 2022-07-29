@@ -1,192 +1,248 @@
-// ARTIC ncov workflow
+// Global default params, used in configs
+params {
 
-// enable dsl2
-nextflow.preview.dsl = 2
+  // Workflow flags
+  outdir = './results'
 
-// import modules
-include {articDownloadScheme} from '../modules/artic.nf' 
-include {articGuppyPlex} from '../modules/artic.nf' 
-include {articMinIONNanopolish} from  '../modules/artic.nf' 
-include {articMinIONMedaka} from  '../modules/artic.nf'
-include {articRemoveUnmappedReads} from '../modules/artic.nf' 
+  // Boilerplate options
+  help = false
+  tracedir = "${params.outdir}/pipeline_info"
 
-include {makeQCCSV} from '../modules/qc.nf'
-include {writeQCSummaryCSV} from '../modules/qc.nf'
-
-include {pangolinTyping} from '../modules/typing.nf' 
-include {nextclade} from '../modules/typing.nf'
-include {getVariantDefinitions} from '../modules/analysis.nf'
-include {makeReport} from '../modules/analysis.nf'
-include {versions} from '../modules/analysis.nf'
-include {fastqcNanopore} from '../modules/qc.nf'
-include {multiqcNanopore} from '../modules/qc.nf'
-
-include {bamToCram} from '../modules/out.nf'
-
-include {collateSamples} from '../modules/upload.nf'
-
-// import subworkflows
-include {Genotyping} from './typing.nf'
-
-// workflow component for artic pipeline
-workflow sequenceAnalysisNanopolish {
-    take:
-      ch_runFastqDirs
-      ch_fast5Pass
-      ch_seqSummary
-    
-    main:
-      versions()
-
-      articDownloadScheme()
-
-      articGuppyPlex(ch_runFastqDirs.flatten())
-
-      articMinIONNanopolish(articGuppyPlex.out.fastq
-                                          .filter{ it.countFastq() > params.minReadsArticGuppyPlex }
-                                          .combine(articDownloadScheme.out.scheme)
-                                          .combine(ch_fast5Pass)
-                                          .combine(ch_seqSummary)
-                                          )
-
-      articRemoveUnmappedReads(articMinIONNanopolish.out.mapped)
-
-      makeQCCSV(articMinIONNanopolish.out.ptrim
-                                     .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
-                                     .combine(articDownloadScheme.out.reffasta))
-
-      makeQCCSV.out.csv.splitCsv()
-                       .unique()
-                       .branch {
-                           header: it[-1] == 'qc_pass'
-                           fail: it[-1] == 'FALSE'
-                           pass: it[-1] == 'TRUE'
-                       }
-                       .set { qc }
-
-      writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
-
-      collateSamples(qc.pass.map{ it[0] }
-                        .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
-                        .join(articRemoveUnmappedReads.out))
-     
-      pangolinTyping(articMinIONNanopolish.out.consensus_fasta)
-     
-      nextclade(articMinIONNanopolish.out.consensus_fasta)
-     
-      getVariantDefinitions()
-     
-      makeReport(pangolinTyping.out.combine(nextclade.out,by:0))
-     
-      makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
-                        storeDir:"${params.outdir}/analysis/report/${params.prefix}" , 
-                        keepHeader:true,
-                        skip:1)
-
-
-     if (params.outCram) {
-        bamToCram(articMinIONNanopolish.out.ptrim.map{ it[0] } 
-                        .join (articDownloadScheme.out.reffasta.combine(ch_preparedRef.map{ it[0] })) )
-
-      }
-
-
-    emit:
-      qc_pass = collateSamples.out
-      reffasta = articDownloadScheme.out.reffasta
-      vcf = articMinIONNanopolish.out.vcf
-
+  // cache option makes it a bit easier to set conda or singularity cacheDir
+  cache = ''
 }
 
-workflow sequenceAnalysisMedaka {
-    take:
-      ch_runFastqDirs
+// Load base.config by default for all pipelines
+includeConfig 'conf/base.config'
 
-    main:
-      versions()
 
-      fastqcNanopore(ch_runFastqDirs)
+if ( params.medaka || params.nanopolish ){
+    includeConfig 'conf/nanopore.config'
+}
 
-      multiqcNanopore(fastqcNanopore.out.zip)
-
-      articDownloadScheme()
-
-      articGuppyPlex(ch_runFastqDirs.flatten())
-
-      articMinIONMedaka(articGuppyPlex.out.fastq
-                                      .filter{ it.countFastq() > params.minReadsArticGuppyPlex }
-                                      .combine(articDownloadScheme.out.scheme))
-
-      articRemoveUnmappedReads(articMinIONMedaka.out.mapped)
-
-      makeQCCSV(articMinIONMedaka.out.ptrim.join(articMinIONMedaka.out.consensus_fasta, by: 0)
-                           .combine(articDownloadScheme.out.reffasta))
-
-      makeQCCSV.out.csv.splitCsv()
-                       .unique()
-                       .branch {
-                           header: it[-1] == 'qc_pass'
-                           fail: it[-1] == 'FALSE'
-                           pass: it[-1] == 'TRUE'
-                       }
-                       .set { qc }
-
-     writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
-
-     collateSamples(qc.pass.map{ it[0] }
-                           .join(articMinIONMedaka.out.consensus_fasta, by: 0)
-                           .join(articRemoveUnmappedReads.out))
-
-     pangolinTyping(articMinIONMedaka.out.consensus_fasta)
-
-     if (params.outCram) {
-        bamToCram(articMinIONMedaka.out.ptrim.map{ it[0] } 
-                        .join (articDownloadScheme.out.reffasta.combine(ch_preparedRef.map{ it[0] })) )
-
-      }
-    emit:
-      qc_pass = collateSamples.out
-      reffasta = articDownloadScheme.out.reffasta
-      vcf = articMinIONMedaka.out.vcf
-
+if ( params.illumina ){
+    includeConfig 'conf/illumina.config'
 }
 
 
-workflow articNcovNanopore {
-    take:
-      ch_fastqDirs
-    
-    main:
-      if ( params.nanopolish ) {
-          Channel.fromPath( "${params.fast5_pass}" )
-                 .set{ ch_fast5Pass }
+profiles {
+  conda {
+     if ( params.medaka || params.nanopolish ) {
+       process.conda = "$baseDir/environments/nanopore/environment.yml"
 
-          Channel.fromPath( "${params.sequencing_summary}" )
-                 .set{ ch_seqSummary }
-
-          sequenceAnalysisNanopolish(ch_fastqDirs, ch_fast5Pass, ch_seqSummary)
-
-          sequenceAnalysisNanopolish.out.vcf.set{ ch_nanopore_vcf }
-
-          sequenceAnalysisNanopolish.out.reffasta.set{ ch_nanopore_reffasta }
-
-      } else if ( params.medaka ) {
-          sequenceAnalysisMedaka(ch_fastqDirs)
-
-          sequenceAnalysisMedaka.out.vcf.set{ ch_nanopore_vcf }
-
-          sequenceAnalysisMedaka.out.reffasta.set{ ch_nanopore_reffasta }
+     } else if (params.illumina) {
+       process.conda = "$baseDir/environments/illumina/environment.yml"
+     }
+     if (params.cache){
+       conda.cacheDir = params.cache
+     }
+     includeConfig 'conf/conda.config'
+  }
+  docker {
+    docker.enabled = true
+    fixOwnership = true
+    runOptions = "-u \$(id -u):\$(id -g)"
+    if ( params.medaka || params.nanopolish ){
+      process {
+        container="genomicmedicinesweden/gms-artic-nanopore:latest"
       }
-
-      if ( params.gff ) {
-          Channel.fromPath("${params.gff}")
-                 .set{ ch_refGff }
-
-          Channel.fromPath("${params.yaml}")
-                 .set{ ch_typingYaml }
-
-          Genotyping(ch_nanopore_vcf, ch_refGff, ch_nanopore_reffasta, ch_typingYaml)
-
+    }
+    else {
+      process {
+        container="genomicmedicinesweden/gms-artic-illumina:latest"
       }
+    }
+  }
+  singularity {
+    singularity.enabled = true
+    singularity.autoMounts = true
+
+    if ( params.medaka || params.nanopolish ){
+          process {
+        withName:articDownloadScheme {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:articGuppyPlex {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:articMinIONMedaka {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:articMinIONNanopolish {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:articRemoveUnmappedReads {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:makeQCCSV {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:writeQCSummaryCSV {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:collateSamples {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:pangolinTyping {
+          container="docker://genomicmedicinesweden/gms-artic-pangolin:latest"
+        }
+        withName:nextclade {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:getVariantDefinitions {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:typeVariants {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:bamToCram {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:makeReport {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+        }
+        withName:fastqcNanopore {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+       }
+        withName:multiqcNanopore {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+       }
+        withName:pycoqc {
+          container="docker://jd21/pycoqc:latest"
+       }
+        withName:versions {
+          container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
+       }
+       withName:pangoversions {
+            container = "docker://genomicmedicinesweden/gms-artic-pangolin:latest"
+       }
+      }
+    } else if (params.illumina) {
+            process {
+          withName:articDownloadScheme {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:indexReference {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:versions {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:pangoversions {
+            container = "docker://genomicmedicinesweden/gms-artic-pangolin:latest"
+          }
+          withName:fastqc {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:readTrimming {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:readMapping {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:flagStat {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:trimPrimerSequences {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:depth {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:callConsensusFreebayes {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:annotationVEP {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:callVariants {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:makeConsensus {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:makeQCCSV {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:writeQCSummaryCSV {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:statsCoverage {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:statsInsert {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:statsAlignment {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:multiqc {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:collateSamples {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:pangolinTyping {
+            container = "docker://genomicmedicinesweden/gms-artic-pangolin:latest"
+          }
+          withName:nextclade {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:getVariantDefinitions {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+          withName:makeReport {
+            container = "docker://genomicmedicinesweden/gms-artic-illumina:latest"
+          }
+        }
+    }
+    if (params.cache){
+      singularity.cacheDir = params.cache
+    }
+  }
+  slurm {
+    process.executor = 'slurm'
+  }
+  lsf {
+    process.executor = 'lsf'
+  }
+  gls {
+    process.executor = 'google-lifesciences'
+    includeConfig 'conf/gls.config'
+  }
+  sge {
+    process.executor = 'sge'
+    process.penv = 'mpi'
+  }
 }
 
+// COG-UK institutional config
+includeConfig 'conf/coguk.config'
+
+// Capture exit codes from upstream processes when piping
+process.shell = ['/bin/bash', '-euo', 'pipefail']
+
+timeline {
+  enabled = true
+  file = "${params.tracedir}/execution_timeline.html"
+}
+report {
+  enabled = true
+  file = "${params.tracedir}/execution_report.html"
+}
+trace {
+  enabled = true
+  file = "${params.tracedir}/execution_trace.txt"
+}
+dag {
+  enabled = false //requires graphic devices to run on ngp
+  file = "${params.tracedir}/pipeline_dag.svg"
+}
+
+manifest {
+  author = 'Matt Bull'
+  description = 'Nextflow for running the Artic ncov2019 pipeline'
+  mainScript = 'main.nf'
+  nextflowVersion = '>=20.01.0'
+  version = '0.1.0'
+}
