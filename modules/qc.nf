@@ -154,7 +154,12 @@ process fastqcNanopore {
     path("*.html") , emit: html
 
     """
-    fastqc ${fastq}/*.fastq --format fastq --threads ${task.cpus} --dir ${params.tmpdir} --outdir .
+    if [ -f ${fastq}/*.fastq ];
+    then
+        fastqc ${fastq}/*.fastq --format fastq --threads ${task.cpus} --dir ${params.tmpdir} --outdir .
+    else 
+        fastqc ${fastq}/*.fastq.gz --format fastq --threads ${task.cpus} --dir ${params.tmpdir} --outdir .
+    fi
     """
 }
 
