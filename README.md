@@ -24,7 +24,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 # Version updates
 ## v2.0.0
 ### Major updates
-- Docker container separated for Pangolin typing -
+- Docker container separated for Pangolin typing 
     - Illumina container: [gms-artic-illumina](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-illumina)
     - Nanopore container: [gms-artic-nanopore](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-nanopore)
     - Pangolin container: [gms-artic-pangolin](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-pangolin)
