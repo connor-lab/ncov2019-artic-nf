@@ -28,7 +28,7 @@ version_regex = {
     "scorpio": r"scorpio (\S+)",
     "snakemake": r"(\S+)",
     "trim_galore": r"version (\S+)",
-    "usher": r"UShER \((\S+)\)"
+    "usher": r"UShER \((\S+)\)",
 }
 # Create csv file for all versions
 output = sys.argv[1]
