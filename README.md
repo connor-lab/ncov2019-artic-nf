@@ -29,7 +29,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
     - Nanopore container: [gms-artic-nanopore](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-nanopore)
     - Pangolin container: [gms-artic-pangolin](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-pangolin)
     - pycoQC container  : [pycoqc](https://hub.docker.com/repository/docker/jd21/pycoqc)
-- Added separate package version files for each workflow -
+- Added separate package version files for each workflow 
     - versions: for Illumina and Nanopore
     - pangoversion: for pangolin typing
 - Illumina analysis additional features -
