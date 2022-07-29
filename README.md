@@ -31,7 +31,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
     - pycoQC container  : [pycoqc](https://hub.docker.com/repository/docker/jd21/pycoqc)
 - Added separate package version files for each workflow -
     - versions      : for Illumina and Nanopore
-    - pangoversion  : for pangolin typing
+    - pangoversion: for pangolin typing
 - Illumina analysis additional features -
     - flagstat
     - depth
