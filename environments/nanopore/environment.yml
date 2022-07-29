@@ -15,8 +15,8 @@ dependencies:
   - nextclade=1.10.2
   - fastqc=0.11.9
   - multiqc=1.11
-  - muscle=3.8
   - pycoqc
   - pip:
       - pandas == 1.0.1
       - scikit-learn >= 0.23.1
+  - muscle=3.8
