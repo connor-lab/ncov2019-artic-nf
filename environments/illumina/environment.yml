@@ -1,4 +1,4 @@
-name: gms-artic-illumina
+name: artic-ncov2019-illumina
 channels:
   - conda-forge
   - bioconda
