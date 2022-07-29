@@ -32,7 +32,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 - Added separate package version files for each workflow 
     - versions: for Illumina and Nanopore
     - pangoversion: for pangolin typing
-- Illumina analysis additional features -
+- Illumina analysis additional features 
     - flagstat
     - depth
     - VEP annotation
