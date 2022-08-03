@@ -37,7 +37,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
     - depth
     - VEP annotation
 - Illumina results works for sc2reporter visualization
-- Nanopore analysis additional features (artic & medaka)-
+- Nanopore analysis additional features (artic & medaka)
     - [fastqc](https://github.com/s-andrews/FastQC)
     - [multiqc](https://multiqc.info)
     - [pycoQC](https://github.com/a-slide/pycoQC) *(only for artic)*
