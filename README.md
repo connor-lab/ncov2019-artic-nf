@@ -6,6 +6,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 ### Table of contents - 
 - [Version updates](#Version-updates)
 - [Pipeline Diagram](#Pipeline-Diagram)
+- [Requirements](#Requirements)
 - [Quick start guide](#Quick-Start-Guide)
   - [parameters setup](#Parameters-setup)
   - [Test Data](#Test-Data)
@@ -63,6 +64,11 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 ![gms-artic package](workflow-image/GMS-Artic_workflow.png)
 
 Find DAG and other figures [here](workflow-image/)
+
+# Requirements
+- Nextflow version >=20.10, <22.0 (tested OK on NextFlow version 20.10.0, version 21.10.6)
+- Singularity version 3.7.1 (tested OK)
+- Conda version >= 4.13.0 (tested OK)
 
 # Quick Start Guide
 ## Test Data
