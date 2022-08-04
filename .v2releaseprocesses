@@ -1,0 +1,63 @@
+gms-artic v2.0 release workflow processes
+
+Nanopore medaka processes
+1. versions
+2. pangoversions
+3. fastqcNanopore
+4. multiqcNanopore
+5. articDownloadScheme
+6. articGuppyPlex
+7. articMinIONMedaka
+8. articRemoveUnmappedReads
+9. makeQCCSV
+10. writeQCSummaryCSV
+11. collateSamples                              -
+12. pangolinTyping
+13. nextclade
+14. getVariantDefinitions
+15. makeReport
+
+Nanopore nanopolish processes
+1. versions
+2. pangoversions
+3. fastqcNanopore
+4. multiqcNanopore
+5. pycoqc
+6. articDownloadScheme
+7. articGuppyPlex
+8. articMinIONNanopolish
+9. articRemoveUnmappedReads
+10. makeQCCSV
+11. writeQCSummaryCSV
+12. collateSamples
+13. pangolinTyping
+14. nextclade
+15. getVariantDefinitions
+16. makeReport
+
+Illumina processes
+1. articDownloadScheme
+2. indexReference
+3. versions
+4. pangoversions
+5. fastqc
+6. readTrimming
+7. readMapping
+8. flagStat
+9. trimPrimerSequences
+10. depth
+11. callConsensusFreebayes
+12. annotationVEP
+13. callVariants
+14. makeConsensus
+15. makeQCCSV
+16. writeQCSummaryCSV
+17. statsCoverage
+18. statsInsert
+19. statsAlignment
+20. multiqc
+21. collateSamples
+22. pangolinTyping
+23. nextclade
+24. getVariantDefinitions
+25. makeReport

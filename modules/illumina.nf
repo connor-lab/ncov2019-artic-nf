@@ -71,9 +71,27 @@ process readMapping {
 
     script:
       """
-      bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
-      samtools sort -o ${sampleName}.sorted.bam
+        bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
+        samtools sort -o ${sampleName}.sorted.bam
       """
+}
+
+process flagStat {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.flagstat", mode: 'copy'
+
+    input:
+    //tuple sampleName, path(forward), path(reverse), path(ref), path("*")
+    tuple sampleName, path(bam)
+
+    output:
+    tuple sampleName, path("${sampleName}.flagstat")
+
+    script:
+    """
+    samtools flagstat ${sampleName}.sorted.bam  >${sampleName}.flagstat
+    """
 }
 
 process trimPrimerSequences {
@@ -82,13 +100,16 @@ process trimPrimerSequences {
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.bam", mode: 'copy'
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam.bai", mode: 'copy'
 
     input:
     tuple sampleName, path(bam), path(bedfile)
 
+
     output:
     tuple sampleName, path("${sampleName}.mapped.bam"), emit: mapped
     tuple sampleName, path("${sampleName}.mapped.primertrimmed.sorted.bam" ), emit: ptrim
+    tuple sampleName, path("${sampleName}.mapped.primertrimmed.sorted.bam.bai"), emit: bai
 
     script:
     if (params.allowNoprimer){
@@ -110,8 +131,10 @@ process trimPrimerSequences {
 
         samtools reheader --no-PG  -c 'sed "s/${sampleName}/sample/g"' ivar.out.bam | \
         samtools sort -o sample.mapped.primertrimmed.sorted.bam
+        samtools index sample.mapped.primertrimmed.sorted.bam
 
         mv sample.mapped.primertrimmed.sorted.bam ${sampleName}.mapped.primertrimmed.sorted.bam
+        mv sample.mapped.primertrimmed.sorted.bam.bai ${sampleName}.mapped.primertrimmed.sorted.bam.bai
         """
 
     else
@@ -120,6 +143,26 @@ process trimPrimerSequences {
         samtools index ${sampleName}.mapped.bam
         ${ivarCmd} -i ${sampleName}.mapped.bam -b ${bedfile} -m ${params.illuminaKeepLen} -q ${params.illuminaQualThreshold} -p ivar.out
         samtools sort -o ${sampleName}.mapped.primertrimmed.sorted.bam ivar.out.bam
+        samtools index ${sampleName}.mapped.primertrimmed.sorted.bam
+        """
+}
+
+process depth {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.depth", mode: 'copy'
+
+    input:
+    tuple(sampleName, path(bam), path(bai))
+
+    output:
+    tuple sampleName, path("${sampleName}.depth"), emit: depth
+
+    script:
+        """
+        samtools index ${sampleName}.mapped.primertrimmed.sorted.bam
+        sambamba depth base -c0 ${sampleName}.mapped.primertrimmed.sorted.bam -o ${sampleName}.depth
         """
 }
 
@@ -175,7 +218,7 @@ process callConsensusFreebayes {
 
     output:
     tuple sampleName, path("${sampleName}.consensus.fasta")
-    tuple sampleName, path("${sampleName}.variants.norm.vcf")
+    tuple sampleName, path("${sampleName}.variants.norm.vcf"), emit:vcf
 
     script:
         """
@@ -215,6 +258,28 @@ process callConsensusFreebayes {
 
         # apply remaining variants, including indels
         bcftools consensus -f ${sampleName}.ambiguous.fasta -m ${sampleName}.mask.txt ${sampleName}.fixed.norm.vcf.gz | sed s/MN908947.3/${sampleName}/ > ${sampleName}.consensus.fasta
+        """
+}
+
+process annotationVEP {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.freebayes.vep.vcf", mode: 'copy'
+    
+    input:
+        tuple sampleName, path(vcf),path(ref)
+
+    output:
+        tuple sampleName, path("${sampleName}.freebayes.vep.vcf")
+
+    script:
+        """   
+        bgzip -i -f -c ${baseDir}/typing/MN908947.3.gff >MN908947.3.gff.gz
+        tabix -f MN908947.3.gff.gz
+
+        bgzip -i -f -c ${sampleName}.variants.norm.vcf > ${sampleName}.variants.norm.vcf.gz
+
+        vep -i ${sampleName}.variants.norm.vcf.gz --format vcf --gff MN908947.3.gff.gz --fasta ${ref} -o ${sampleName}.freebayes.vep.vcf --vcf --force_overwrite --no_stats --hgvs
         """
 }
 

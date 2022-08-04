@@ -1,0 +1,38 @@
+Bootstrap: docker
+From: continuumio/miniconda3:latest
+Stage: condabuild
+
+%labels
+authors= "Jyotirmoy Das"
+description= "Docker image containing all requirements for the ARTIC project's ncov2019 pipeline"
+
+%post
+        rm -rf /var/lib/apt/lists/*
+        apt -y clean
+        apt -y update
+        apt -y install build-essential make
+        apt -y install procps
+        apt -y install libbz2-dev
+
+        
+        git clone https://github.com/cov-lineages/pangolin.git
+        cd pangolin
+        conda env create -f environment.yml -q
+        . activate pangolin
+        python setup.py install
+        pip install .
+        pip install snakemake==6.4.1
+        pip install git+https://github.com/cov-lineages/pangoLEARN.git
+        pip install git+https://github.com/cov-lineages/constellations.git
+        pip install git+https://github.com/cov-lineages/scorpio.git
+        pip install git+https://github.com/cov-lineages/pango-designation.git
+        cd -
+
+
+%environment
+export PATH=/opt/conda/envs/pangolin/bin:$PATH
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+
+%runscript
+exec "/opt/conda/envs/pangolin/bin/pangolin" "$@"

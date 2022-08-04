@@ -18,8 +18,10 @@ include {nextclade} from '../modules/typing.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
 include {versions} from '../modules/analysis.nf'
+include {pangoversions} from '../modules/analysis.nf'
 include {fastqcNanopore} from '../modules/qc.nf'
 include {multiqcNanopore} from '../modules/qc.nf'
+include {pycoqc} from '../modules/qc.nf'
 
 include {bamToCram} from '../modules/out.nf'
 
@@ -37,6 +39,14 @@ workflow sequenceAnalysisNanopolish {
     
     main:
       versions()
+      
+      pangoversions()
+      
+      fastqcNanopore(ch_runFastqDirs)
+      
+      multiqcNanopore(fastqcNanopore.out.zip)
+      
+      pycoqc(ch_seqSummary)
 
       articDownloadScheme()
 
@@ -104,11 +114,13 @@ workflow sequenceAnalysisMedaka {
 
     main:
       versions()
-
+      
+      pangoversions()
+      
       fastqcNanopore(ch_runFastqDirs)
-
+      
       multiqcNanopore(fastqcNanopore.out.zip)
-
+      
       articDownloadScheme()
 
       articGuppyPlex(ch_runFastqDirs.flatten())
@@ -137,7 +149,16 @@ workflow sequenceAnalysisMedaka {
                            .join(articMinIONMedaka.out.consensus_fasta, by: 0)
                            .join(articRemoveUnmappedReads.out))
 
+     nextclade(articMinIONMedaka.out.consensus_fasta)
+     
      pangolinTyping(articMinIONMedaka.out.consensus_fasta)
+     
+     makeReport(pangolinTyping.out.combine(nextclade.out,by:0))
+     
+     makeReport.out.tsv.collectFile(name:'analysisReport.tsv',
+                       storeDir:"${params.outdir}/analysis/report/${params.prefix}" , 
+                       keepHeader:true,
+                       skip:1)
 
      if (params.outCram) {
         bamToCram(articMinIONMedaka.out.ptrim.map{ it[0] } 
@@ -189,4 +210,3 @@ workflow articNcovNanopore {
 
       }
 }
-

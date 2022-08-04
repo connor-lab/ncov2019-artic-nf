@@ -7,17 +7,21 @@ nextflow.preview.dsl = 2
 include {articDownloadScheme } from '../modules/artic.nf' 
 include {readTrimming} from '../modules/illumina.nf' 
 include {indexReference} from '../modules/illumina.nf'
-include {readMapping} from '../modules/illumina.nf' 
-include {trimPrimerSequences} from '../modules/illumina.nf' 
+include {readMapping} from '../modules/illumina.nf'
+include {flagStat} from '../modules/illumina.nf'
+include {trimPrimerSequences} from '../modules/illumina.nf'
+include {depth} from '../modules/illumina.nf'
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
 include {callConsensusFreebayes} from '../modules/illumina.nf'
+include {annotationVEP} from '../modules/illumina.nf'
 
 include {pangolinTyping} from '../modules/typing.nf' 
 include {nextclade} from '../modules/typing.nf'
 include {getVariantDefinitions} from '../modules/analysis.nf'
 include {makeReport} from '../modules/analysis.nf'
 include {versions} from '../modules/analysis.nf'
+include {pangoversions} from '../modules/analysis.nf'
 include {cramToFastq} from '../modules/illumina.nf'
 
 include {makeQCCSV} from '../modules/qc.nf'
@@ -102,18 +106,26 @@ workflow sequenceAnalysis {
     main:
       versions()
 
+      pangoversions()
+
       fastqc(ch_filePairs)
 
       readTrimming(ch_filePairs)
 
       readMapping(readTrimming.out.trim.combine(ch_preparedRef))
 
+      flagStat(readMapping.out.combine(ch_bedFile))
+
       trimPrimerSequences(readMapping.out.combine(ch_bedFile))
 
-      freebayes_out = callConsensusFreebayes(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))     
+      depth(trimPrimerSequences.out.ptrim.combine(ch_bedFile))
+
+      freebayes_out = callConsensusFreebayes(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
       freebayes_consensus_out = freebayes_out[0]
 
-      callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) 
+      annotationVEP(callConsensusFreebayes.out.vcf.combine(ch_preparedRef.map{ it[0] }))
+
+      callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
 
       makeConsensus(trimPrimerSequences.out.ptrim)
 

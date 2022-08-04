@@ -3,13 +3,12 @@ channels:
   - conda-forge
   - bioconda
   - defaults
-  - r
 dependencies:
   - biopython=1.74
   - libxcb
   - matplotlib>=3.3.3
   - python>=3.7
-  - bwa=0.7.17=pl5.22.0_2
+  - bwa=0.7.17
   - samtools=1.10
   - bcftools=1.10
   - trim-galore=0.6.5
@@ -28,11 +27,9 @@ dependencies:
   - fastqc=0.11.9
   - multiqc=1.11
   - nextclade=1.10.2
-  - r=3.6.0
+  - sambamba=0.8.0
+  - ensembl-vep>=102.0
+  - conda-forge::r-base
   - pip:
       - pandas >= 1.1
       - scikit-learn >= 0.23.1
-      - git+https://github.com/cov-lineages/pangolin.git
-      - git+https://github.com/cov-lineages/constellations.git 
-      - git+https://github.com/cov-lineages/scorpio.git
-      - git+https://github.com/cov-lineages/pangolin-data.git
