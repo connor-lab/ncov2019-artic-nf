@@ -4,5 +4,5 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - artic=1.1.3
+  - artic=1.2.2
   - pyyaml=5.3.1
