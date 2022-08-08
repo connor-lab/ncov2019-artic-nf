@@ -81,6 +81,7 @@ process articMinIONMedaka {
     """
     artic minion --medaka \
     ${minionFinalConfig} \
+    --medaka-model ${params.medakaModel} \
     --threads ${task.cpus} \
     --scheme-directory ${schemeRepo} \
     --read-file ${fastq} \
