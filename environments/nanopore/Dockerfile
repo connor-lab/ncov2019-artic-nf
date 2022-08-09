@@ -2,8 +2,8 @@ FROM continuumio/miniconda3:latest AS condabuild
 LABEL authors="Matt Bull" \
       description="Docker image containing all requirements for the ARTIC project's ncov2019 pipeline"
 
-COPY extras.yml /extras.yml
-COPY environment.yml /environment.yml
+COPY environment/extras.yml /extras.yml
+COPY environment/nanopore/environment.yml /environment.yml
 RUN /opt/conda/bin/conda install mamba -c conda-forge && \
 /opt/conda/bin/conda update mamba -c conda-forge && \
 /opt/conda/bin/mamba env create -f /environment.yml
