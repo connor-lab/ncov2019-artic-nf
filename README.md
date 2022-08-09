@@ -1,3 +1,4 @@
+[![Update docker for artic-ncov2019-illumina, artic-ncov2019-nanopore](https://github.com/genomic-medicine-sweden/gms-artic/actions/workflows/build_dockerfile.yml/badge.svg)](https://github.com/genomic-medicine-sweden/gms-artic/actions/workflows/build_dockerfile.yml)
 
 ![logo](workflow-image/logo.png)
 
