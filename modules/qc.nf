@@ -2,7 +2,7 @@ process makeQCCSV {
     tag { sampleName }
 
     publishDir "${params.outdir}/qc_plots", pattern: "${sampleName}.depth.png", mode: 'copy'
-    publishDir "${params.outdir}/qc_plots", pattern: "${sampleName}.qc.csv", mode: 'copy'
+    publishDir "${params.outdir}/QCStats", pattern: "${sampleName}.qc.csv", mode: 'copy'
 
     input:
     tuple sampleName, path(bam), path(fasta), path(ref)
