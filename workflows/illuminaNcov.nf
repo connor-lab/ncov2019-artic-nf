@@ -13,7 +13,7 @@ include {trimPrimerSequences} from '../modules/illumina.nf'
 include {depth} from '../modules/illumina.nf'
 include {callVariants} from '../modules/illumina.nf'
 include {makeConsensus} from '../modules/illumina.nf' 
-include {callConsensusFreebayes} from '../modules/illumina.nf'
+include {freebayes} from '../modules/illumina.nf'
 include {annotationVEP} from '../modules/illumina.nf'
 
 include {pangolinTyping} from '../modules/typing.nf' 
@@ -120,10 +120,10 @@ workflow sequenceAnalysis {
 
       depth(trimPrimerSequences.out.ptrim.combine(ch_bedFile))
 
-      freebayes_out = callConsensusFreebayes(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
+      freebayes_out = freebayes(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
       freebayes_consensus_out = freebayes_out[0]
 
-      annotationVEP(callConsensusFreebayes.out.vcf.combine(ch_preparedRef.map{ it[0] }))
+      annotationVEP(freebayes.out.vcf.combine(ch_preparedRef.map{ it[0] }))
 
       callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
 
@@ -153,7 +153,7 @@ workflow sequenceAnalysis {
               statsInsert.out.stats.collect(), statsAlignment.out.collect())
       
       collateSamples(qc.pass.map{ it[0] }
-                           .join(makeConsensus.out, by: 0)
+                           .join(makeConsensus.out.consensus_fasta, by: 0)
                            .join(trimPrimerSequences.out.mapped))     
       
       pangolinTyping(makeConsensus.out.consensus_fasta)
