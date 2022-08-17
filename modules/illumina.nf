@@ -191,11 +191,13 @@ process makeConsensus {
     tag { sampleName }
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.primertrimmed.consensus.fa", mode: 'copy'
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.primertrimmed.consensus.qual.txt", mode: 'copy'
 
     input:
         tuple(sampleName, path(bam))
 
     output:
+        tuple sampleName, path("${sampleName}.primertrimmed.consensus.qual.txt")
         tuple sampleName, path("${sampleName}.primertrimmed.consensus.fa"), emit: consensus_fasta
 
     script:
