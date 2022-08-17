@@ -236,7 +236,7 @@ process annotationVEP {
     tag { sampleName }
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.freebayes.vep.vcf", mode: 'copy'
-    
+
     input:
         tuple sampleName, path(vcf),path(ref)
 
@@ -244,13 +244,13 @@ process annotationVEP {
         tuple sampleName, path("${sampleName}.freebayes.vep.vcf")
 
     script:
-        """   
+        """
         bgzip -i -f -c ${baseDir}/typing/MN908947.3.gff >MN908947.3.gff.gz
         tabix -f MN908947.3.gff.gz
 
         bgzip -i -f -c ${sampleName}.variants.norm.vcf > ${sampleName}.variants.norm.vcf.gz
 
-        vep -i ${sampleName}.variants.norm.vcf.gz --format vcf --gff MN908947.3.gff.gz --fasta ${ref} -o ${sampleName}.freebayes.vep.vcf --vcf --force_overwrite --no_stats --hgvs
+        vep -i ${sampleName}.variants.norm.vcf.gz --format vcf --gff MN908947.3.gff.gz --fasta ${ref} -o ${sampleName}.freebayes.vep.vcf --vcf --force_overwrite --no_stats --distance 10 --hgvs
         """
 }
 
