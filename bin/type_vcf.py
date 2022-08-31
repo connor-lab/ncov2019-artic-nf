@@ -23,7 +23,7 @@ def parse_args(args=None):
     parser.add_argument('-af', '--allele_freq_thresh', type=float, dest="ALLELE_FREQ_THRESH", default=0, help="Only output variants where allele frequency greater than this number (default: 0).")
     parser.add_argument('-dp', '--minimum_depth', type=int, dest="MIN_DEPTH", default=0, help="Only output variants where overall read depth is greater than this number (default: 0).")
     infile = parser.add_mutually_exclusive_group(required=True)
-    infile.add_argument('-v', '--vcf', dest='VCF_IN', required=False, help="Input VCF file from either ARTIC pipeline (Nanopolish or Medaka).")
+    infile.add_argument('-v', '--vcf', dest='VCF_IN', required=False, help="Input VCF file from either ARTIC pipeline (Medaka).")
     infile.add_argument('-t', '--tab', dest='TSV_IN', required=False, help="Input iVar tsv file.")
     parser.add_argument('GFF_IN', help="Annotation GFF3 file.")
     parser.add_argument('REF_IN', help="Reference fasta file.")

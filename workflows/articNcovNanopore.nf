@@ -5,7 +5,6 @@ nextflow.preview.dsl = 2
 
 // import modules
 include {articGuppyPlex} from '../modules/artic.nf'
-include {articMinIONNanopolish} from  '../modules/artic.nf'
 include {articMinIONMedaka} from  '../modules/artic.nf'
 include {articRemoveUnmappedReads} from '../modules/artic.nf'
 
@@ -20,62 +19,6 @@ include {collateSamples} from '../modules/upload.nf'
 // import subworkflows
 include {Genotyping} from './typing.nf'
 
-
-// workflow component for artic pipeline
-workflow sequenceAnalysisNanopolish {
-    take:
-      ch_runFastqDirs
-      ch_fast5Pass
-      ch_seqSummary
-
-    main:
-
-      ch_reffasta = Channel.fromPath( "${params.schemeDir}/${params.scheme}/SARS-CoV-2/${params.schemeVersion}/*.reference.fasta" )
-
-      SetupPrimerScheme()
-      
-      articGuppyPlex(ch_runFastqDirs.flatten())
-
-      articMinIONNanopolish(articGuppyPlex.out.fastq
-                                          .filter{ it.countFastq() > params.minReadsArticGuppyPlex }
-                                          .combine(SetupPrimerScheme.out.scheme)
-                                          .combine(ch_fast5Pass)
-                                          .combine(ch_seqSummary))
-
-      articRemoveUnmappedReads(articMinIONNanopolish.out.mapped)
-
-      makeQCCSV(articMinIONNanopolish.out.ptrim
-                                     .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
-                                     .combine(SetupPrimerScheme.out.reffasta))
-
-      makeQCCSV.out.csv.splitCsv()
-                       .unique()
-                       .branch {
-                           header: it[-1] == 'qc_pass'
-                           fail: it[-1] == 'FALSE'
-                           pass: it[-1] == 'TRUE'
-                       }
-                       .set { qc }
-
-     writeQCSummaryCSV(qc.header.concat(qc.pass).concat(qc.fail).toList())
-
-     collateSamples(qc.pass.map{ it[0] }
-                           .join(articMinIONNanopolish.out.consensus_fasta, by: 0)
-                           .join(articRemoveUnmappedReads.out))
-
-     if (params.outCram) {
-        bamToCram(articMinIONNanopolish.out.ptrim.map{ it[0] } 
-                        .join (SetupPrimerScheme.out.reffasta.combine(ch_preparedRef.map{ it[0] })) )
-
-      }
-
-
-    emit:
-      qc_pass = collateSamples.out
-      reffasta = SetupPrimerScheme.out.reffasta
-      vcf = articMinIONNanopolish.out.vcf
-
-}
 
 workflow sequenceAnalysisMedaka {
     take:
@@ -131,20 +74,7 @@ workflow articNcovNanopore {
       ch_fastqDirs
     
     main:
-      if ( params.nanopolish ) {
-          Channel.fromPath( "${params.fast5_pass}" )
-                 .set{ ch_fast5Pass }
-
-          Channel.fromPath( "${params.sequencing_summary}" )
-                 .set{ ch_seqSummary }
-
-          sequenceAnalysisNanopolish(ch_fastqDirs, ch_fast5Pass, ch_seqSummary)
-
-          sequenceAnalysisNanopolish.out.vcf.set{ ch_nanopore_vcf }
-
-          sequenceAnalysisNanopolish.out.reffasta.set{ ch_nanopore_reffasta }
-
-      } else if ( params.medaka ) {
+      if ( params.medaka ) {
           sequenceAnalysisMedaka(ch_fastqDirs)
 
           sequenceAnalysisMedaka.out.vcf.set{ ch_nanopore_vcf }

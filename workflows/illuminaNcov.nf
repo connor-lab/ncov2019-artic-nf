@@ -53,7 +53,7 @@ workflow sequenceAnalysis {
 
       trimPrimerSequences(readMapping.out.combine(ch_bedFile))
 
-      callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) 
+      callVariants(trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] }))
 
       makeConsensus(trimPrimerSequences.out.ptrim)
 
@@ -73,10 +73,10 @@ workflow sequenceAnalysis {
 
       collateSamples(qc.pass.map{ it[0] }
                            .join(makeConsensus.out, by: 0)
-                           .join(trimPrimerSequences.out.mapped))     
+                           .join(trimPrimerSequences.out.mapped))
 
       if (params.outCram) {
-        bamToCram(trimPrimerSequences.out.mapped.map{it[0] } 
+        bamToCram(trimPrimerSequences.out.mapped.map{it[0] }
                         .join (trimPrimerSequences.out.ptrim.combine(ch_preparedRef.map{ it[0] })) )
 
       }
@@ -91,9 +91,9 @@ workflow ncovIllumina {
       ch_filePairs
 
     main:
-      // Build or download fasta, index and bedfile as required
+      // prepare fasta, index and bedfile as required
       prepareReferenceFiles()
-      
+
       // Actually do analysis
       sequenceAnalysis(ch_filePairs, prepareReferenceFiles.out.bwaindex, prepareReferenceFiles.out.bedfile)
 
@@ -105,7 +105,7 @@ workflow ncovIllumina {
           Channel.fromPath("${params.yaml}")
                  .set{ ch_typingYaml }
 
-          Genotyping(sequenceAnalysis.out.variants, ch_refGff, prepareReferenceFiles.out.reffasta, ch_typingYaml) 
+          Genotyping(sequenceAnalysis.out.variants, ch_refGff, prepareReferenceFiles.out.reffasta, ch_typingYaml)
 
       }
 }

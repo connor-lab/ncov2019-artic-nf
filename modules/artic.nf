@@ -73,55 +73,6 @@ process articMinIONMedaka {
     """
 }
 
-process articMinIONNanopolish {
-    tag { sampleName }
-
-    label 'largecpu'
-
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
-
-    input:
-    tuple file(fastq), file(schemeRepo), file(fast5Pass), file(seqSummary)
-
-    output:
-    file("${sampleName}*")
-    
-    tuple sampleName, file("${sampleName}.primertrimmed.rg.sorted.bam"), emit: ptrim
-    tuple sampleName, file("${sampleName}.sorted.bam"), emit: mapped
-    tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
-    tuple sampleName, file("${sampleName}.pass.vcf.gz"), emit: vcf
-
-    script:
-    // Make an identifier from the fastq filename
-    sampleName = fastq.getBaseName().replaceAll(~/\.fastq.*$/, '')
-
-    // Configure artic minion pipeline
-    minionRunConfigBuilder = []
-
-    if ( params.normalise ) {
-    minionRunConfigBuilder.add("--normalise ${params.normalise}")
-    }
-    
-    if ( params.bwa ) {
-    minionRunConfigBuilder.add("--bwa")
-    } else {
-    minionRunConfigBuilder.add("--minimap2")
-    }
-
-    minionFinalConfig = minionRunConfigBuilder.join(" ")
-
-    """
-    artic minion ${minionFinalConfig} \
-    --threads ${task.cpus} \
-    --scheme-directory ${schemeRepo} \
-    --read-file ${fastq} \
-    --fast5-directory ${fast5Pass} \
-    --sequencing-summary ${seqSummary} \
-    ${params.scheme}/${params.schemeVersion} \
-    ${sampleName}
-    """
-}
-
 process articRemoveUnmappedReads {
     tag { sampleName }
 

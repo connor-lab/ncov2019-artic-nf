@@ -28,31 +28,12 @@ if ( params.illumina ) {
        println("Use --help to print help")
        System.exit(1)
    }
-   if ( (params.bed && ! params.ref) || (!params.bed && params.ref) ) {
-       println("--bed and --ref must be supplied together")
-       System.exit(1)
-   }
-} else if ( params.nanopolish ) {
-   if (! params.basecalled_fastq ) {
-       println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
-   }
-   if (! params.fast5_pass ) {
-       println("Please supply a directory containing fast5 files with --fast5_pass (this is the fast5_pass directory)")
-   }
-   if (! params.sequencing_summary ) {
-       println("Please supply the path to the sequencing_summary.txt file from your run with --sequencing_summary")
-       System.exit(1)
-   }
-   if ( params.bed || params.ref ) {
-       println("ivarBed and alignerRefPrefix only work in illumina mode")
-       System.exit(1)
-   }
 } else if ( params.medaka ) {
    if (! params.basecalled_fastq ) {
        println("Please supply a directory containing basecalled fastqs with --basecalled_fastq. This is the output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. This can optionally contain barcodeXX directories, which are auto-detected.")
    }
 } else {
-       println("Please select a workflow with --nanopolish, --illumina or --medaka, or use --help to print help")
+       println("Please select a workflow with --illumina or --medaka, or use --help to print help")
        System.exit(1)
 }
 
@@ -115,7 +96,7 @@ workflow {
    }
 
    main:
-     if ( params.nanopolish || params.medaka ) {
+     if ( params.medaka ) {
          articNcovNanopore(ch_fastqDirs)
      } else if ( params.illumina ) {
          if ( params.cram ) {
@@ -125,7 +106,7 @@ workflow {
             ncovIllumina(ch_filePairs)
          }
      } else {
-         println("Please select a workflow with --nanopolish, --illumina or --medaka")
+         println("Please select a workflow with --illumina or --medaka")
      }
      
 }
