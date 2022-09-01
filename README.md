@@ -25,11 +25,9 @@ For production use at large scale, where you will run the workflow many times, y
 Alternatively you can avoid just the cloning of the scheme repository to remain on a fixed revision of it over time by passing --schemeRepoURL /path/to/own/clone/of/github.com/artic-network/artic-ncov2019. This removes any internet access from the workflow except for the optional upload steps.
 
 ##### Nanopore
-###### Nanopolish
-`nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] --nanopolish --prefix "output_file_prefix" --basecalled_fastq /path/to/directory --fast5_pass /path/to/directory --sequencing_summary /path/to/sequencing_summary.txt`
 
 ###### Medaka
- `nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] --medaka --prefix "output_file_prefix" --basecalled_fastq /path/to/directory --fast5_pass /path/to/directory --sequencing_summary /path/to/sequencing_summary.txt`
+ `nextflow run connor-lab/ncov2019-artic-nf [-profile conda,singularity,docker,slurm,lsf] --medaka --prefix "output_file_prefix" --basecalled_fastq /path/to/directory`
 
 #### Installation
 An up-to-date version of Nextflow is required because the pipeline is written in DSL2. Following the instructions at https://www.nextflow.io/ to download and install Nextflow should get you a recent-enough version. 
