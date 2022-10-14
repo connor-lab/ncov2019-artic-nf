@@ -1,8 +1,6 @@
 process makeQCCSV {
     tag { sampleName }
 
-    //conda 'environments/extras.txt'
-
     publishDir "${params.outdir}/qc_plots", pattern: "${sampleName}.depth.png", mode: 'copy'
 
     input:

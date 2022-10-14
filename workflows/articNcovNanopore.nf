@@ -19,8 +19,7 @@ include {collateSamples} from '../modules/upload.nf'
 
 
 // import subworkflows
-include {CLIMBrsync} from './upload.nf'
-
+include {Genotyping} from './typing.nf'
 
 // workflow component for artic pipeline
 workflow sequenceAnalysisNanopolish {
@@ -70,6 +69,8 @@ workflow sequenceAnalysisNanopolish {
 
     emit:
       qc_pass = collateSamples.out
+      reffasta = articDownloadScheme.out.reffasta
+      vcf = articMinIONNanopolish.out.vcf
 
 }
 
@@ -113,6 +114,8 @@ workflow sequenceAnalysisMedaka {
       }
     emit:
       qc_pass = collateSamples.out
+      reffasta = articDownloadScheme.out.reffasta
+      vcf = articMinIONMedaka.out.vcf
 
 }
 
@@ -131,16 +134,27 @@ workflow articNcovNanopore {
 
           sequenceAnalysisNanopolish(ch_fastqDirs, ch_fast5Pass, ch_seqSummary)
 
+          sequenceAnalysisNanopolish.out.vcf.set{ ch_nanopore_vcf }
+
+          sequenceAnalysisNanopolish.out.reffasta.set{ ch_nanopore_reffasta }
+
       } else if ( params.medaka ) {
           sequenceAnalysisMedaka(ch_fastqDirs)
+
+          sequenceAnalysisMedaka.out.vcf.set{ ch_nanopore_vcf }
+
+          sequenceAnalysisMedaka.out.reffasta.set{ ch_nanopore_reffasta }
       }
 
-      if ( params.upload ) {
+      if ( params.gff ) {
+          Channel.fromPath("${params.gff}")
+                 .set{ ch_refGff }
 
-        Channel.fromPath("${params.CLIMBkey}")
-               .set{ ch_CLIMBkey }
+          Channel.fromPath("${params.yaml}")
+                 .set{ ch_typingYaml }
 
-        CLIMBrsync(sequenceAnalysis.out.qc_pass, ch_CLIMBkey )
+          Genotyping(ch_nanopore_vcf, ch_refGff, ch_nanopore_reffasta, ch_typingYaml)
+
       }
 }
 

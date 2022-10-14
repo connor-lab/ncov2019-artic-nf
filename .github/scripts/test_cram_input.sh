@@ -35,7 +35,8 @@ find results results_sanger_profile \
      -name "test.qc.csv" \
      -o -name "*.fq.gz" \
      -o -name "*.bam" \
-     -o -name "scheme" | xargs rm -rf
+     -o -name "scheme" \
+     -o -name "*.png" | xargs rm -rf
 # exclude git diff renaming modifications (as the filenames of output sudbirs have an extra prefix when using --cram)
 echo run git diff
 git diff --no-index results results_sanger_profile | \

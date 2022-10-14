@@ -68,10 +68,10 @@ process readMapping {
         tuple(sampleName, path("${sampleName}.sorted.bam"))
 
     script:
-        """
-        bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
-        samtools sort -o ${sampleName}.sorted.bam
-        """
+      """
+      bwa mem -t ${task.cpus} ${ref} ${forward} ${reverse} | \
+      samtools sort -o ${sampleName}.sorted.bam
+      """
 }
 
 process trimPrimerSequences {
@@ -94,6 +94,25 @@ process trimPrimerSequences {
     } else {
         ivarCmd = "ivar trim"
     }
+   
+    if ( params.cleanBamHeader )
+        """
+        samtools reheader --no-PG  -c 'sed "s/${sampleName}/sample/g"' ${bam} | \
+        samtools view -F4 -o sample.mapped.bam
+
+        mv sample.mapped.bam ${sampleName}.mapped.bam
+        
+        samtools index ${sampleName}.mapped.bam
+
+        ${ivarCmd} -i ${sampleName}.mapped.bam -b ${bedfile} -m ${params.illuminaKeepLen} -q ${params.illuminaQualThreshold} -p ivar.out
+
+        samtools reheader --no-PG  -c 'sed "s/${sampleName}/sample/g"' ivar.out.bam | \
+        samtools sort -o sample.mapped.primertrimmed.sorted.bam
+
+        mv sample.mapped.primertrimmed.sorted.bam ${sampleName}.mapped.primertrimmed.sorted.bam
+        """
+
+    else
         """
         samtools view -F4 -o ${sampleName}.mapped.bam ${bam}
         samtools index ${sampleName}.mapped.bam
@@ -112,7 +131,7 @@ process callVariants {
     tuple(sampleName, path(bam), path(ref))
 
     output:
-    tuple sampleName, path("${sampleName}.variants.tsv")
+    tuple sampleName, path("${sampleName}.variants.tsv"), emit: variants
 
     script:
         """

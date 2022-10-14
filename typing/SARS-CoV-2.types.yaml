@@ -1,0 +1,72 @@
+VOC-202012/01:
+  # https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/947048/Technical_Briefing_VOC_SH_NJL2_SH2.pdf
+  # Table 1
+  coverage: 0.7 # Proportion of found variants to call a type
+  variants:
+    S:          # Gene name
+      - IHV68I  # AA-space type-defining mutation 
+      - VY143V
+      - N501Y
+      - A570D
+      - P681H
+      - T716I
+      - S982A
+      - D1118H
+  
+    ORF1ab:
+      - T1001I
+      - A1708D
+      - I2230T
+      - LSGF3674L
+
+    ORF8:
+      - Q27*
+      - R52I
+      - Y73C
+
+    N:
+      - D3L
+      - S235F
+
+N501Y.V2:
+  # Note not a complete set of type defining mutations but covers triple spike variants 
+  coverage: 0.7
+  variants:
+    S:
+      - D80A
+      - R246I
+      - K417N
+      - E484K
+      - N501Y
+      - D614G
+      - A701V
+  
+    E: 
+      - P71L
+    N: 
+      - T205I
+
+    ORF3a: 
+      - Q57H
+      - S171L
+
+    ORF1ab:
+      - T265I
+      - K1655N
+      - H2799Y
+      - S2900L
+      - K3353R
+      - M3655I
+
+N501Y:
+  coverage: 1
+  variants:
+    S:
+      - N501Y
+
+D614G:
+  coverage: 1
+  variants:
+    S:
+      - D614G
+
