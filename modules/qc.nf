@@ -4,7 +4,7 @@ process makeQCCSV {
     publishDir "${params.outdir}/qc_plots", pattern: "${sampleName}.depth.png", mode: 'copy'
 
     input:
-    tuple sampleName, path(bam), path(fasta), path(ref)
+    tuple val(sampleName), path(bam), path(fasta), path(ref)
 
     output:
     path "${params.prefix}.${sampleName}.qc.csv", emit: csv
