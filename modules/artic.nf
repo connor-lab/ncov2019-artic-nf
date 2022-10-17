@@ -1,23 +1,5 @@
 // ARTIC processes
 
-process articDownloadScheme{
-    tag params.schemeRepoURL
-
-    label 'internet'
-
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "scheme", mode: "copy"
-
-    output:
-    path "${params.schemeDir}/${params.scheme}/${params.schemeVersion}/*.reference.fasta" , emit: reffasta
-    path "${params.schemeDir}/${params.scheme}/${params.schemeVersion}/*.primer.bed" , emit: bed
-    path "${params.schemeDir}" , emit: scheme
-
-    script:
-    """
-    git clone ${params.schemeRepoURL} ${params.schemeDir}
-    """
-}
-
 process articGuppyPlex {
     tag { params.prefix + "-" + fastqDir }
 
@@ -49,7 +31,7 @@ process articMinIONMedaka {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
 
     input:
-    tuple file(fastq), file(schemeRepo)
+    tuple file(fastq), file(scheme)
 
     output:
     file("${sampleName}*")
@@ -69,7 +51,7 @@ process articMinIONMedaka {
     if ( params.normalise ) {
     minionRunConfigBuilder.add("--normalise ${params.normalise}")
     }
-    
+
     if ( params.bwa ) {
     minionRunConfigBuilder.add("--bwa")
     } else {
@@ -81,60 +63,13 @@ process articMinIONMedaka {
     """
     artic minion --medaka \
     ${minionFinalConfig} \
+    --medaka-model ${params.medakaModel} \
     --threads ${task.cpus} \
-    --scheme-directory ${schemeRepo} \
+    --scheme-directory ${params.schemeDir}/${params.scheme} \
     --read-file ${fastq} \
-    ${params.scheme}/${params.schemeVersion} \
+    SARS-CoV-2/${params.schemeVersion} \
     ${sampleName}
-    """
-}
 
-process articMinIONNanopolish {
-    tag { sampleName }
-
-    label 'largecpu'
-
-    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}*", mode: "copy"
-
-    input:
-    tuple file(fastq), file(schemeRepo), file(fast5Pass), file(seqSummary)
-
-    output:
-    file("${sampleName}*")
-    
-    tuple sampleName, file("${sampleName}.primertrimmed.rg.sorted.bam"), emit: ptrim
-    tuple sampleName, file("${sampleName}.sorted.bam"), emit: mapped
-    tuple sampleName, file("${sampleName}.consensus.fasta"), emit: consensus_fasta
-    tuple sampleName, file("${sampleName}.pass.vcf.gz"), emit: vcf
-
-    script:
-    // Make an identifier from the fastq filename
-    sampleName = fastq.getBaseName().replaceAll(~/\.fastq.*$/, '')
-
-    // Configure artic minion pipeline
-    minionRunConfigBuilder = []
-
-    if ( params.normalise ) {
-    minionRunConfigBuilder.add("--normalise ${params.normalise}")
-    }
-    
-    if ( params.bwa ) {
-    minionRunConfigBuilder.add("--bwa")
-    } else {
-    minionRunConfigBuilder.add("--minimap2")
-    }
-
-    minionFinalConfig = minionRunConfigBuilder.join(" ")
-
-    """
-    artic minion ${minionFinalConfig} \
-    --threads ${task.cpus} \
-    --scheme-directory ${schemeRepo} \
-    --read-file ${fastq} \
-    --fast5-directory ${fast5Pass} \
-    --sequencing-summary ${seqSummary} \
-    ${params.scheme}/${params.schemeVersion} \
-    ${sampleName}
     """
 }
 

@@ -16,7 +16,6 @@ def printHelp() {
 
   Mandatory workflow arguments (mutually exclusive):
     --illumina                Run the Illumina workflow
-    --nanopolish              Run the Nanopore/Nanopolish workflow (https://github.com/jts/nanopolish)
     --medaka                  Run the Nanopore/Medaka workflow (https://github.com/nanoporetech/medaka)
 
   Nanopore workflow options:
@@ -26,16 +25,13 @@ def printHelp() {
       --basecalled_fastq      The output directory from guppy_barcoder or guppy_basecaller - usually fastq_pass. 
                               This can optionally contain barcodeXXX directories, which are 
                               auto-detected and analysed in parallel.
-      --fast5_pass            Directory containing fast5 files - usually fast5_pass. NOT REQUIRED FOR MEDAKA WORKFLOW.
-      --sequencing_summary    Path to sequencing_summary.txt. NOT REQUIRED FOR MEDAKA WORKFLOW.
 
     Optional:
       --outdir                Output directory (Default: ./results)
  
-      --schemeVersion         ARTIC scheme version (Default: 'V3')
-      --schemeRepoURL         Repo to download your primer scheme from (Default: 'https://github.com/artic-network/artic-ncov2019')
-      --schemeDir             Directory within schemeRepoURL that contains primer schemes (Default: 'primer_schemes')
-      --scheme                Scheme name (Default: 'nCoV-2019')
+      --schemeVersion         ARTIC scheme version
+      --schemeDir             Directory that contains primer schemes
+      --scheme                Scheme name (e.g. ARTIC)
  
       --min_length            Minimum read length for artic guppyplex (Default: 400)
       --max_length            Maximum read length for artic guppyplex (Default: 700)
@@ -58,15 +54,10 @@ def printHelp() {
     Optional:
       --outdir                Output directory (Default: ./results)
 
-      --schemeVersion         ARTIC scheme version (Default: 'V3')
-      --schemeRepoURL         Repo to download your primer scheme from (Default: 'https://github.com/artic-network/artic-ncov2019')
-      --schemeDir             Directory within schemeRepoURL that contains primer schemes (Default: 'primer_schemes')
-      --scheme                Scheme name (Default: 'nCoV-2019')
+      --schemeVersion         ARTIC scheme version
+      --schemeDir             Directory that contains primer schemes
+      --scheme                Scheme name
  
-      --bed                   Path to iVar-compatible bed file, also requires --ref
-                              Overrides --scheme* options. (Default: unset, download scheme from git)
-      --ref                   Path to iVar-compatible reference fasta file, also requires --bed 
-                              Overrides --scheme* options. (Default: unset, download scheme from git)
       --gff                   Path to annotation gff for variant consequence calling and typing. (Default: unset, typing not run unless set)
       --yaml                  Path to YAML file with typing schemes. 
                               Format: { <typing_scheme_name> : { coverage: <float>, variants: <gene_name>: <[ D614G, IHV68I ]> }}

@@ -8,3 +8,4 @@ dependencies:
   - pandas
   - samtools
   - libxcb
+  - nextflow=21.10.6
