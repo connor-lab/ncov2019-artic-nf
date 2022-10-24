@@ -5,6 +5,7 @@ on:
    - cron: '0 0 * * *'
  push:
     branches:
+      - master
       - update_nextclade_version
 jobs:
   get-version:
