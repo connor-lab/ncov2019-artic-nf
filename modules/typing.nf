@@ -123,11 +123,12 @@ process nextclade {
     """
     echo \$(nextclade --version 2>&1) > nextclade_version.txt 
     nextclade dataset get --name 'sars-cov-2' --output-dir 'data/sars-cov-2'
-    nextclade --input-fasta ${consensus_fasta} \
+    nextclade run \
         --input-dataset data/sars-cov-2 \
         --output-tree ${sampleName}_tree.json \
         --output-tsv ${sampleName}.tsv \
-        --output-json ${sampleName}.json
+        --output-json ${sampleName}.json \
+        ${consensus_fasta}
 
     """ 
     
