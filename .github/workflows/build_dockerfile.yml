@@ -6,7 +6,6 @@ on:
  push:
     branches:
       - master
-      - update_nextclade_version
 jobs:
   get-version:
     runs-on: ubuntu-latest

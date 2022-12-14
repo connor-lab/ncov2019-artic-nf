@@ -26,7 +26,7 @@ dependencies:
   - picard=2.25.2
   - fastqc=0.11.9
   - multiqc=1.11
-  - nextclade>=2.6.0
+  - nextclade=1.10.2
   - sambamba=0.8.0
   - ensembl-vep>=102.0
   - conda-forge::r-base
