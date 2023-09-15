@@ -1,0 +1,79 @@
+name: Build and publish pangolin docker image on push for tests
+
+on: [push]
+
+jobs:
+  get-version:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v2
+     - name: Get current date
+       id: date
+       run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+     - name: Test with environment variables
+       run: echo $RELEASE_DATE
+       env:
+         RELEASE_DATE: ${{ steps.date.outputs.date }}
+     - name: Fetch pangolin version
+       shell: bash
+       run: |
+         ##Get pangolin-data version
+         curl -sL https://api.github.com/repos/cov-lineages/pangolin-data/releases/latest | \
+         jq -r ".tag_name" > versions/pangolin-data-latest-version.txt
+         pangolin_data_VER=$(cat versions/pangolin-data-latest-version.txt)
+         echo $pangolin_data_VER
+
+         ##Get constellations version
+         curl -sL https://api.github.com/repos/cov-lineages/constellations/releases/latest | \
+         jq -r ".tag_name" > versions/constellations-latest-version.txt
+         constellations_VER=$(cat versions/constellations-latest-version.txt)
+         echo $constellations_VER
+
+         ##Get pangolin version
+         curl -sL https://api.github.com/repos/cov-lineages/pangolin/releases/latest | \
+         jq -r ".tag_name" > versions/pangolin-latest-version.txt
+         PANGOLIN_VER=$(cat versions/pangolin-latest-version.txt)
+         echo $PANGOLIN_VER
+
+         ##Get scorpio version
+         curl -sL https://api.github.com/repos/cov-lineages/scorpio/releases/latest | \
+         jq -r ".tag_name" > versions/scorpio-latest-version.txt
+         scorpio_VER=$(cat versions/scorpio-latest-version.txt)
+         echo $scorpio_VER
+
+
+     - name: Check for modified files
+       id: git-check
+       run: echo ::set-output name=modified::$([ -z "`git status --porcelain`" ] && echo "false" || echo "true")
+
+     - name: Login to Docker Hub
+       uses: docker/login-action@v1
+       with:
+         username: ${{ secrets.DOCKER_HUB_USERNAME }}
+         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+     - name: Set up Docker Buildx
+       id: buildx
+       uses: docker/setup-buildx-action@v1
+
+     - name: Build new docker image
+       shell: bash
+       run: |
+         echo  ${{ steps.date.outputs.date }}
+         REPO_VER=$(cat versions/pangolin-latest-version.txt | sed 's|v||')
+         pangolin_data_VER=$(cat versions/pangolin-data-latest-version.txt | sed 's|v||')
+         scorpio_VER=$(cat versions/scorpio-latest-version.txt | sed 's|v||')
+         constellations_VER=$(cat versions/constellations-latest-version.txt | sed 's|v||')
+         #Build docker for pangolin-check for specific requirements
+         docker build --no-cache -f environments/pangolin/Dockerfile -t genomicmedicinesweden/gms-artic-pangolin-stage:latest -t genomicmedicinesweden/gms-artic-pangolin-stage:${{ steps.date.outputs.date }}-p-${REPO_VER}-d-${pangolin_data_VER}-c-${constellations_VER}-s-${scorpio_VER} --build-arg PANGOLIN_VER=v${REPO_VER} .
+
+     - name: Push Docker image to DockerHub
+       shell: bash
+       run: |
+         REPO_VER=$(cat versions/pangolin-latest-version.txt | sed 's|v||')
+         pangolin_data_VER=$(cat versions/pangolin-data-latest-version.txt | sed 's|v||')
+         scorpio_VER=$(cat versions/scorpio-latest-version.txt | sed 's|v||')
+         constellations_VER=$(cat versions/constellations-latest-version.txt | sed 's|v||')
+         #Push to dockerhub for pangolin with specific requirements
+         docker image push genomicmedicinesweden/gms-artic-pangolin-stage:latest
+         docker image push genomicmedicinesweden/gms-artic-pangolin-stage:${{ steps.date.outputs.date }}-p-${REPO_VER}-d-${pangolin_data_VER}-c-${constellations_VER}-s-${scorpio_VER}
