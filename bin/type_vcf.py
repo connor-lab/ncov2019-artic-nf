@@ -210,7 +210,6 @@ def csq_annotate_vcf_string(vcfString, RefIn, GffIn):
 
 
 def extract_csq_info_from_vcf_string(csqVcf, minAF, minDP):
-
     v = io.StringIO(csqVcf)
 
     vcf_reader = vcf.Reader(v)
@@ -235,7 +234,6 @@ def extract_csq_info_from_vcf_string(csqVcf, minAF, minDP):
         vcf_type = None
 
     for record in vcf_reader:
-
         if vcf_type == "nanopolish":
             if record.FILTER:
                 continue
@@ -260,7 +258,6 @@ def extract_csq_info_from_vcf_string(csqVcf, minAF, minDP):
                 continue
 
         if vcf_type == "medaka":
-
             if record.FILTER:
                 continue
 
@@ -289,11 +286,9 @@ def extract_csq_info_from_vcf_string(csqVcf, minAF, minDP):
 
 
 def get_variant_summary(info):
-
     sample_vars = []
 
     for variant in info:
-
         aa_r = re.compile(
             "(?P<refpos>[0-9]+)(?P<refaa>[A-Z\*]+)*>*(?P<varpos>[0-9]+)*(?P<varaa>[A-Z\*]+)"
         )
@@ -308,9 +303,7 @@ def get_variant_summary(info):
             "synonymous" not in variant["consequence"]
             and "stop_retained" not in variant["consequence"]
         ):
-
             if "frameshift" in variant["consequence"]:
-
                 complete_aa_variant_string = (
                     "Frameshift." + aa_var["refpos"] + aa_var["varaa"]
                 )
@@ -345,7 +338,6 @@ def read_types_yaml(inFile):
 
 
 def type_vars_in_sample(types, sample_vars):
-
     types_assigned = []
 
     for typename, data in types.items():
@@ -357,14 +349,10 @@ def type_vars_in_sample(types, sample_vars):
 
         # {gene, [var, var]}
         for gene in data["variants"]:
-
             # { gene: gene, aa_var: var, dna_var: var }
             for sample_variant in sample_vars:
-
                 if gene in sample_variant["gene"]:
-
                     if sample_variant["aa_var"] in data["variants"][gene]:
-
                         data["variants"][gene].remove(sample_variant["aa_var"])
                         additional_vars_from_type.remove(sample_variant)
 
@@ -405,13 +393,11 @@ def type_vars_in_sample(types, sample_vars):
 
 
 def write_types_to_csv(types_assigned, sampleID, csvFileOut):
-
     fieldnames = list(types_assigned[0].keys())
 
     fieldnames.insert(0, "sampleID")
 
     with open(csvFileOut, "w", newline="") as csvfile:
-
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
@@ -421,7 +407,6 @@ def write_types_to_csv(types_assigned, sampleID, csvFileOut):
 
 
 def read_vcf_to_vcf_string(FileIn):
-
     if FileIn.endswith(".gz"):
         with gzip.open(FileIn, "rt") as f:
             vcfString = f.read()
@@ -444,7 +429,6 @@ def write_sample_vars_to_csv(summaryCsvOut, sampleID, sampleVars):
     fieldnames.insert(0, "sampleID")
 
     with open(summaryCsvOut, "w", newline="") as csvfile:
-
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()

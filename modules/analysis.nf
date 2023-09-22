@@ -15,8 +15,8 @@ process makeReport {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", mode: 'copy', pattern: "${sampleName}_report.tsv"
 
     input:
-    tuple(sampleName, path('pangolinTyping.csv'), path('nextclade_tree.json'), path('nextclade.tsv'),
-		path('nextclade.json'))
+    tuple val(sampleName), path('pangolinTyping.csv'), path('nextclade_tree.json'), path('nextclade.tsv'),
+		path('nextclade.json')
 
     output:
     path "${sampleName}_report.tsv", emit: tsv

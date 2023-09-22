@@ -7,6 +7,7 @@ import sys
 import os
 from collections import defaultdict
 
+
 # from https://www.geeksforgeeks.org/python-make-a-list-of-intervals-with-sequential-numbers/
 # via artic-mask
 def intervals_extract(iterable):
@@ -119,7 +120,6 @@ def handle_sub(vcf_header, record):
 
     # construct output records
     for i in range(0, sub_length):
-
         # choose base with highest frequency, skipping the reference
         max_b = base_max(base_frequency[i], record.ref[i])
         if max_b is None:
@@ -137,7 +137,6 @@ def handle_sub(vcf_header, record):
 
 
 def main():
-
     description = "Process a .gvcf file to create a file of consensus variants, low-frequency variants and a coverage mask"
     parser = argparse.ArgumentParser(description=description)
 
@@ -221,7 +220,6 @@ def main():
     )
 
     for record in vcf:
-
         is_gvcf_ref = record.alts[0] == "<*>"
 
         # set depth for this part of the genome
@@ -261,7 +259,6 @@ def main():
         # classify variants using VAF cutoffs for IUPAC ambiguity codes, etc
         accept_variant = False
         for out_r in out_records:
-
             # at this point we should have resolved multi-allelic variants
             assert len(out_r.alts) == 1
 

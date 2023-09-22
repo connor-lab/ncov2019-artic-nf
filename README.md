@@ -1,4 +1,5 @@
-[![Update docker for artic-ncov2019-illumina, artic-ncov2019-nanopore](https://github.com/genomic-medicine-sweden/gms-artic/actions/workflows/build_dockerfile.yml/badge.svg)](https://github.com/genomic-medicine-sweden/gms-artic/actions/workflows/build_dockerfile.yml)
+[![Update docker for gms-artic-illumina, gms-artic-nanopore](https://github.com/genomic-medicine-sweden/gms-artic/actions/workflows/build_dockerfile_master.yml/badge.svg)](https://github.com/genomic-medicine-sweden/gms-artic/actions/workflows/build_dockerfile_master.yml) [![Update docker for gms-artic-pangolin
+](https://github.com/genomic-medicine-sweden/gms-artic/actions/workflows/build_dockerfile_pangolin_master.yml/badge.svg)](https://github.com/genomic-medicine-sweden/gms-artic/actions/workflows/build_dockerfile_pangolin_master.yml)
 
 ![logo](workflow-image/logo.png)
 

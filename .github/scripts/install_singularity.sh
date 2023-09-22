@@ -20,11 +20,11 @@ echo $(which go)
 go version
 
 # install Singularity
-export VERSION=3.7.3
+export VERSION=3.11.4
 echo Install Singularity version $VERSION .. >> artifacts/test_artifact.log
-wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz
-tar -xzf singularity-${VERSION}.tar.gz
-cd singularity
+wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-ce-${VERSION}.tar.gz
+tar -xzf singularity-ce-${VERSION}.tar.gz
+cd singularity-ce-${VERSION}
 ./mconfig
 make -C builddir
 sudo make -C builddir install

@@ -4,7 +4,7 @@ process makeQCCSV {
     publishDir "${params.outdir}/qc_plots", pattern: "${sampleName}.depth.png", mode: 'copy'
 
     input:
-    tuple sampleName, path(bam), path(fasta), path(ref)
+    tuple val(sampleName), path(bam), path(fasta), path(ref)
 
     output:
     path "${params.prefix}.${sampleName}.qc.csv", emit: csv
@@ -42,7 +42,7 @@ process fastqc {
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", mode: 'copy', overwrite: true
 
     input:
-    tuple sampleName, path(forward), path(reverse)
+    tuple val(sampleName), path(forward), path(reverse)
 
     output:
     file "*fastqc*"
@@ -60,7 +60,7 @@ process statsCoverage {
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
 
     input:
-    tuple sampleName, path(bam), path(ref)
+    tuple val(sampleName), path(bam), path(ref)
 
     output:
     path "*.txt"
@@ -82,7 +82,7 @@ process statsInsert {
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.pdf", mode: 'copy'
 
     input:
-    tuple sampleName, path(bam), path(ref)
+    tuple val(sampleName), path(bam), path(ref)
 
     output:
     path "${sampleName}_insert_size.metrics.txt", emit: stats
@@ -108,7 +108,7 @@ process statsAlignment {
     publishDir "${params.outdir}/QCStats/${task.process.replaceAll(":","_")}", pattern: "*.txt", mode: 'copy'
 
     input:
-    tuple sampleName, path(bam), path(ref)
+    tuple val(sampleName), path(bam), path(ref)
 
     output:
     path "${sampleName}_alignment.metrics.txt"

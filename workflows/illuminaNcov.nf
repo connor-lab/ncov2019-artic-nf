@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 // enable dsl2
-nextflow.preview.dsl = 2
+nextflow.enable.dsl=2
 
 // import modules
 include {articDownloadScheme } from '../modules/artic.nf' 
@@ -114,7 +114,7 @@ workflow sequenceAnalysis {
 
       readMapping(readTrimming.out.trim.combine(ch_preparedRef))
 
-      flagStat(readMapping.out.combine(ch_bedFile))
+      flagStat(readMapping.out)
 
       trimPrimerSequences(readMapping.out.combine(ch_bedFile))
 

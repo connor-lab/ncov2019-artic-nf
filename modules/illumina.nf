@@ -13,11 +13,11 @@ process readTrimming {
     cpus 2
 
     input:
-    tuple(sampleName, path(forward), path(reverse))
+    tuple val(sampleName), path(forward), path(reverse)
 
     output:
     path "*_trimming_report.txt", optional: true, emit: log
-    tuple sampleName, path("*_val_1.fq.gz"), path("*_val_2.fq.gz"), optional: true, emit: trim
+    tuple val(sampleName), path("*_val_1.fq.gz"), path("*_val_2.fq.gz"), optional: true, emit: trim
 
     script:
     """
@@ -64,10 +64,10 @@ process readMapping {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.sorted.bam", mode: 'copy'
 
     input:
-        tuple sampleName, path(forward), path(reverse), path(ref), path("*")
+        tuple val(sampleName), path(forward), path(reverse), path(ref), path("*")
 
     output:
-        tuple sampleName, path("${sampleName}.sorted.bam")
+        tuple val(sampleName), path("${sampleName}.sorted.bam")
 
     script:
       """
@@ -83,10 +83,10 @@ process flagStat {
 
     input:
     //tuple sampleName, path(forward), path(reverse), path(ref), path("*")
-    tuple sampleName, path(bam)
+    tuple val(sampleName), path(bam)
 
     output:
-    tuple sampleName, path("${sampleName}.flagstat")
+    tuple val(sampleName), path("${sampleName}.flagstat")
 
     script:
     """
@@ -103,13 +103,13 @@ process trimPrimerSequences {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam.bai", mode: 'copy'
 
     input:
-    tuple sampleName, path(bam), path(bedfile)
+    tuple val(sampleName), path(bam), path(bedfile)
 
 
     output:
-    tuple sampleName, path("${sampleName}.mapped.bam"), emit: mapped
-    tuple sampleName, path("${sampleName}.mapped.primertrimmed.sorted.bam" ), emit: ptrim
-    tuple sampleName, path("${sampleName}.mapped.primertrimmed.sorted.bam.bai"), emit: bai
+    tuple val(sampleName), path("${sampleName}.mapped.bam"), emit: mapped
+    tuple val(sampleName), path("${sampleName}.mapped.primertrimmed.sorted.bam" ), emit: ptrim
+    tuple val(sampleName), path("${sampleName}.mapped.primertrimmed.sorted.bam.bai"), emit: bai
 
     script:
     if (params.allowNoprimer){
@@ -154,10 +154,10 @@ process depth {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.depth", mode: 'copy'
 
     input:
-    tuple(sampleName, path(bam), path(bai))
+    tuple val(sampleName), path(bam), path(bai)
 
     output:
-    tuple sampleName, path("${sampleName}.depth"), emit: depth
+    tuple val(sampleName), path("${sampleName}.depth"), emit: depth
 
     script:
         """
@@ -173,10 +173,10 @@ process callVariants {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.variants.tsv", mode: 'copy'
 
     input:
-    tuple(sampleName, path(bam), path(ref))
+    tuple val(sampleName), path(bam), path(ref)
 
     output:
-    tuple sampleName, path("${sampleName}.variants.tsv"), emit: variants
+    tuple val(sampleName), path("${sampleName}.variants.tsv"), emit: variants
 
     script:
         """
@@ -193,10 +193,10 @@ process makeConsensus {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.primertrimmed.consensus.fa", mode: 'copy'
 
     input:
-        tuple(sampleName, path(bam))
+        tuple val(sampleName), path(bam)
 
     output:
-        tuple sampleName, path("${sampleName}.primertrimmed.consensus.fa"), emit: consensus_fasta
+        tuple val(sampleName), path("${sampleName}.primertrimmed.consensus.fa"), emit: consensus_fasta
 
     script:
         """
@@ -214,11 +214,11 @@ process callConsensusFreebayes {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.variants.norm.vcf", mode: 'copy'
 
     input:
-    tuple(sampleName, path(bam), path(ref))
+    tuple val(sampleName), path(bam), path(ref)
 
     output:
-    tuple sampleName, path("${sampleName}.consensus.fasta")
-    tuple sampleName, path("${sampleName}.variants.norm.vcf"), emit:vcf
+    tuple val(sampleName), path("${sampleName}.consensus.fasta")
+    tuple val(sampleName), path("${sampleName}.variants.norm.vcf"), emit:vcf
 
     script:
         """
@@ -267,10 +267,10 @@ process annotationVEP {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.freebayes.vep.vcf", mode: 'copy'
     
     input:
-        tuple sampleName, path(vcf),path(ref)
+        tuple val(sampleName), path(vcf),path(ref)
 
     output:
-        tuple sampleName, path("${sampleName}.freebayes.vep.vcf")
+        tuple val(sampleName), path("${sampleName}.freebayes.vep.vcf")
 
     script:
         """   
@@ -292,10 +292,10 @@ process cramToFastq {
     */
 
     input:
-        tuple sampleName, file(cram)
+        tuple val(sampleName), file(cram)
 
     output:
-        tuple sampleName, path("${sampleName}_1.fastq.gz"), path("${sampleName}_2.fastq.gz")
+        tuple val(sampleName), path("${sampleName}_1.fastq.gz"), path("${sampleName}_2.fastq.gz")
 
     script:
         """

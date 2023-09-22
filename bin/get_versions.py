@@ -41,5 +41,5 @@ with open(output, "w") as out:
                 contents = f.read()
                 match = re.search(regex, contents)
                 if match:
-                    # Add version number to output
+                    # Add version number to output file
                     out.write("{},{}\n".format(tool, match.group(1)))

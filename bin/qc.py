@@ -80,7 +80,6 @@ def get_N_positions(fasta):
 
 
 def get_pct_N_bases(fasta):
-
     count_N = len(get_N_positions(fasta))
 
     pct_N_bases = count_N / len(fasta.seq) * 100
@@ -104,7 +103,6 @@ def get_ref_length(ref):
 
 
 def sliding_window_N_density(sequence, window=10):
-
     sliding_window_n_density = []
     for i in range(0, len(sequence.seq), 1):
         window_mid = i + (window / 2)
@@ -118,7 +116,6 @@ def sliding_window_N_density(sequence, window=10):
 
 
 def get_num_reads(bamfile):
-
     st_filter = "0x900"
     command = "samtools view -c -F{} {}".format(st_filter, bamfile)
     what = shlex.split(command)
@@ -151,7 +148,6 @@ def go(args):
     qc_pass = "FALSE"
 
     if len(fasta.seq) != 0:
-
         pct_N_bases = get_pct_N_bases(fasta)
         largest_N_gap = get_largest_N_gap(fasta)
 
