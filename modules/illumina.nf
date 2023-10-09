@@ -121,6 +121,22 @@ process trimPrimerSequences {
         """
 }
 
+process getDepths {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.depths.tsv", mode: 'copy'
+
+    input:
+    tuple(val(sampleName), path(bam), path(ref))
+
+    output:
+    tuple(val(sampleName), path("${sampleName}.depths.tsv"), emit: depths)
+
+    script:
+        """
+        samtools mpileup -aa -A -d 0 -Q 0 -q ${params.ivarMinVariantQuality} -B -f ${ref} ${bam} | cut -f1-4 > "${sampleName}.depths.tsv"
+        """
+}
 process callVariants {
 
     tag { sampleName }
@@ -150,13 +166,48 @@ process makeConsensus {
         tuple(val(sampleName), path(bam))
 
     output:
-        tuple(val(sampleName), path("${sampleName}.primertrimmed.consensus.fa"))
+        tuple(val(sampleName), path("${sampleName}.primertrimmed.consensus.fa"), emit: consensus)
 
     script:
         """
         samtools mpileup -aa -A -B -d ${params.mpileupDepth} -Q0 ${bam} | \
         ivar consensus -t ${params.ivarFreqThreshold} -m ${params.ivarMinDepth} \
         -n N -p ${sampleName}.primertrimmed.consensus
+        """
+}
+
+process callLineage {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.pangolin.csv", mode: 'copy'
+
+    input:
+        tuple(val(sampleName), path(consensus))
+
+    output:
+        tuple(val(sampleName), path("${sampleName}.pangolin.csv"))
+
+    script:
+        """
+        pangolin ${consensus} --outfile ${sampleName}.pangolin.csv --verbose
+        """
+}
+
+process freyjaDemix {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.freyja.demix.tsv", mode: 'copy'
+
+    input:
+        tuple(val(sampleName), path(variants), path(depths))
+
+    output:
+        tuple(val(sampleName), path("${sampleName}.freyja.demix.tsv"))
+
+    script:
+        """
+        freyja demix ${variants} ${depths} --output ${sampleName}.freyja.demix.tsv
         """
 }
 
