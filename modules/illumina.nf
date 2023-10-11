@@ -12,10 +12,10 @@ process readTrimming {
     cpus 2
 
     input:
-    tuple(sampleName, path(forward), path(reverse))
+    tuple(val(sampleName), path(forward), path(reverse))
 
     output:
-    tuple(sampleName, path("*_val_1.fq.gz"), path("*_val_2.fq.gz")) optional true
+    tuple(val(sampleName), path("*_val_1.fq.gz"), path("*_val_2.fq.gz")) optional true
 
     script:
     """
@@ -38,7 +38,7 @@ process indexReference {
         path(ref)
 
     output:
-        tuple path('ref.fa'), path('ref.fa.*')
+        tuple(path('ref.fa'), path('ref.fa.*'))
 
     script:
         """
@@ -62,10 +62,10 @@ process readMapping {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.sorted.bam", mode: 'copy'
 
     input:
-        tuple sampleName, path(forward), path(reverse), path(ref), path("*")
+        tuple(val(sampleName), path(forward), path(reverse), path(ref), path("*"))
 
     output:
-        tuple(sampleName, path("${sampleName}.sorted.bam"))
+        tuple(val(sampleName), path("${sampleName}.sorted.bam"))
 
     script:
       """
@@ -82,11 +82,11 @@ process trimPrimerSequences {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.mapped.primertrimmed.sorted.bam", mode: 'copy'
 
     input:
-    tuple sampleName, path(bam), path(bedfile)
+    tuple(val(sampleName), path(bam), path(bedfile))
 
     output:
-    tuple sampleName, path("${sampleName}.mapped.bam"), emit: mapped
-    tuple sampleName, path("${sampleName}.mapped.primertrimmed.sorted.bam" ), emit: ptrim
+    tuple(val(sampleName), path("${sampleName}.mapped.bam"), emit: mapped)
+    tuple(val(sampleName), path("${sampleName}.mapped.primertrimmed.sorted.bam" ), emit: ptrim)
 
     script:
     if (params.allowNoprimer){
@@ -121,17 +121,36 @@ process trimPrimerSequences {
         """
 }
 
+process getDepths {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.depths.tsv", mode: 'copy'
+
+    input:
+    tuple(val(sampleName), path(bam), path(ref))
+
+    output:
+    tuple(val(sampleName), path("${sampleName}.depths.tsv"), emit: depths)
+
+    script:
+        """
+        samtools mpileup -aa -A -d 0 -Q 0 -q ${params.ivarMinVariantQuality} -B -f ${ref} ${bam} | cut -f1-4 > "${sampleName}.depths.tsv"
+        """
+}
 process callVariants {
 
     tag { sampleName }
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.variants.tsv", mode: 'copy'
 
+    errorStrategy { sleep(Math.pow(2, task.attempt) * 1 as long); return 'retry' }
+    maxRetries 9999999999
+
     input:
-    tuple(sampleName, path(bam), path(ref))
+    tuple(val(sampleName), path(bam), path(ref))
 
     output:
-    tuple sampleName, path("${sampleName}.variants.tsv"), emit: variants
+    tuple(val(sampleName), path("${sampleName}.variants.tsv"), emit: variants)
 
     script:
         """
@@ -147,16 +166,56 @@ process makeConsensus {
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.primertrimmed.consensus.fa", mode: 'copy'
 
     input:
-        tuple(sampleName, path(bam))
+        tuple(val(sampleName), path(bam))
 
     output:
-        tuple(sampleName, path("${sampleName}.primertrimmed.consensus.fa"))
+        tuple(val(sampleName), path("${sampleName}.primertrimmed.consensus.fa"), emit: consensus)
 
     script:
         """
         samtools mpileup -aa -A -B -d ${params.mpileupDepth} -Q0 ${bam} | \
         ivar consensus -t ${params.ivarFreqThreshold} -m ${params.ivarMinDepth} \
         -n N -p ${sampleName}.primertrimmed.consensus
+        """
+}
+
+process callLineage {
+
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.pangolin.csv", mode: 'copy'
+
+    errorStrategy { sleep(Math.pow(2, task.attempt) * 1 as long); return 'retry' }
+    maxRetries -1
+
+    input:
+        tuple(val(sampleName), path(consensus))
+
+    output:
+        tuple(val(sampleName), path("${sampleName}.pangolin.csv"))
+
+    script:
+        """
+        pangolin ${consensus} -t 1 --outfile ${sampleName}.pangolin.csv --verbose
+        """
+}
+
+process freyjaDemix {
+    tag { sampleName }
+
+    publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.freyja.demix.tsv", mode: 'copy'
+
+    errorStrategy 'ignore'
+
+    input:
+        tuple(val(sampleName), path(variants), path(depths))
+
+    output:
+        tuple(val(sampleName), path("${sampleName}.freyja.demix.tsv"))
+
+    script:
+        """
+        freyja demix ${variants} ${depths} --output ${sampleName}.freyja.demix.tsv
         """
 }
 
@@ -169,10 +228,10 @@ process cramToFastq {
     */
 
     input:
-        tuple sampleName, file(cram)
+        tuple(val(sampleName), file(cram))
 
     output:
-        tuple sampleName, path("${sampleName}_1.fastq.gz"), path("${sampleName}_2.fastq.gz")
+        tuple(val(sampleName), path("${sampleName}_1.fastq.gz"), path("${sampleName}_2.fastq.gz"))
 
     script:
         """
