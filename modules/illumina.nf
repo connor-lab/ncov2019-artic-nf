@@ -143,6 +143,9 @@ process callVariants {
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.variants.tsv", mode: 'copy'
 
+    errorStrategy { sleep(Math.pow(2, task.attempt) * 1 as long); return 'retry' }
+    maxRetries 9999999999
+
     input:
     tuple(val(sampleName), path(bam), path(ref))
 
@@ -182,6 +185,9 @@ process callLineage {
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.pangolin.csv", mode: 'copy'
 
+    errorStrategy { sleep(Math.pow(2, task.attempt) * 1 as long); return 'retry' }
+    maxRetries -1
+
     input:
         tuple(val(sampleName), path(consensus))
 
@@ -190,7 +196,7 @@ process callLineage {
 
     script:
         """
-        pangolin ${consensus} --outfile ${sampleName}.pangolin.csv --verbose
+        pangolin ${consensus} -t 1 --outfile ${sampleName}.pangolin.csv --verbose
         """
 }
 
@@ -198,6 +204,8 @@ process freyjaDemix {
     tag { sampleName }
 
     publishDir "${params.outdir}/${task.process.replaceAll(":","_")}", pattern: "${sampleName}.freyja.demix.tsv", mode: 'copy'
+
+    errorStrategy 'ignore'
 
     input:
         tuple(val(sampleName), path(variants), path(depths))
