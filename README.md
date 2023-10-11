@@ -5,7 +5,7 @@
 
 A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinformatics tools (https://github.com/artic-network/fieldbioinformatics).
 
-### Table of contents - 
+### Table of contents -
 - [Version updates](#Version-updates)
 - [Pipeline Diagram](#Pipeline-Diagram)
 - [Requirements](#Requirements)
@@ -22,20 +22,20 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
     - [Pipeline run command](#Manual-running-of-analysis-pipeline)
       - [Illumina pipeline](#Run-Illumina-pipeline)
       - [Nanopore pipeline](#Run-Nanopore-Pipeline)
-- [Useful information](#Useful-information) 
+- [Useful information](#Useful-information)
 ------------
 # Version updates
 ## v2.0.0
 ### Major updates
-- Docker container separated for Pangolin typing 
+- Docker container separated for Pangolin typing
     - Illumina container: [gms-artic-illumina](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-illumina)
     - Nanopore container: [gms-artic-nanopore](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-nanopore)
     - Pangolin container: [gms-artic-pangolin](https://hub.docker.com/repository/docker/genomicmedicinesweden/gms-artic-pangolin)
     - pycoQC container  : [pycoqc](https://hub.docker.com/repository/docker/jd21/pycoqc)
-- Added separate package version files for each workflow 
+- Added separate package version files for each workflow
     - versions: for Illumina and Nanopore
     - pangoversion: for pangolin typing
-- Illumina analysis additional features 
+- Illumina analysis additional features
     - flagstat
     - depth
     - VEP annotation
@@ -68,7 +68,7 @@ A nextflow pipeline with a GMS touch for running the ARTIC network's fieldbioinf
 Find DAG and other figures [here](workflow-image/)
 
 # Requirements
-- Nextflow version >=20.10, <22.0 (tested OK on NextFlow version 20.10.0, version 21.10.6)
+- Nextflow version >=20.10
 - Singularity version 3.7.1 (tested OK)
 - Conda version >= 4.13.0 (tested OK)
 
@@ -146,7 +146,7 @@ nextflow run main.nf -profile singularity,sge \
 ```
 2. *for Illumina analysis*
 ```
-    sample_name     
+    sample_name
          |___ fastq/
 ```
 #### Run Illumina pipeline
