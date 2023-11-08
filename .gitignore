@@ -2,6 +2,9 @@
 nextflow
 results
 *.sif
-work
+work/
 .idea/
 .DS_Store
+nanopore_medaka/
+nanopore_nanopolish/
+illumina_test/

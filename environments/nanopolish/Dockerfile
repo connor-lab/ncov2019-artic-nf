@@ -3,7 +3,7 @@ LABEL authors="Matt Bull" \
       description="Docker image containing all requirements for the ARTIC project's ncov2019 pipeline"
 
 COPY environments/extras.yml /extras.yml
-COPY environments/nanopore/environment.yml /environment.yml
+COPY environments/nanopolish/environment.yml /environment.yml
 RUN /opt/conda/bin/conda install mamba -c conda-forge && \
 /opt/conda/bin/conda update mamba -c conda-forge && \
 /opt/conda/bin/mamba env create -f /environment.yml

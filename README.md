@@ -102,6 +102,9 @@ nextflow run main.nf -profile singularity \
     --outdir illumina_test
 ```
 ### Nanopore nanopolish pipeline
+
+PLEASE NOTE: check the 'nextflow.config' is updated with 'gms-artic-nanopolish:latest'
+
 ```
 nextflow run main.nf -profile singularity \
     --nanopolish --prefix "test_nanopore_nanopolish" \
@@ -111,10 +114,14 @@ nextflow run main.nf -profile singularity \
     --outdir nanopore_nanopolish
 ```
 #### Nanopore medaka pipeline
+
+PLEASE NOTE: check the 'nextflow.config' is updated with 'gms-artic-medaka:latest'. To use the 'medka' workflow, please provide the '--medaka-model'. [Read more here](https://github.com/nanoporetech/medaka/tree/master#models) how to get the model information.
+
 ```
 nextflow run main.nf -profile singularity \
     --medaka --prefix "test_nanopore_medaka" \
     --basecalled_fastq .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fastq_pass/ \
+    --medaka-model dna_r10.4.1_e8.2_400bps_hac@v4.1.0:variant \
     --outdir nanopore_medaka
 ```
 
@@ -142,6 +149,7 @@ nextflow run main.nf -profile singularity,sge \
 nextflow run main.nf -profile singularity,sge \
     --medaka --prefix "test_nanopore_medaka" \
     --basecalled_fastq .github/data/nanopore/20200311_1427_X1_FAK72834_a3787181/fastq_pass/ \
+    --medaka-model dna_r10.4.1_e8.2_400bps_hac@v4.1.0:variant \
     --outdir nanopore_medaka
 ```
 2. *for Illumina analysis*

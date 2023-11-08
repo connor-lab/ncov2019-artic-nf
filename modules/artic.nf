@@ -81,10 +81,12 @@ process articMinIONMedaka {
     """
     artic minion --medaka \
     ${minionFinalConfig} \
+    --medaka-model ${params.medakaModel} \
     --threads ${task.cpus} \
-    --scheme-directory ${schemeRepo} \
+    --scheme-directory ${params.schemeDir}/${params.scheme} \
     --read-file ${fastq} \
-    ${params.scheme}/${params.schemeVersion} \
+    --scheme-version ${params.schemeVersion} \
+    nCoV-2019-primer \
     ${sampleName}
     """
 }
